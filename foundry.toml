@@ -8,25 +8,42 @@ remappings = [
 ]
 fs_permissions = [{ access = "write", path = "./reports" }]
 
+solc='0.8.19'
+
 [rpc_endpoints]
-mainnet = "${RPC_MAINNET}"
-optimism = "${RPC_OPTIMISM}"
-avalanche = "${RPC_AVALANCHE}"
-polygon = "${RPC_POLYGON}"
-arbitrum = "${RPC_ARBITRUM}"
-fantom = "${RPC_FANTOM}"
-harmony = "${RPC_HARMONY}"
-metis = "${RPC_METIS}"
-base = "${RPC_BASE}"
+ethereum="${RPC_MAINNET}"
+ethereum-testnet="${RPC_MAINNET_TESTNET}"
+polygon="${RPC_POLYGON}"
+polygon-testnet="${RPC_POLYGON_TESTNET}"
+arbitrum="${RPC_ARBITRUM}"
+arbitrum-testnet="${RPC_ARBITRUM_TESTNET}"
+metis="${RPC_METIS}"
+metis-testnet="${RPC_METIS_TESTNET}"
+avalanche="${RPC_AVALANCHE}"
+avalanche-testnet="${RPC_AVALANCHE_TESTNET}"
+optimism="${RPC_OPTIMISM}"
+optimism-testnet="${RPC_OPTIMISM_TESTNET}"
+fantom="${RPC_FANTOM}"
+fantom-testnet="${RPC_FANTOM_TESTNET}"
+binance="${RPC_BINANCE}"
+binance-testnet="${RPC_BINANCE_TESTNET}"
 
 [etherscan]
-mainnet = { key="${ETHERSCAN_API_KEY_MAINNET}", chainId=1 }
-optimism = { key="${ETHERSCAN_API_KEY_OPTIMISM}", chainId=10 }
-avalanche = { key="${ETHERSCAN_API_KEY_AVALANCHE}", chainId=43114 }
-polygon = { key="${ETHERSCAN_API_KEY_POLYGON}", chainId=137 }
-arbitrum = { key="${ETHERSCAN_API_KEY_ARBITRUM}", chainId=42161 }
-fantom = { key="${ETHERSCAN_API_KEY_FANTOM}", chainId=250 }
-metis = { key="any", chainId=1088, url='https://andromeda-explorer.metis.io/' }
-base = { key="any", chainId=8453, url='https://basescan.org/' }
+ethereum={key="${ETHERSCAN_API_KEY_MAINNET}", chain=1 }
+ethereum-testnet={key="${ETHERSCAN_API_KEY_MAINNET}",chain=1}
+optimism={key="${ETHERSCAN_API_KEY_OPTIMISM}",chain=10}
+optimism-testnet={key="${ETHERSCAN_API_KEY_OPTIMISM}",chain=10}
+avalanche={key="${ETHERSCAN_API_KEY_AVALANCHE}",chain=43114}
+avalanche-testnet={key="${ETHERSCAN_API_KEY_AVALANCHE}",chain=43114}
+polygon={key="${ETHERSCAN_API_KEY_POLYGON}",chain=137}
+polygon-testnet={key="${ETHERSCAN_API_KEY_POLYGON}",chain=137}
+arbitrum={key="${ETHERSCAN_API_KEY_ARBITRUM}",chain=42161}
+arbitrum-testnet={key="${ETHERSCAN_API_KEY_ARBITRUM}",chain=42161}
+metis={ key="any", chain=1088, url='https://andromeda-explorer.metis.io/' }
+metis-testnet={ key="any", chain=599, url='https://goerli.explorer.metisdevops.link/' }
+fantom={key="${ETHERSCAN_API_KEY_FANTOM}",chain=250}
+fantom-testnet={key="${ETHERSCAN_API_KEY_FANTOM}",chain=250}
+binance={key="${ETHERSCAN_API_KEY_BINANCE}",chain=56}
+binance-testnet={key="${ETHERSCAN_API_KEY_BINANCE}",chain=56}
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config
