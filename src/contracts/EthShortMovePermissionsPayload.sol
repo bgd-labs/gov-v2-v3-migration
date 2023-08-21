@@ -10,7 +10,7 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
-import {IExecutor as IExecutorV3} from '../contracts/payloads/interfaces/IExecutor.sol';
+import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
 import {MigratorLib} from './MigratorLib.sol';

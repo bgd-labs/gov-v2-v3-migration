@@ -7,7 +7,7 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {PolygonMovePermissionsPayload} from '../../src/proposal/PolygonMovePermissionsPayload.sol';
+import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
 
 contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {

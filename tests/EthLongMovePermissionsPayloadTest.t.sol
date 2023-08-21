@@ -6,7 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {Executor} from '../../src/contracts/payloads/Executor.sol';
+import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
 
