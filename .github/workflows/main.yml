@@ -9,4 +9,6 @@ on:
 
 jobs:
   test:
-    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@feat/add-infra-secret
+    secrets:
+      FACTORY_SSH_PRIVATE_KEY: ${{ secrets.FACTORY_SSH_PRIVATE_KEY }}
