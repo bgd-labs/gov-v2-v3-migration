@@ -10,17 +10,13 @@ import {ArbMovePermissionsPayload} from '../src/contracts/ArbMovePermissionsPayl
 
 contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('arbitrum'), 107373660);
+    vm.createSelectFork(vm.rpcUrl('arbitrum'), 123817571);
   }
 
   function testPermissionsTransfer() public {
     ArbMovePermissionsPayload payload = new ArbMovePermissionsPayload();
 
-    GovHelpers.executePayload(
-      vm,
-      address(payload),
-      AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR
-    );
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
 
     vm.startPrank(payload.ARBITRUM_LEVEL_1_EXECUTOR_V3());
 

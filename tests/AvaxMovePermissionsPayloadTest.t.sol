@@ -13,24 +13,14 @@ import {IProofOfReserveExecutor} from './helpers/IProofOfReserveExecutor.sol';
 import {IProofOfReserveAggregator} from './helpers/IProofOfReserveAggregator.sol';
 
 contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
-  address constant AVALANCHE_GUARDIAN =
-    0xa35b76E4935449E33C56aB24b23fcd3246f13470;
-  address constant AVALANCHE_LEGACY_GUARDIAN =
-    0x01244E7842254e3FD229CD263472076B1439D1Cd;
+  address constant AVALANCHE_GUARDIAN = 0xa35b76E4935449E33C56aB24b23fcd3246f13470;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 32070190);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 34233520);
   }
 
   function testPayload() public {
     AvaxMovePermissionsPayload payload = new AvaxMovePermissionsPayload();
-
-    // move ownership of pool admin from the legacy guardian
-    vm.startPrank(AVALANCHE_LEGACY_GUARDIAN);
-    Ownable(address(AaveV2Avalanche.POOL_ADDRESSES_PROVIDER)).transferOwnership(
-      AVALANCHE_GUARDIAN
-    );
-    vm.stopPrank();
 
     GovHelpers.executePayload(vm, address(payload), AVALANCHE_GUARDIAN);
 
@@ -71,14 +61,10 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
     assets[0] = AaveV2AvalancheAssets.WBTCe_UNDERLYING;
 
     // Proof or reserve executor
-    IProofOfReserveExecutor(AaveV2Avalanche.PROOF_OF_RESERVE).disableAssets(
-      assets
-    );
+    IProofOfReserveExecutor(AaveV2Avalanche.PROOF_OF_RESERVE).disableAssets(assets);
 
     // Proof or reserve executor
-    IProofOfReserveExecutor(AaveV3Avalanche.PROOF_OF_RESERVE).disableAssets(
-      assets
-    );
+    IProofOfReserveExecutor(AaveV3Avalanche.PROOF_OF_RESERVE).disableAssets(assets);
 
     // Proof or reserve aggregator
     IProofOfReserveAggregator(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR)

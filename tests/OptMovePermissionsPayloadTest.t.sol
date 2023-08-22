@@ -10,17 +10,13 @@ import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayl
 
 contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 106342461);
+    vm.createSelectFork(vm.rpcUrl('optimism'), 108548784);
   }
 
   function testPermissionsTransfer() public {
     OptMovePermissionsPayload payload = new OptMovePermissionsPayload();
 
-    GovHelpers.executePayload(
-      vm,
-      address(payload),
-      AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR
-    );
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
 
     vm.startPrank(payload.OPTIMISM_LEVEL_1_EXECUTOR_V3());
 

@@ -17,11 +17,10 @@ import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.s
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
-  address public constant AAVE_V1_CONFIGURATOR =
-    0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
+  address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 17279232);
+    vm.createSelectFork(vm.rpcUrl('ethereum'), 17969348);
   }
 
   function testPayload() public {
@@ -32,18 +31,11 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       address(newExecutor)
     );
 
-    GovHelpers.executePayload(
-      vm,
-      address(payload),
-      AaveGovernanceV2.SHORT_EXECUTOR
-    );
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
 
     vm.startPrank(payload.LEVEL_1_EXECUTOR_V3());
 
-    _testV1(
-      payload.AAVE_V1_ADDRESS_PROVIDER(),
-      payload.AAVE_V1_PRICE_PROVIDER()
-    );
+    _testV1(payload.AAVE_V1_ADDRESS_PROVIDER(), payload.AAVE_V1_PRICE_PROVIDER());
 
     _testV2(
       payload.LEVEL_1_EXECUTOR_V3(),
@@ -86,23 +78,14 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     address aaveMerkleDistributor
   ) internal {
     // Lend to Aave migrator
-    assertEq(
-      TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(),
-      newExecutor
-    );
+    assertEq(TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(), newExecutor);
 
     // Merkle Distributor
     assertEq(Ownable(aaveMerkleDistributor).owner(), newExecutor);
   }
 
-  function _testExecutor(
-    address newExecutor,
-    address payloadController
-  ) internal {
-    assertEq(
-      IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin(),
-      newExecutor
-    );
+  function _testExecutor(address newExecutor, address payloadController) internal {
+    assertEq(IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin(), newExecutor);
 
     assertEq(Ownable(newExecutor).owner(), payloadController);
   }

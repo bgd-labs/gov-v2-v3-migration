@@ -11,17 +11,13 @@ import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermiss
 
 contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 44626730);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 46612086);
   }
 
   function testPayload() public {
     PolygonMovePermissionsPayload payload = new PolygonMovePermissionsPayload();
 
-    GovHelpers.executePayload(
-      vm,
-      address(payload),
-      AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR
-    );
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
 
     vm.startPrank(payload.POLYGON_LEVEL_1_EXECUTOR_V3());
 

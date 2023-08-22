@@ -14,17 +14,13 @@ import {IEmissionManager} from './helpers/IEmissionManager.sol';
 
 contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('metis'), 6795840);
+    vm.createSelectFork(vm.rpcUrl('metis'), 8140311);
   }
 
   function testPermissionsTransfer() public {
     MetisMovePermissionsPayload payload = new MetisMovePermissionsPayload();
 
-    GovHelpers.executePayload(
-      vm,
-      address(payload),
-      AaveGovernanceV2.METIS_BRIDGE_EXECUTOR
-    );
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.METIS_BRIDGE_EXECUTOR);
 
     vm.startPrank(payload.METIS_LEVEL_1_EXECUTOR_V3());
 
