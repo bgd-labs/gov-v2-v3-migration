@@ -29,6 +29,7 @@ fantom="${RPC_FANTOM}"
 fantom-testnet="${RPC_FANTOM_TESTNET}"
 binance="${RPC_BINANCE}"
 binance-testnet="${RPC_BINANCE_TESTNET}"
+base = "${RPC_BASE}"
 
 [etherscan]
 ethereum={key="${ETHERSCAN_API_KEY_MAINNET}", chain=1 }
@@ -47,5 +48,6 @@ fantom={key="${ETHERSCAN_API_KEY_FANTOM}",chain=250}
 fantom-testnet={key="${ETHERSCAN_API_KEY_FANTOM}",chain=250}
 binance={key="${ETHERSCAN_API_KEY_BINANCE}",chain=56}
 binance-testnet={key="${ETHERSCAN_API_KEY_BINANCE}",chain=56}
+base={key="${ETHERSCAN_API_KEY_BASE}",chainId=8453}
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config
