@@ -19,3 +19,6 @@
 [submodule "lib/aave-stk-gov-v3"]
 	path = lib/aave-stk-gov-v3
 	url = https://github.com/bgd-labs/aave-stk-gov-v3
+[submodule "lib/aave-token-v3"]
+	path = lib/aave-token-v3
+	url = https://github.com/bgd-labs/aave-token-v3
