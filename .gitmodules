@@ -16,3 +16,6 @@
 [submodule "lib/aave-governance-v3"]
 	path = lib/aave-governance-v3
 	url = git@github.com:bgd-labs/aave-governance-v3.git
+[submodule "lib/aave-stk-gov-v3"]
+	path = lib/aave-stk-gov-v3
+	url = https://github.com/bgd-labs/aave-stk-gov-v3
