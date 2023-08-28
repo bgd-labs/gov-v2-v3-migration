@@ -18,7 +18,7 @@ contract DeployMainnetPayload is EthereumScript {
   // TODO: this should be get from address-book
   function run() external broadcast {
     new EthShortMovePermissionsPayload(LEVEL_1_EXECUTOR_V3);
-    new EthLongMovePermissionsPayload(LEVEL_2_EXECUTOR_V3);
+    new EthLongMovePermissionsPayload(LEVEL_2_EXECUTOR_V3, address(0), address(0));
   }
 }
 

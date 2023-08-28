@@ -67,3 +67,5 @@ lib/aave-v3-factory:solidity-utils/=lib/aave-v3-factory/lib/solidity-utils/src/
 lib/forge-std:ds-test/=lib/forge-std/lib/ds-test/src/
 lib/solidity-utils:ds-test/=lib/solidity-utils/lib/forge-std/lib/ds-test/src/
 lib/solidity-utils:forge-std/=lib/solidity-utils/lib/forge-std/src/
+aave-stk-gov-v3/=lib/aave-stk-gov-v3/src/
+aave-token-v3/=lib/aave-token-v3/src/
