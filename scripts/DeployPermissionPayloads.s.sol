@@ -12,13 +12,9 @@ import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayl
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
 
 contract DeployMainnetPayload is EthereumScript {
-  address public constant LEVEL_1_EXECUTOR_V3 = address(1);
-  address public constant LEVEL_2_EXECUTOR_V3 = address(2);
-
-  // TODO: this should be get from address-book
   function run() external broadcast {
-    new EthShortMovePermissionsPayload(LEVEL_1_EXECUTOR_V3);
-    new EthLongMovePermissionsPayload(LEVEL_2_EXECUTOR_V3);
+    new EthShortMovePermissionsPayload();
+    new EthLongMovePermissionsPayload();
   }
 }
 
