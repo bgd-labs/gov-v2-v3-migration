@@ -2,15 +2,18 @@
 pragma solidity ^0.8.0;
 
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
-import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IStakedToken} from './dependencies/IStakedToken.sol';
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
+import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
 import {MigratorLib} from './MigratorLib.sol';
@@ -19,6 +22,7 @@ contract EthShortMovePermissionsPayload {
   address public immutable LEVEL_1_EXECUTOR_V3;
 
   address public constant PAYLOAD_CONTROLLER = address(1);
+  address public constant CROSSCHAIN_CONTROLLER = address(44);
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
   address public constant AAVE_MERKLE_DISTRIBUTOR = 0xa88c6D90eAe942291325f9ae3c66f3563B93FE10;
@@ -30,12 +34,30 @@ contract EthShortMovePermissionsPayload {
 
   address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
 
+  // ~ 20 proposals
+  uint256 public constant ETH_AMOUNT = 2 ether;
+  uint256 public constant LINK_AMOUNT = 9 ether;
+
   constructor(address newExecutor) {
     LEVEL_1_EXECUTOR_V3 = newExecutor;
   }
 
   function execute() external {
-    // stk tokens - set admin roles
+    // CC FUNDING
+    MigratorLib.fundCrosschainController(
+      AaveV3Ethereum.COLLECTOR,
+      AaveV3Ethereum.POOL,
+      CROSSCHAIN_CONTROLLER,
+      AaveV3EthereumAssets.WETH_A_TOKEN,
+      ETH_AMOUNT,
+      AaveV3Ethereum.WETH_GATEWAY,
+      AaveV3EthereumAssets.LINK_UNDERLYING,
+      address(0),
+      LINK_AMOUNT,
+      false
+    );
+
+    // STK TOKENS - SET ADMIN ROLES
     IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
 
     stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), LEVEL_1_EXECUTOR_V3);

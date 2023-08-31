@@ -45,6 +45,13 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER
     );
 
+    _testCrosschainFunding(
+      payload.CROSSCHAIN_CONTROLLER(),
+      AaveV3PolygonAssets.LINK_UNDERLYING,
+      payload.MATIC_AMOUNT(),
+      payload.LINK_AMOUNT()
+    );
+
     vm.stopPrank();
   }
 }

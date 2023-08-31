@@ -74,6 +74,13 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     _testStkRoles();
 
+    _testCrosschainFunding(
+      payload.CROSSCHAIN_CONTROLLER(),
+      AaveV3EthereumAssets.LINK_UNDERLYING,
+      payload.ETH_AMOUNT(),
+      payload.LINK_AMOUNT()
+    );
+
     vm.stopPrank();
   }
 

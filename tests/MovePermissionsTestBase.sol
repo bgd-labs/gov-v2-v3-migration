@@ -10,6 +10,7 @@ import {ICollector} from 'aave-address-book/common/ICollector.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
 import {IPoolAddressProviderRegistry} from './helpers/IPoolAddressProviderRegistry.sol';
@@ -25,8 +26,7 @@ contract MovePermissionsTestBase is Test {
     address wethGateway
   ) internal {
     // check Pool Admin
-    ILendingPoolConfigurator(poolAddressProvider.getLendingPoolConfigurator())
-      .freezeReserve(asset);
+    ILendingPoolConfigurator(poolAddressProvider.getLendingPoolConfigurator()).freezeReserve(asset);
 
     // check address provider owner
     poolAddressProvider.setPoolAdmin(newExecutor);
@@ -37,18 +37,15 @@ contract MovePermissionsTestBase is Test {
 
     assets[0] = asset;
     sources[0] = assetSource;
-    IAaveOracleV2(poolAddressProvider.getPriceOracle()).setAssetSources(
-      assets,
-      sources
-    );
+    IAaveOracleV2(poolAddressProvider.getPriceOracle()).setAssetSources(assets, sources);
 
     // check lending rate oracle owner
-    ILendingRateOracle(poolAddressProvider.getLendingRateOracle())
-      .setMarketBorrowRate(asset, 33);
+    ILendingRateOracle(poolAddressProvider.getLendingRateOracle()).setMarketBorrowRate(asset, 33);
 
     // check LendingPoolAddressesProviderRegistry owner
-    IPoolAddressProviderRegistry(poolAddressProviderRegistry)
-      .unregisterAddressesProvider(address(poolAddressProvider));
+    IPoolAddressProviderRegistry(poolAddressProviderRegistry).unregisterAddressesProvider(
+      address(poolAddressProvider)
+    );
 
     // WETH_GATEWAY
     assertEq(Ownable(wethGateway).owner(), newExecutor);
@@ -69,32 +66,25 @@ contract MovePermissionsTestBase is Test {
     address repayWithCollateral
   ) internal {
     // check Pool Admin
-    IPoolConfigurator(poolAddressProvider.getPoolConfigurator())
-      .setReserveFreeze(asset, true);
+    IPoolConfigurator(poolAddressProvider.getPoolConfigurator()).setReserveFreeze(asset, true);
 
     // ACLManager - default admin role
     IACLManager aclManager = IACLManager(poolAddressProvider.getACLManager());
-    aclManager.setRoleAdmin(
-      aclManager.RISK_ADMIN_ROLE(),
-      aclManager.DEFAULT_ADMIN_ROLE()
-    );
+    aclManager.setRoleAdmin(aclManager.RISK_ADMIN_ROLE(), aclManager.DEFAULT_ADMIN_ROLE());
 
     // check pool address provider owner
     poolAddressProvider.setMarketId('3');
 
     // check oracle permissions
-    _checkOraclePermissions(
-      poolAddressProvider.getPriceOracle(),
-      asset,
-      assetSource
-    );
+    _checkOraclePermissions(poolAddressProvider.getPriceOracle(), asset, assetSource);
 
     // Emission Manager
     IEmissionManager(emissionManager).setRewardsController(address(1));
 
     // check LendingPoolAddressesProviderRegistry owner
-    IPoolAddressProviderRegistry(poolAddressProviderRegistry)
-      .unregisterAddressesProvider(address(poolAddressProvider));
+    IPoolAddressProviderRegistry(poolAddressProviderRegistry).unregisterAddressesProvider(
+      address(poolAddressProvider)
+    );
 
     // Collector
     collector.approve(aAsset, address(1), 100);
@@ -124,16 +114,25 @@ contract MovePermissionsTestBase is Test {
     }
   }
 
-  function _checkOraclePermissions(
-    address oracle,
-    address asset,
-    address assetSource
-  ) internal {
+  function _checkOraclePermissions(address oracle, address asset, address assetSource) internal {
     address[] memory assets = new address[](1);
     address[] memory sources = new address[](1);
 
     assets[0] = asset;
     sources[0] = assetSource;
     IAaveOracleV3(oracle).setAssetSources(assets, sources);
+  }
+
+  function _testCrosschainFunding(
+    address crosschainController,
+    address linkAddress,
+    uint256 nativeAmount,
+    uint256 linkAmount
+  ) internal {
+    uint256 nativeAfter = address(crosschainController).balance;
+    uint256 linkAfter = IERC20(linkAddress).balanceOf(crosschainController);
+
+    assertEq(nativeAfter, nativeAmount);
+    assertEq(linkAfter, linkAmount);
   }
 }

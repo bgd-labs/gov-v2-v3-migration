@@ -52,6 +52,13 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     _testProofOfReserve();
 
+    _testCrosschainFunding(
+      payload.CROSSCHAIN_CONTROLLER(),
+      AaveV3AvalancheAssets.LINKe_UNDERLYING,
+      payload.AVAX_AMOUNT(),
+      (payload.LINK_AMOUNT() + 100000000000000000) // some link is currently stuck
+    );
+
     vm.stopPrank();
   }
 
