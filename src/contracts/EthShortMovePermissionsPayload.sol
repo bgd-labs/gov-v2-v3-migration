@@ -8,7 +8,7 @@ import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
-
+import {IStakedToken} from './dependencies/IStakedToken.sol';
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
@@ -21,27 +21,58 @@ contract EthShortMovePermissionsPayload {
   address public constant PAYLOAD_CONTROLLER = address(1);
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
-  address public constant AAVE_MERKLE_DISTRIBUTOR =
-    0xa88c6D90eAe942291325f9ae3c66f3563B93FE10;
-  address payable public constant ABPT =
-    payable(0x41A08648C3766F9F9d85598fF102a08f4ef84F84);
+  address public constant AAVE_MERKLE_DISTRIBUTOR = 0xa88c6D90eAe942291325f9ae3c66f3563B93FE10;
+  address payable public constant ABPT = payable(0x41A08648C3766F9F9d85598fF102a08f4ef84F84);
 
-  address public constant AAVE_V1_ADDRESS_PROVIDER =
-    0x24a42fD28C976A61Df5D00D0599C34c4f90748c8;
+  address public constant AAVE_V1_ADDRESS_PROVIDER = 0x24a42fD28C976A61Df5D00D0599C34c4f90748c8;
 
-  address public constant AAVE_V1_PRICE_PROVIDER =
-    0x76B47460d7F7c5222cFb6b6A75615ab10895DDe4;
+  address public constant AAVE_V1_PRICE_PROVIDER = 0x76B47460d7F7c5222cFb6b6A75615ab10895DDe4;
+
+  address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
 
   constructor(address newExecutor) {
     LEVEL_1_EXECUTOR_V3 = newExecutor;
   }
 
   function execute() external {
+    // stk tokens - set admin roles
+    IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
+
+    stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), LEVEL_1_EXECUTOR_V3);
+    stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), LEVEL_1_EXECUTOR_V3);
+    stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), LEVEL_1_EXECUTOR_V3);
+
+    // new executor - call execute payload to accept new permissions
+    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+      address(stkAave),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkAave.SLASH_ADMIN_ROLE()),
+      false
+    );
+
+    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+      address(stkAave),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkAave.COOLDOWN_ADMIN_ROLE()),
+      false
+    );
+
+    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+      address(stkAave),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkAave.CLAIM_HELPER_ROLE()),
+      false
+    );
+
     // V1 MARKET
 
     // lending pool manager
-    ILendingPoolAddressProviderV1(AAVE_V1_ADDRESS_PROVIDER)
-      .setLendingPoolManager(LEVEL_1_EXECUTOR_V3);
+    ILendingPoolAddressProviderV1(AAVE_V1_ADDRESS_PROVIDER).setLendingPoolManager(
+      LEVEL_1_EXECUTOR_V3
+    );
 
     // owner of address provider
     Ownable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(LEVEL_1_EXECUTOR_V3);
@@ -87,9 +118,7 @@ contract EthShortMovePermissionsPayload {
     Ownable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(LEVEL_1_EXECUTOR_V3);
 
     // LendToAave Migrator
-    TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(
-      LEVEL_1_EXECUTOR_V3
-    );
+    TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(LEVEL_1_EXECUTOR_V3);
 
     // Safety module
     TransparentUpgradeableProxy(ABPT).changeAdmin(LEVEL_1_EXECUTOR_V3);

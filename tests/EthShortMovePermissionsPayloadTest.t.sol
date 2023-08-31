@@ -12,12 +12,15 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
+import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
+
+  address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('ethereum'), 17969348);
@@ -69,6 +72,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     _testExecutor(payload.LEVEL_1_EXECUTOR_V3(), payload.PAYLOAD_CONTROLLER());
 
+    _testStkRoles();
+
     vm.stopPrank();
   }
 
@@ -101,5 +106,14 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     // check price provider
     IPriceProviderV1(priceProvider).setFallbackOracle(address(12));
+  }
+
+  function _testStkRoles() internal {
+    // stk tokens - set admin roles
+    IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
+
+    stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), address(1));
+    stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), address(2));
+    stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), address(3));
   }
 }
