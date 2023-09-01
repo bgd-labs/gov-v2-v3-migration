@@ -24,10 +24,21 @@ export const deployAaveImpl = async (
   });
   const transaction = await publicClient.waitForTransactionReceipt({hash});
   // console.log('tx: ', transaction);
+  const aaveTokenImplAddress = transaction.contractAddress as Hex;
 
-  return transaction.contractAddress;
+  const {request} = await publicClient.simulateContract({
+    address: aaveTokenImplAddress,
+    abi: AaveTokenV3.abi,
+    functionName: 'initialize',
+    account: deployer,
+    args: [],
+  });
+  await walletClient.writeContract(request);
+
+  return aaveTokenImplAddress;
 };
 
+// - deploy stkAave token implementation
 export const deployStkAaveImpl = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
@@ -55,9 +66,10 @@ export const deployStkAaveImpl = async (
   const transaction = await publicClient.waitForTransactionReceipt({hash});
   // console.log('tx: ', transaction);
 
-  return transaction.contractAddress;
+  return transaction.contractAddress as Hex;
 };
 
+// - deploy aAave token implementation
 export const deployAAaveImpl = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
@@ -98,14 +110,29 @@ export const deployAAaveImpl = async (
   return aAaveImplAddress;
 };
 
-// - deploy stkAave token implementation
-// - deploy aAave token implementation
-
 // deploy all payloads
 
 // - deploy aave update payload
+export const deployAaveTokenPayload = async (
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  deployer: Address,
+  aaveTokenImplAddress: Address
+) => {};
 // - deploy stkAave update payload
+export const deployStkAaveTokenPayload = async (
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  deployer: Address,
+  stkAaveTokenImplAddress: Address
+) => {};
 // - deploy aAave update payload
+export const deployAAaveTokenPayload = async (
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  deployer: Address,
+  aAaveTokenImplAddress: Address
+) => {};
 
 // - deploy short executor payload
 // - deploy long executor payload
