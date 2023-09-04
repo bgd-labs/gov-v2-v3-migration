@@ -8,9 +8,12 @@ import {
   deployAAaveTokenPayload,
   deployAaveImpl,
   deployAaveTokenPayload,
+  deployLongPermissionsPayload,
+  deployShortPermissionsPayload,
   deployStkAaveImpl,
   deployStkAaveTokenPayload,
 } from './payloadsV2';
+import {createShortV2Proposal} from './proposalsV2';
 
 export const DEPLOYER = '0x6D603081563784dB3f83ef1F65Cc389D94365Ac9';
 // create mainnet fork
@@ -39,8 +42,7 @@ const deployPayloadsV2 = async () => {
   const stkAaveTokenV3 = await deployStkAaveImpl(walletClient, publicClient, DEPLOYER);
   const aAaveTokenV3 = await deployAAaveImpl(walletClient, publicClient, DEPLOYER);
 
-  // deploy payloads
-
+  // deploy token payloads
   const aaveTokenPayload = await deployAaveTokenPayload(
     walletClient,
     publicClient,
@@ -59,6 +61,24 @@ const deployPayloadsV2 = async () => {
     DEPLOYER,
     aAaveTokenV3
   );
+
+  // deploy migration payloads
+  const shortMigrationPayload = await deployShortPermissionsPayload(
+    walletClient,
+    publicClient,
+    DEPLOYER
+  );
+  const longMigrationPayload = await deployLongPermissionsPayload(
+    walletClient,
+    publicClient,
+    DEPLOYER
+  );
+
+  // create proposal on v2
+  const shortProposalId = await createShortV2Proposal(walletClient, publicClient, DEPLOYER, [
+    aAaveTokenPayload,
+    shortMigrationPayload,
+  ]);
 };
 
 deployPayloadsV2().then().catch(console.log);
