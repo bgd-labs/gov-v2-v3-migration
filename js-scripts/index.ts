@@ -13,14 +13,14 @@ import {
   deployStkAaveImpl,
   deployStkAaveTokenPayload,
 } from './payloadsV2';
-import {createShortV2Proposal} from './proposalsV2';
+import {createV2Proposal, executeV2Proposals} from './proposalsV2';
+import {AaveGovernanceV2, GovernanceV3Ethereum} from '@bgd-labs/aave-address-book';
+import {changeExecutorsOwner} from './proposalsV3';
 
 export const DEPLOYER = '0x6D603081563784dB3f83ef1F65Cc389D94365Ac9';
 // create mainnet fork
 const getFork = async () => {
-  const fork = await tenderly.fork({chainId: 1, alias: 'govV3Fork'});
-
-  return fork;
+  return tenderly.fork({chainId: 1, alias: 'govV3Fork'});
 };
 
 const deployPayloadsV2 = async () => {
@@ -75,10 +75,35 @@ const deployPayloadsV2 = async () => {
   );
 
   // create proposal on v2
-  const shortProposalId = await createShortV2Proposal(walletClient, publicClient, DEPLOYER, [
-    aAaveTokenPayload,
-    shortMigrationPayload,
-  ]);
+  const shortProposalId = await createV2Proposal(
+    walletClient,
+    publicClient,
+    [aAaveTokenPayload, shortMigrationPayload],
+    AaveGovernanceV2.SHORT_EXECUTOR
+  );
+  const longProposalId = await createV2Proposal(
+    walletClient,
+    publicClient,
+    [stkAaveTokenPayload, aaveTokenPayload, longMigrationPayload],
+    AaveGovernanceV2.LONG_EXECUTOR
+  );
+
+  // change owner
+  await changeExecutorsOwner(
+    AaveGovernanceV2.SHORT_EXECUTOR,
+    GovernanceV3Ethereum.EXECUTOR_LVL_1,
+    publicClient,
+    walletClient
+  );
+  await changeExecutorsOwner(
+    AaveGovernanceV2.LONG_EXECUTOR,
+    GovernanceV3Ethereum.EXECUTOR_LVL_2,
+    publicClient,
+    walletClient
+  );
+
+  // execute proposals
+  await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork);
 };
 
 deployPayloadsV2().then().catch(console.log);
