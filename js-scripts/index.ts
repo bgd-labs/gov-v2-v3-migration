@@ -15,7 +15,7 @@ import {
 } from './payloadsV2';
 import {createV2Proposal, executeV2Proposals} from './proposalsV2';
 import {AaveGovernanceV2, GovernanceV3Ethereum, AaveMisc} from '@bgd-labs/aave-address-book';
-import {changeExecutorsOwner} from './proposalsV3';
+import {changeExecutorsOwner, deployVotingMachine, deployVotingPortal} from './proposalsV3';
 
 export const DEPLOYER = '0x6D603081563784dB3f83ef1F65Cc389D94365Ac9';
 // create mainnet fork
@@ -105,8 +105,15 @@ const deployPayloadsV2 = async () => {
   // execute proposals
   await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork);
 
-  // deploy new voting portal
   // deploy new voting machine
+  const votingMachine = await deployVotingMachine(DEPLOYER, publicClient, walletClient);
+  // deploy new voting portal
+  const votingPortal = await deployVotingPortal(
+    votingMachine,
+    DEPLOYER,
+    publicClient,
+    walletClient
+  );
   // remove old voting portal and set new one
 
   // deploy and register new payload
