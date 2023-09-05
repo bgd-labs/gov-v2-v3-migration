@@ -14,7 +14,7 @@ export const changeExecutorsOwner = async (
   walletClient: WalletClient
 ) => {
   const {request} = await publicClient.simulateContract({
-    address: GovernanceV3Ethereum.EXECUTOR_LVL_1,
+    address: executor,
     abi: V3_EXECUTOR_ABI,
     functionName: 'transferOwnership',
     args: [newOwner],
