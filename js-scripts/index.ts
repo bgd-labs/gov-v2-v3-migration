@@ -104,6 +104,14 @@ const deployPayloadsV2 = async () => {
 
   // execute proposals
   await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork);
+
+  // deploy new voting portal
+  // deploy new voting machine
+  // remove old voting portal and set new one
+
+  // deploy and register new payload
+  // create proposal on gov v3
+  // execute proposal on v3
 };
 
 deployPayloadsV2().then().catch(console.log);
