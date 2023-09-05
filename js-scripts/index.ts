@@ -14,7 +14,7 @@ import {
   deployStkAaveTokenPayload,
 } from './payloadsV2';
 import {createV2Proposal, executeV2Proposals} from './proposalsV2';
-import {AaveGovernanceV2, GovernanceV3Ethereum} from '@bgd-labs/aave-address-book';
+import {AaveGovernanceV2, GovernanceV3Ethereum, AaveMisc} from '@bgd-labs/aave-address-book';
 import {changeExecutorsOwner} from './proposalsV3';
 
 export const DEPLOYER = '0x6D603081563784dB3f83ef1F65Cc389D94365Ac9';
@@ -27,7 +27,7 @@ const deployPayloadsV2 = async () => {
   const fork = await getFork();
 
   const walletClient = createWalletClient({
-    account: '0x0', // TODO: create some proper address
+    account: AaveMisc.ECOSYSTEM_RESERVE,
     chain: {...mainnet, id: 3030, name: 'tenderly'},
     transport: http(fork.forkUrl),
   });
