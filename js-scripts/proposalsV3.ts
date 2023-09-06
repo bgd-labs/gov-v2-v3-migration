@@ -16,8 +16,8 @@ import {
   GovernanceV3Ethereum,
   ICrossChainController_ABI,
   IGovernanceCore_ABI,
+  IOwnable_ABI,
 } from '@bgd-labs/aave-address-book';
-import {V3_EXECUTOR_ABI} from './abis/V3ExecutorAbi';
 import {create3Deploy, create3GetAddress} from './create3';
 import VotingMachine from './artifacts/VotingMachine.sol/VotingMachine.json';
 
@@ -32,7 +32,7 @@ export const changeExecutorsOwner = async (
 ) => {
   const {request} = await publicClient.simulateContract({
     address: executor,
-    abi: V3_EXECUTOR_ABI,
+    abi: IOwnable_ABI,
     functionName: 'transferOwnership',
     args: [newOwner],
     account: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
