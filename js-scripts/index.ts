@@ -15,7 +15,12 @@ import {
 } from './payloadsV2';
 import {createV2Proposal, executeV2Proposals} from './proposalsV2';
 import {AaveGovernanceV2, GovernanceV3Ethereum, AaveMisc} from '@bgd-labs/aave-address-book';
-import {changeExecutorsOwner, deployVotingMachine, deployVotingPortal} from './proposalsV3';
+import {
+  changeExecutorsOwner,
+  deployAndRegisterTestPayloads,
+  deployVotingMachine,
+  deployVotingPortal,
+} from './proposalsV3';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 // create mainnet fork
@@ -115,8 +120,13 @@ const deployPayloadsV2 = async () => {
     walletClient
   );
 
-  // deploy and register new payload
-  // create proposal on gov v3
+  const proposalId = await deployAndRegisterTestPayloads(
+    walletClient,
+    publicClient,
+    AaveMisc.ECOSYSTEM_RESERVE,
+    votingPortal
+  );
+  console.log('proposalId: ', proposalId);
   // execute proposal on v3
 };
 
