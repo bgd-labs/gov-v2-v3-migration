@@ -10,6 +10,7 @@ import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {IStakedToken} from './dependencies/IStakedToken.sol';
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
@@ -19,10 +20,6 @@ import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressP
 import {MigratorLib} from './MigratorLib.sol';
 
 contract EthShortMovePermissionsPayload {
-  address public immutable LEVEL_1_EXECUTOR_V3;
-
-  address public constant PAYLOAD_CONTROLLER = address(1);
-  address public constant CROSSCHAIN_CONTROLLER = address(44);
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
   address public constant AAVE_MERKLE_DISTRIBUTOR = 0xa88c6D90eAe942291325f9ae3c66f3563B93FE10;
@@ -38,16 +35,12 @@ contract EthShortMovePermissionsPayload {
   uint256 public constant ETH_AMOUNT = 2 ether;
   uint256 public constant LINK_AMOUNT = 9 ether;
 
-  constructor(address newExecutor) {
-    LEVEL_1_EXECUTOR_V3 = newExecutor;
-  }
-
   function execute() external {
     // CC FUNDING
     MigratorLib.fundCrosschainController(
       AaveV3Ethereum.COLLECTOR,
       AaveV3Ethereum.POOL,
-      CROSSCHAIN_CONTROLLER,
+      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.WETH_A_TOKEN,
       ETH_AMOUNT,
       AaveV3Ethereum.WETH_GATEWAY,
@@ -60,12 +53,12 @@ contract EthShortMovePermissionsPayload {
     // STK TOKENS - SET ADMIN ROLES
     IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
 
-    stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), LEVEL_1_EXECUTOR_V3);
-    stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), LEVEL_1_EXECUTOR_V3);
-    stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), LEVEL_1_EXECUTOR_V3);
+    stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // new executor - call execute payload to accept new permissions
-    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
       address(stkAave),
       0,
       'claimRoleAdmin(uint256)',
@@ -73,7 +66,7 @@ contract EthShortMovePermissionsPayload {
       false
     );
 
-    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
       address(stkAave),
       0,
       'claimRoleAdmin(uint256)',
@@ -81,7 +74,7 @@ contract EthShortMovePermissionsPayload {
       false
     );
 
-    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
       address(stkAave),
       0,
       'claimRoleAdmin(uint256)',
@@ -93,18 +86,18 @@ contract EthShortMovePermissionsPayload {
 
     // lending pool manager
     ILendingPoolAddressProviderV1(AAVE_V1_ADDRESS_PROVIDER).setLendingPoolManager(
-      LEVEL_1_EXECUTOR_V3
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
     );
 
     // owner of address provider
-    Ownable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(LEVEL_1_EXECUTOR_V3);
+    Ownable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // owner of price provider
-    Ownable(AAVE_V1_PRICE_PROVIDER).transferOwnership(LEVEL_1_EXECUTOR_V3);
+    Ownable(AAVE_V1_PRICE_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // V2 MARKETS
     MigratorLib.migrateV2MarketPermissions(
-      LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER,
       AaveV2Ethereum.ORACLE,
       AaveV2Ethereum.LENDING_RATE_ORACLE,
@@ -112,7 +105,7 @@ contract EthShortMovePermissionsPayload {
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY
     );
     MigratorLib.migrateV2MarketPermissions(
-      LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER,
       AaveV2EthereumAMM.ORACLE,
       AaveV2EthereumAMM.LENDING_RATE_ORACLE,
@@ -122,7 +115,7 @@ contract EthShortMovePermissionsPayload {
 
     // V3 MARKETS
     MigratorLib.migrateV3MarketPermissions(
-      LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV3Ethereum.ACL_MANAGER,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
       AaveV3Ethereum.EMISSION_MANAGER,
@@ -137,23 +130,25 @@ contract EthShortMovePermissionsPayload {
     // MISC ECOSYSTEM
 
     // MerkleDistributor
-    Ownable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(LEVEL_1_EXECUTOR_V3);
+    Ownable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // LendToAave Migrator
-    TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(LEVEL_1_EXECUTOR_V3);
+    TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
 
     // Safety module
-    TransparentUpgradeableProxy(ABPT).changeAdmin(LEVEL_1_EXECUTOR_V3);
-    IBalancerOwnable(ABPT).setController(LEVEL_1_EXECUTOR_V3);
+    TransparentUpgradeableProxy(ABPT).changeAdmin(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IBalancerOwnable(ABPT).setController(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // DefaultIncentivesController - do we need it?
 
     // EXECUTOR PERMISSIONS
 
-    IExecutorV2(address(this)).setPendingAdmin(address(LEVEL_1_EXECUTOR_V3));
+    IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_1));
 
     // new executor - call execute payload to accept new permissions
-    IExecutorV3(LEVEL_1_EXECUTOR_V3).executeTransaction(
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
       address(this),
       0,
       'acceptAdmin()',
@@ -162,6 +157,8 @@ contract EthShortMovePermissionsPayload {
     );
 
     // new executor - change owner to payload controller
-    Ownable(LEVEL_1_EXECUTOR_V3).transferOwnership(PAYLOAD_CONTROLLER);
+    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
+      GovernanceV3Ethereum.PAYLOADS_CONTROLLER
+    );
   }
 }

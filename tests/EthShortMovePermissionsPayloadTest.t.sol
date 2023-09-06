@@ -6,6 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
@@ -23,25 +24,24 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 17969348);
+    vm.createSelectFork(vm.rpcUrl('ethereum'), 18035350);
   }
 
   function testPayload() public {
-    Executor newExecutor = new Executor();
-    Ownable(newExecutor).transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
+    vm.startPrank(GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
+    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
+    vm.stopPrank();
 
-    EthShortMovePermissionsPayload payload = new EthShortMovePermissionsPayload(
-      address(newExecutor)
-    );
+    EthShortMovePermissionsPayload payload = new EthShortMovePermissionsPayload();
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
 
-    vm.startPrank(payload.LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     _testV1(payload.AAVE_V1_ADDRESS_PROVIDER(), payload.AAVE_V1_PRICE_PROVIDER());
 
     _testV2(
-      payload.LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER,
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2EthereumAssets.WBTC_UNDERLYING,
@@ -50,7 +50,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3(
-      payload.LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
       AaveV3Ethereum.COLLECTOR,
       AaveV3EthereumAssets.DAI_UNDERLYING,
@@ -65,17 +65,17 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testMisc(
-      payload.LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       payload.LEND_TO_AAVE_MIGRATOR(),
       payload.AAVE_MERKLE_DISTRIBUTOR()
     );
 
-    _testExecutor(payload.LEVEL_1_EXECUTOR_V3(), payload.PAYLOAD_CONTROLLER());
+    _testExecutor(GovernanceV3Ethereum.EXECUTOR_LVL_1, GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
 
     _testStkRoles();
 
     _testCrosschainFunding(
-      payload.CROSSCHAIN_CONTROLLER(),
+      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.LINK_UNDERLYING,
       payload.ETH_AMOUNT(),
       payload.LINK_AMOUNT()

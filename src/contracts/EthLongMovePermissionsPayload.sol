@@ -3,27 +3,22 @@ pragma solidity ^0.8.0;
 
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 
 contract EthLongMovePermissionsPayload {
-  address public immutable LEVEL_2_EXECUTOR_V3;
-
-  address public constant PAYLOAD_CONTROLLER = address(1);
-
-  constructor(address newExecutor) {
-    LEVEL_2_EXECUTOR_V3 = newExecutor;
-  }
-
   function execute() external {
-    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(address(LEVEL_2_EXECUTOR_V3));
+    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+      address(GovernanceV3Ethereum.EXECUTOR_LVL_2)
+    );
 
     // EXECUTOR PERMISSIONS
 
-    IExecutorV2(address(this)).setPendingAdmin(address(LEVEL_2_EXECUTOR_V3));
+    IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_2));
 
     // new executor - call execute payload to accept new permissions
-    IExecutorV3(LEVEL_2_EXECUTOR_V3).executeTransaction(
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_2).executeTransaction(
       address(this),
       0,
       'acceptAdmin()',
@@ -32,6 +27,8 @@ contract EthLongMovePermissionsPayload {
     );
 
     // new executor - change owner to payload controller
-    Ownable(LEVEL_2_EXECUTOR_V3).transferOwnership(PAYLOAD_CONTROLLER);
+    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
+      GovernanceV3Ethereum.PAYLOADS_CONTROLLER
+    );
   }
 }
