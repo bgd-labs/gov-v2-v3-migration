@@ -1,4 +1,9 @@
-import {AaveGovernanceV2, AaveMisc, IAaveGovernanceV2_ABI} from '@bgd-labs/aave-address-book';
+import {
+  AaveGovernanceV2,
+  AaveMisc,
+  IAaveGovernanceV2_ABI,
+  IExecutorWithTimelock_ABI,
+} from '@bgd-labs/aave-address-book';
 import {
   Address,
   concat,
@@ -17,7 +22,6 @@ import {
 } from 'viem';
 import {tenderly} from '@bgd-labs/aave-cli';
 import {EOA, getAaveGovernanceV2Slots, getSolidityStorageSlotBytes} from './helpers';
-import {EXECUTOR_ABI} from './abis/V2ExecutorAbi';
 
 // create proposals
 export const createV2Proposal = async (
@@ -77,7 +81,7 @@ const simulateOnTenderly = async (
   const slots = getAaveGovernanceV2Slots(proposalId, proposal.executor);
   const executorContract = getContract({
     address: proposal.executor,
-    abi: EXECUTOR_ABI,
+    abi: IExecutorWithTimelock_ABI,
     publicClient,
   });
   const duration = await executorContract.read.VOTING_DURATION();

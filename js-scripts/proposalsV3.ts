@@ -2,6 +2,7 @@ import {
   Address,
   encodeAbiParameters,
   encodePacked,
+  getContract,
   Hex,
   parseAbiParameters,
   parseEther,
@@ -13,6 +14,8 @@ import {
   AaveV3Ethereum,
   AaveV3EthereumAssets,
   GovernanceV3Ethereum,
+  ICrossChainController_ABI,
+  IGovernanceCore_ABI,
 } from '@bgd-labs/aave-address-book';
 import {V3_EXECUTOR_ABI} from './abis/V3ExecutorAbi';
 import {create3Deploy, create3GetAddress} from './create3';
@@ -42,7 +45,7 @@ export const deployVotingMachine = async (
   publicClient: PublicClient,
   walletClient: WalletClient
 ) => {
-  const votingPortalAddress = create3GetAddress(publicClient, VOTING_PORTAL_SALT, deployer);
+  const votingPortalAddress = await create3GetAddress(publicClient, VOTING_PORTAL_SALT, deployer);
   const bytecode = VotingMachine.bytecode.object as Hex;
   const hash = await walletClient.deployContract({
     abi: VotingMachine.abi,
@@ -60,10 +63,19 @@ export const deployVotingMachine = async (
   });
 
   const transaction = await publicClient.waitForTransactionReceipt({hash});
+  const votingMachineAddress = transaction.contractAddress as Hex;
 
   // set voting machine as sender
+  const {request} = await publicClient.simulateContract({
+    address: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+    abi: ICrossChainController_ABI,
+    functionName: 'approveSenders',
+    args: [[votingMachineAddress]],
+    account: deployer,
+  });
+  await walletClient.writeContract(request);
 
-  return transaction.contractAddress as Hex;
+  return votingMachineAddress;
 };
 
 export const deployVotingPortal = async (
@@ -97,9 +109,24 @@ export const deployVotingPortal = async (
   );
 
   // set voting portal as sender
+  const {request} = await publicClient.simulateContract({
+    address: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+    abi: ICrossChainController_ABI,
+    functionName: 'approveSenders',
+    args: [[votingPortalAddress as Hex]],
+    account: deployer,
+  });
+  await walletClient.writeContract(request);
+
   // set voting portal in gov
+  const {request: requestVP_GOV} = await publicClient.simulateContract({
+    address: GovernanceV3Ethereum.GOVERNANCE,
+    abi: IGovernanceCore_ABI,
+    functionName: 'addVotingPortals',
+    args: [[votingPortalAddress as Hex]],
+    account: deployer,
+  });
+  await walletClient.writeContract(requestVP_GOV);
 
   return votingPortalAddress;
 };
-
-export const;

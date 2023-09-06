@@ -17,7 +17,7 @@ import {createV2Proposal, executeV2Proposals} from './proposalsV2';
 import {AaveGovernanceV2, GovernanceV3Ethereum, AaveMisc} from '@bgd-labs/aave-address-book';
 import {changeExecutorsOwner, deployVotingMachine, deployVotingPortal} from './proposalsV3';
 
-export const DEPLOYER = '0x6D603081563784dB3f83ef1F65Cc389D94365Ac9';
+export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 // create mainnet fork
 const getFork = async () => {
   return tenderly.fork({chainId: 1, alias: 'govV3Fork'});
@@ -114,7 +114,6 @@ const deployPayloadsV2 = async () => {
     publicClient,
     walletClient
   );
-  // remove old voting portal and set new one
 
   // deploy and register new payload
   // create proposal on gov v3
