@@ -5,7 +5,6 @@ import {
   getContract,
   Hex,
   parseAbiParameters,
-  parseEther,
   PublicClient,
   WalletClient,
 } from 'viem';
@@ -13,10 +12,9 @@ import VotingPortal from './artifacts/VotingPortal.sol/VotingPortal.json';
 import TestV2Payload from './artifacts/PoolPayload.sol/TestV2Payload.json';
 import TestV3Payload from './artifacts/PoolPayload.sol/TestV3Payload.json';
 import {
-  AaveV3Ethereum,
-  AaveV3EthereumAssets,
   GovernanceV3Ethereum,
   ICrossChainController_ABI,
+  IExecutor_ABI,
   IGovernanceCore_ABI,
   IOwnable_ABI,
   IPayloadsControllerCore_ABI,
@@ -217,6 +215,15 @@ export const deployAndRegisterTestPayloads = async (
     accessLevel: 1,
   });
 
+  const govContract = getContract({
+    address: GovernanceV3Ethereum.GOVERNANCE,
+    abi: IGovernanceCore_ABI,
+    publicClient,
+  });
+  const fee = await govContract.read.getCancellationFee();
+
+  await tenderly.fundAccount(fork, deployer);
+
   const {request, result: proposalId} = await publicClient.simulateContract({
     address: GovernanceV3Ethereum.GOVERNANCE,
     abi: IGovernanceCore_ABI,
@@ -226,6 +233,7 @@ export const deployAndRegisterTestPayloads = async (
       newVotingPortal,
       '0x22f22ad910127d3ca76dc642f94db34397f94ca969485a216b9d82387808cdfa' as Hex,
     ],
+    value: fee,
     account: deployer,
   });
   await walletClient.writeContract(request);
@@ -237,5 +245,13 @@ export const deployAndRegisterTestPayloads = async (
   const payload = await payloadController.getSimulationPayloadForExecution(payloadId);
   await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, payload);
 
+  const execContract = getContract({
+    address: GovernanceV3Ethereum.EXECUTOR_LVL_1,
+    abi: IOwnable_ABI,
+    publicClient,
+  });
+
+  const executorAddress = await execContract.read.owner();
+  console.log('exec address', executorAddress);
   return proposalId.toString();
 };
