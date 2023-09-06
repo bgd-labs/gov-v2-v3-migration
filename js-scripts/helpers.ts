@@ -22,8 +22,6 @@ import {
   IExecutorWithTimelock_ABI,
   IPayloadsControllerCore_ABI,
 } from '@bgd-labs/aave-address-book';
-import {TenderlyRequest} from '@bgd-labs/aave-cli/src/utils/tenderlyClient';
-import {PayloadState} from '@bgd-labs/aave-cli/src/simulate/govv3/payloadsController';
 
 export const EOA = '0xD73a92Be73EfbFcF3854433A5FcbAbF9c1316073' as const;
 
@@ -201,49 +199,4 @@ export const simulateOnTenderly = async (
       },
     },
   };
-};
-
-const getSimulationPayloadForExecution = async (
-  id: number,
-  payloadsController: Address,
-  publicClient: PublicClient
-) => {
-  const controllerContract = getContract({
-    abi: IPayloadsControllerCore_ABI,
-    address: payloadsController,
-    publicClient,
-  });
-
-  const payload = await controllerContract.read.getPayloadById([id]);
-  const _currentBlock = await publicClient.getBlockNumber();
-  // workaround for tenderly lags & bugs when not specifying the blocknumber
-  const currentBlock = await publicClient.getBlock({blockNumber: _currentBlock - 5n});
-  const simulationPayload: TenderlyRequest = {
-    network_id: String(publicClient.chain!.id),
-    from: EOA,
-    to: controllerContract.address,
-    input: encodeFunctionData({
-      abi: IPayloadsControllerCore_ABI,
-      functionName: 'executePayload',
-      args: [id],
-    }),
-    block_number: Number(currentBlock.number),
-    state_objects: {
-      [controllerContract.address]: {
-        storage: {
-          [getSolidityStorageSlotUint(3n, BigInt(id))]: encodePacked(
-            ['uint40', 'uint40', 'uint8', 'uint8', 'address'],
-            [
-              Number(currentBlock.timestamp - BigInt(payload.delay) - 1n), // altering queued time so can be executed in current block
-              payload.createdAt,
-              PayloadState.Queued,
-              payload.maximumAccessLevelRequired,
-              payload.creator,
-            ]
-          ),
-        },
-      },
-    },
-  };
-  return simulationPayload;
 };

@@ -23,6 +23,7 @@ import {
 } from '@bgd-labs/aave-address-book';
 import {create3Deploy, create3GetAddress} from './create3';
 import VotingMachine from './artifacts/VotingMachine.sol/VotingMachine.json';
+import {getPayloadsController, tenderly} from '@bgd-labs/aave-cli';
 
 const VOTING_PORTAL_SALT = 'VotingPortal salt test';
 const VOTING_STRATEGY = '0x5642A5A5Ec284B4145563aBF319620204aCCA7f4';
@@ -154,7 +155,8 @@ export const deployAndRegisterTestPayloads = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
   deployer: Address,
-  newVotingPortal: Address
+  newVotingPortal: Address,
+  fork: any
 ) => {
   const bytecodeV3Payload = TestV3Payload.bytecode.object as Hex;
   const hashV3Payload = await walletClient.deployContract({
@@ -227,6 +229,13 @@ export const deployAndRegisterTestPayloads = async (
     account: deployer,
   });
   await walletClient.writeContract(request);
+
+  const payloadController = await getPayloadsController(
+    GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+    publicClient
+  );
+  const payload = await payloadController.getSimulationPayloadForExecution(payloadId);
+  await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, payload);
 
   return proposalId.toString();
 };

@@ -124,7 +124,8 @@ const deployPayloadsV2 = async () => {
     walletClient,
     publicClient,
     AaveMisc.ECOSYSTEM_RESERVE,
-    votingPortal
+    votingPortal,
+    fork
   );
   console.log('proposalId: ', proposalId);
   // execute proposal on v3
