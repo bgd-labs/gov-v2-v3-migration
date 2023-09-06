@@ -189,7 +189,7 @@ export const deployShortPermissionsPayload = async (
     account: deployer,
     bytecode: bytecode,
     chain: undefined,
-    args: [GovernanceV3Ethereum.EXECUTOR_LVL_1],
+    args: [],
   });
   const transaction = await publicClient.waitForTransactionReceipt({hash});
 
@@ -208,7 +208,7 @@ export const deployLongPermissionsPayload = async (
     account: deployer,
     bytecode: bytecode,
     chain: undefined,
-    args: [GovernanceV3Ethereum.EXECUTOR_LVL_2],
+    args: [],
   });
   const transaction = await publicClient.waitForTransactionReceipt({hash});
 

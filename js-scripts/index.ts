@@ -128,7 +128,6 @@ const deployPayloadsV2 = async () => {
     fork
   );
   console.log('proposalId: ', proposalId);
-  // execute proposal on v3
 };
 
 deployPayloadsV2().then().catch(console.log);
