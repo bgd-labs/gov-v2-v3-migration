@@ -31,8 +31,8 @@ contract AvaxMovePermissionsPayload {
       true
     );
 
-    // V2 MARKETS
-    MigratorLib.migrateV2MarketPermissions(
+    // V2 POOL
+    MigratorLib.migrateV2PoolPermissions(
       AVALANCHE_LEVEL_1_EXECUTOR_V3,
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER,
       AaveV2Avalanche.ORACLE,
@@ -40,8 +40,8 @@ contract AvaxMovePermissionsPayload {
       AaveV2Avalanche.WETH_GATEWAY,
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY
     );
-    // V3 MARKETS
-    MigratorLib.migrateV3MarketPermissions(
+    // V3 POOL
+    MigratorLib.migrateV3PoolPermissions(
       AVALANCHE_LEVEL_1_EXECUTOR_V3,
       AaveV3Avalanche.ACL_MANAGER,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,

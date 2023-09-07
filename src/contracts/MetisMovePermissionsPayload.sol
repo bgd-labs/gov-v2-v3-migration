@@ -10,8 +10,8 @@ contract MetisMovePermissionsPayload {
   address public constant METIS_LEVEL_1_EXECUTOR_V3 = address(5);
 
   function execute() external {
-    // V3 MARKETS
-    MigratorLib.migrateV3MarketPermissions(
+    // V3 POOL
+    MigratorLib.migrateV3PoolPermissions(
       METIS_LEVEL_1_EXECUTOR_V3,
       AaveV3Metis.ACL_MANAGER,
       AaveV3Metis.POOL_ADDRESSES_PROVIDER,

@@ -10,8 +10,8 @@ contract BaseMovePermissionsPayload {
   address public constant BASE_LEVEL_1_EXECUTOR_V3 = address(6);
 
   function execute() external {
-    // V3 MARKETS
-    MigratorLib.migrateV3MarketPermissions(
+    // V3 POOL
+    MigratorLib.migrateV3PoolPermissions(
       BASE_LEVEL_1_EXECUTOR_V3,
       AaveV3Base.ACL_MANAGER,
       AaveV3Base.POOL_ADDRESSES_PROVIDER,
