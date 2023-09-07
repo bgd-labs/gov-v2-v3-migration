@@ -22,6 +22,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
   address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
+  address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('ethereum'), 18035350);
@@ -118,9 +119,14 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testStkRoles() internal {
     // stk tokens - set admin roles
     IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
+    IStakedToken stkABPT = IStakedToken(STK_ABPT_ADDRESS);
 
     stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), address(1));
     stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), address(2));
     stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), address(3));
+
+    stkABPT.setPendingAdmin(stkABPT.SLASH_ADMIN_ROLE(), address(1));
+    stkABPT.setPendingAdmin(stkABPT.COOLDOWN_ADMIN_ROLE(), address(2));
+    stkABPT.setPendingAdmin(stkABPT.CLAIM_HELPER_ROLE(), address(3));
   }
 }
