@@ -17,6 +17,7 @@ import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/in
 import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
+import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 contract EthShortMovePermissionsPayload {
@@ -112,18 +113,11 @@ contract EthShortMovePermissionsPayload {
       false
     );
 
+    // GHO
+    migrateGHOPermissions();
+
     // V1 POOL
-
-    // lending pool manager
-    ILendingPoolAddressProviderV1(AAVE_V1_ADDRESS_PROVIDER).setLendingPoolManager(
-      GovernanceV3Ethereum.EXECUTOR_LVL_1
-    );
-
-    // owner of address provider
-    Ownable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-
-    // owner of price provider
-    Ownable(AAVE_V1_PRICE_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    migrateV1Pool();
 
     // V2 POOL
     MigratorLib.migrateV2PoolPermissions(
@@ -186,5 +180,88 @@ contract EthShortMovePermissionsPayload {
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
       GovernanceV3Ethereum.PAYLOADS_CONTROLLER
     );
+  }
+
+  function migrateStkPermissions() internal {
+    IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
+    IStakedToken stkABPT = IStakedToken(STK_ABPT_ADDRESS);
+
+    stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    stkABPT.setPendingAdmin(stkABPT.SLASH_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    stkABPT.setPendingAdmin(stkABPT.COOLDOWN_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    stkABPT.setPendingAdmin(stkABPT.CLAIM_HELPER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    // new executor - call execute payload to accept new permissions
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
+      address(stkAave),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkAave.SLASH_ADMIN_ROLE()),
+      false
+    );
+
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
+      address(stkAave),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkAave.COOLDOWN_ADMIN_ROLE()),
+      false
+    );
+
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
+      address(stkAave),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkAave.CLAIM_HELPER_ROLE()),
+      false
+    );
+
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
+      address(stkABPT),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkABPT.SLASH_ADMIN_ROLE()),
+      false
+    );
+
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
+      address(stkABPT),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkABPT.COOLDOWN_ADMIN_ROLE()),
+      false
+    );
+
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
+      address(stkABPT),
+      0,
+      'claimRoleAdmin(uint256)',
+      abi.encode(stkABPT.CLAIM_HELPER_ROLE()),
+      false
+    );
+  }
+
+  function migrateV1Pool() internal {
+    // lending pool manager
+    ILendingPoolAddressProviderV1(AAVE_V1_ADDRESS_PROVIDER).setLendingPoolManager(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
+
+    // owner of address provider
+    Ownable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    // owner of price provider
+    Ownable(AAVE_V1_PRICE_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+  }
+
+  function migrateGHOPermissions() internal {
+    IGhoAccessControl ghoToken = IGhoAccessControl(AaveV3Ethereum.GHO_TOKEN);
+
+    ghoToken.grantRole(ghoToken.DEFAULT_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    ghoToken.grantRole(ghoToken.FACILITATOR_MANAGER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    ghoToken.grantRole(ghoToken.BUCKET_MANAGER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
   }
 }

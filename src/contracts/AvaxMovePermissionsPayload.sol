@@ -62,8 +62,5 @@ contract AvaxMovePermissionsPayload {
     Ownable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
       AVALANCHE_LEVEL_1_EXECUTOR_V3
     );
-
-    // DefaultIncentivesController - need to be redeployed with the new params
-    // Currently permission is held by separate multisig
   }
 }
