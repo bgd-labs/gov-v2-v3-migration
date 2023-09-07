@@ -112,7 +112,7 @@ contract EthShortMovePermissionsPayload {
       false
     );
 
-    // V1 MARKET
+    // V1 POOL
 
     // lending pool manager
     ILendingPoolAddressProviderV1(AAVE_V1_ADDRESS_PROVIDER).setLendingPoolManager(
@@ -125,8 +125,8 @@ contract EthShortMovePermissionsPayload {
     // owner of price provider
     Ownable(AAVE_V1_PRICE_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
-    // V2 MARKETS
-    MigratorLib.migrateV2MarketPermissions(
+    // V2 POOL
+    MigratorLib.migrateV2PoolPermissions(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER,
       AaveV2Ethereum.ORACLE,
@@ -134,7 +134,7 @@ contract EthShortMovePermissionsPayload {
       AaveV2Ethereum.WETH_GATEWAY,
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY
     );
-    MigratorLib.migrateV2MarketPermissions(
+    MigratorLib.migrateV2PoolPermissions(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER,
       AaveV2EthereumAMM.ORACLE,
@@ -143,8 +143,8 @@ contract EthShortMovePermissionsPayload {
       AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY
     );
 
-    // V3 MARKETS
-    MigratorLib.migrateV3MarketPermissions(
+    // V3 POOL
+    MigratorLib.migrateV3PoolPermissions(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV3Ethereum.ACL_MANAGER,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
@@ -163,15 +163,11 @@ contract EthShortMovePermissionsPayload {
     Ownable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // LendToAave Migrator
-    TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(
-      GovernanceV3Ethereum.EXECUTOR_LVL_1
-    );
+    TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
 
     // Safety module
-    TransparentUpgradeableProxy(ABPT).changeAdmin(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    IBalancerOwnable(ABPT).setController(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-
-    // DefaultIncentivesController - do we need it?
+    TransparentUpgradeableProxy(ABPT).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
+    IBalancerOwnable(ABPT).setController(AaveMisc.PROXY_ADMIN_ETHEREUM);
 
     // EXECUTOR PERMISSIONS
 
