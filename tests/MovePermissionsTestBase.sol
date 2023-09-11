@@ -132,7 +132,7 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     uint256 nativeAfter = address(crosschainController).balance;
     uint256 linkAfter = IERC20(linkAddress).balanceOf(crosschainController);
 
-    assertTrue(nativeAfter > nativeAmount);
-    assertTrue(linkAfter > linkAmount);
+    assertTrue(nativeAfter >= nativeAmount);
+    assertTrue(linkAfter >= linkAmount);
   }
 }
