@@ -9,7 +9,7 @@ import {ICollector} from 'aave-address-book/common/ICollector.sol';
 import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 
 library MigratorLib {
-  function migrateV2MarketPermissions(
+  function migrateV2PoolPermissions(
     address executor,
     ILendingPoolAddressesProvider poolAddressesProvider,
     IAaveOracle oracle, // per chain
@@ -21,7 +21,7 @@ library MigratorLib {
     Ownable(address(poolAddressesProvider)).transferOwnership(executor);
     Ownable(wETHGateway).transferOwnership(executor);
 
-    // this components are common across different markets, and maybe already transfered
+    // this components are common across different pools, and maybe already transfered
     if (Ownable(address(oracle)).owner() == address(this)) {
       Ownable(address(oracle)).transferOwnership(executor);
     }
@@ -33,7 +33,7 @@ library MigratorLib {
     }
   }
 
-  function migrateV3MarketPermissions(
+  function migrateV3PoolPermissions(
     address executor,
     IACLManager aclManager,
     IPoolAddressesProvider poolAddressesProvider,

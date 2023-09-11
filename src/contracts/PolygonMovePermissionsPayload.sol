@@ -30,8 +30,8 @@ contract PolygonMovePermissionsPayload {
       true
     );
 
-    // V2 MARKETS
-    MigratorLib.migrateV2MarketPermissions(
+    // V2 POOL
+    MigratorLib.migrateV2PoolPermissions(
       POLYGON_LEVEL_1_EXECUTOR_V3,
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER,
       AaveV2Polygon.ORACLE,
@@ -40,8 +40,8 @@ contract PolygonMovePermissionsPayload {
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY
     );
 
-    // V3 MARKETS
-    MigratorLib.migrateV3MarketPermissions(
+    // V3 POOL
+    MigratorLib.migrateV3PoolPermissions(
       POLYGON_LEVEL_1_EXECUTOR_V3,
       AaveV3Polygon.ACL_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,

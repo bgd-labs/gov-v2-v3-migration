@@ -14,6 +14,7 @@ import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
 import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
+import {IGhoAccessControl} from '../src/contracts/dependencies/IGhoAccessControl.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
@@ -22,6 +23,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
   address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
+  address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('ethereum'), 18035350);
@@ -64,11 +66,14 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER
     );
 
+    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM);
     _testMisc(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       payload.LEND_TO_AAVE_MIGRATOR(),
       payload.AAVE_MERKLE_DISTRIBUTOR()
     );
+    vm.stopPrank();
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     _testExecutor(GovernanceV3Ethereum.EXECUTOR_LVL_1, GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
 
@@ -81,6 +86,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       payload.LINK_AMOUNT()
     );
 
+    _testGhoPermissions();
+
     vm.stopPrank();
   }
 
@@ -90,7 +97,10 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     address aaveMerkleDistributor
   ) internal {
     // Lend to Aave migrator
-    assertEq(TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(), newExecutor);
+    assertEq(
+      TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(),
+      AaveMisc.PROXY_ADMIN_ETHEREUM
+    );
 
     // Merkle Distributor
     assertEq(Ownable(aaveMerkleDistributor).owner(), newExecutor);
@@ -118,9 +128,23 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testStkRoles() internal {
     // stk tokens - set admin roles
     IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
+    IStakedToken stkABPT = IStakedToken(STK_ABPT_ADDRESS);
 
     stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), address(1));
     stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), address(2));
     stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), address(3));
+
+    stkABPT.setPendingAdmin(stkABPT.SLASH_ADMIN_ROLE(), address(1));
+    stkABPT.setPendingAdmin(stkABPT.COOLDOWN_ADMIN_ROLE(), address(2));
+    stkABPT.setPendingAdmin(stkABPT.CLAIM_HELPER_ROLE(), address(3));
+  }
+
+  function _testGhoPermissions() internal {
+    IGhoAccessControl ghoToken = IGhoAccessControl(AaveV3Ethereum.GHO_TOKEN);
+
+    ghoToken.addFacilitator(address(1), 'test_one', 1 ether);
+    ghoToken.setFacilitatorBucketCapacity(address(1), 2 ether);
+
+    ghoToken.grantRole(ghoToken.FACILITATOR_MANAGER_ROLE(), address(2));
   }
 }
