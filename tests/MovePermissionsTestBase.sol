@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Test} from 'forge-std/Test.sol';
+import {ProtocolV3TestBase} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveOracle as IAaveOracleV2, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
@@ -16,7 +16,7 @@ import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermiss
 import {IPoolAddressProviderRegistry} from './helpers/IPoolAddressProviderRegistry.sol';
 import {IEmissionManager} from './helpers/IEmissionManager.sol';
 
-contract MovePermissionsTestBase is Test {
+contract MovePermissionsTestBase is ProtocolV3TestBase {
   function _testV2(
     address newExecutor,
     ILendingPoolAddressesProvider poolAddressProvider,
