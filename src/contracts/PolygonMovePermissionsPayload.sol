@@ -15,7 +15,19 @@ contract PolygonMovePermissionsPayload {
   uint256 public constant MATIC_AMOUNT = 2040 ether;
   uint256 public constant LINK_AMOUNT = 114 ether;
 
+  address public constant GELATO_ADDRESS = 0x73495115E38A307DA3419Bf062bb050b96f68Cf3;
+  uint256 public constant GELATO_AMOUNT = 10_000e6;
+
   function execute() external {
+    // GELATO FUNDING
+    AaveV3Polygon.COLLECTOR.transfer(
+      AaveV3PolygonAssets.USDC_A_TOKEN,
+      address(this),
+      GELATO_AMOUNT
+    );
+
+    AaveV3Polygon.POOL.withdraw(AaveV3PolygonAssets.USDC_UNDERLYING, GELATO_AMOUNT, GELATO_ADDRESS);
+
     // CC FUNDING
     MigratorLib.fundCrosschainController(
       AaveV3Polygon.COLLECTOR,
@@ -53,8 +65,5 @@ contract PolygonMovePermissionsPayload {
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER
     );
-
-    // DefaultIncentivesController - need to be redeployed with the new params
-    // Currently permission is held by separate multisig
   }
 }
