@@ -30,7 +30,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18035350);
+    vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
   }
 
   function testPayload() public {
@@ -75,13 +75,12 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
     );
 
-    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM);
     _testMisc(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       payload.LEND_TO_AAVE_MIGRATOR(),
       payload.AAVE_MERKLE_DISTRIBUTOR()
     );
-    vm.stopPrank();
+
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     _testExecutor(
@@ -108,14 +107,21 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     address lendToAaveMigrator,
     address aaveMerkleDistributor
   ) internal {
+    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM);
+
     // Lend to Aave migrator
     assertEq(
       TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(),
       AaveMisc.PROXY_ADMIN_ETHEREUM
     );
 
+    vm.stopPrank();
+
     // Merkle Distributor
     assertEq(Ownable(aaveMerkleDistributor).owner(), newExecutor);
+
+    assertEq(Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).owner(), newExecutor);
+    assertEq(Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).owner(), newExecutor);
   }
 
   function _testExecutor(address newExecutor, address payloadController) internal {

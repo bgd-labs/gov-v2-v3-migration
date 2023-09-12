@@ -167,6 +167,9 @@ contract EthShortMovePermissionsPayload {
     TransparentUpgradeableProxy(ABPT).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
     IBalancerOwnable(ABPT).setController(AaveMisc.PROXY_ADMIN_ETHEREUM);
 
+    Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
     // EXECUTOR PERMISSIONS
 
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_1));
