@@ -51,7 +51,8 @@ contract AvaxMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_AVALANCHE,
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER
     );
 
     // Proof of reserve

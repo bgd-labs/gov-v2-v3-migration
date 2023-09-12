@@ -23,7 +23,7 @@ contract EthLongMovePermissionsPayloadTest is ProtocolV3TestBase {
   }
 
   function testPayload() public {
-    vm.startPrank(GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
+    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(AaveGovernanceV2.LONG_EXECUTOR);
     vm.stopPrank();
 
@@ -40,7 +40,7 @@ contract EthLongMovePermissionsPayloadTest is ProtocolV3TestBase {
 
     assertEq(
       Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(),
-      GovernanceV3Ethereum.PAYLOADS_CONTROLLER
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
 
     vm.stopPrank();

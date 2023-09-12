@@ -151,7 +151,8 @@ contract EthShortMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_ETHEREUM,
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
     );
 
     // MISC ECOSYSTEM
@@ -181,7 +182,7 @@ contract EthShortMovePermissionsPayload {
 
     // new executor - change owner to payload controller
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
-      GovernanceV3Ethereum.PAYLOADS_CONTROLLER
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
   }
 

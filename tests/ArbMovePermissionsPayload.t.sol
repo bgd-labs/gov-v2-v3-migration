@@ -10,7 +10,7 @@ import {ArbMovePermissionsPayload} from '../src/contracts/ArbMovePermissionsPayl
 
 contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('arbitrum'), 123817571);
+    vm.createSelectFork(vm.rpcUrl('arbitrum'), 130402128);
   }
 
   function testPermissionsTransfer() public {
@@ -29,10 +29,15 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3ArbitrumAssets.DAI_ORACLE,
       AaveV3Arbitrum.EMISSION_MANAGER,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_ARBITRUM,
+      AaveMisc.PROXY_ADMIN_ARBITRUM
+    );
+
+    _testV3Optional(
+      payload.ARBITRUM_LEVEL_1_EXECUTOR_V3(),
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Arbitrum.WITHDRAW_SWAP_ADAPTER
     );
 
     vm.stopPrank();

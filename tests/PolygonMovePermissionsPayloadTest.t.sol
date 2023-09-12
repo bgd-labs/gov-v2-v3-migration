@@ -15,7 +15,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   uint256 public constant GELATO_AMOUNT = 10_000e6;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 46612086);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 47447966);
   }
 
   function testPayload() public {
@@ -43,10 +43,15 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3PolygonAssets.DAI_ORACLE,
       AaveV3Polygon.EMISSION_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_POLYGON,
+      AaveMisc.PROXY_ADMIN_POLYGON
+    );
+
+    _testV3Optional(
+      payload.POLYGON_LEVEL_1_EXECUTOR_V3(),
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER
     );
 
     _testCrosschainFunding(

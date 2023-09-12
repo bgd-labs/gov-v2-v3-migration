@@ -34,7 +34,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function testPayload() public {
-    vm.startPrank(GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
+    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
     vm.stopPrank();
 
@@ -64,10 +64,15 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3EthereumAssets.DAI_ORACLE,
       AaveV3Ethereum.EMISSION_MANAGER,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_ETHEREUM,
+      AaveMisc.PROXY_ADMIN_ETHEREUM
+    );
+
+    _testV3Optional(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
     );
 
     vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM);
@@ -79,7 +84,10 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     vm.stopPrank();
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
-    _testExecutor(GovernanceV3Ethereum.EXECUTOR_LVL_1, GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
+    _testExecutor(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
+    );
 
     _testStkRoles();
 

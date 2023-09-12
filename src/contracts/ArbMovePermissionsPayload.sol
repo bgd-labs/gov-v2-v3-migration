@@ -21,7 +21,8 @@ contract ArbMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_ARBITRUM,
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Arbitrum.WITHDRAW_SWAP_ADAPTER
     );
   }
 }

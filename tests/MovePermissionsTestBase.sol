@@ -60,10 +60,7 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     address assetSource,
     address emissionManager,
     address poolAddressProviderRegistry,
-    address proxyAdmin,
-    address wethGateway,
-    address swapCollateral,
-    address repayWithCollateral
+    address proxyAdmin
   ) internal {
     // check Pool Admin
     IPoolConfigurator(poolAddressProvider.getPoolConfigurator()).setReserveFreeze(asset, true);
@@ -97,7 +94,15 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
 
     // Proxy Admin
     ProxyAdmin(proxyAdmin).changeProxyAdmin(proxy, address(this));
+  }
 
+  function _testV3Optional(
+    address newExecutor,
+    address wethGateway,
+    address swapCollateral,
+    address repayWithCollateral,
+    address withdrawSwapAdapter
+  ) internal {
     // WETH_GATEWAY
     if (wethGateway != address(0)) {
       assertEq(Ownable(wethGateway).owner(), newExecutor);
@@ -111,6 +116,11 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     // ParaSwapRepayAdapter
     if (repayWithCollateral != address(0)) {
       assertEq(Ownable(repayWithCollateral).owner(), newExecutor);
+    }
+
+    // WithdrawSwapAdapter
+    if (withdrawSwapAdapter != address(0)) {
+      assertEq(Ownable(withdrawSwapAdapter).owner(), newExecutor);
     }
   }
 

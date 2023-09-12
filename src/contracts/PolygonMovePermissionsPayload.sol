@@ -63,7 +63,8 @@ contract PolygonMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_POLYGON,
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER
     );
   }
 }

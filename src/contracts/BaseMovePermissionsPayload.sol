@@ -21,7 +21,8 @@ contract BaseMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_BASE,
       AaveV3Base.WETH_GATEWAY,
       address(0), // swap collateral adapter not deployed yet
-      address(0) // repay with collateral adapter not deployed yet
+      address(0), // repay with collateral adapter not deployed yet
+      address(0) // withdraw swap adapter not deployed
     );
   }
 }

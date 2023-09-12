@@ -43,7 +43,8 @@ library MigratorLib {
     address proxyAdmin,
     address wETHGateway,
     address swapCollateralAdapter,
-    address repayWithCollateralAdapter
+    address repayWithCollateralAdapter,
+    address withdrawSwapAdapter
   ) internal {
     // grant pool admin role
     aclManager.grantRole(aclManager.POOL_ADMIN_ROLE(), executor);
@@ -77,6 +78,10 @@ library MigratorLib {
 
     if (repayWithCollateralAdapter != address(0)) {
       Ownable(repayWithCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (withdrawSwapAdapter != address(0)) {
+      Ownable(withdrawSwapAdapter).transferOwnership(executor);
     }
   }
 

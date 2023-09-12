@@ -58,7 +58,7 @@ contract EthLongMovePermissionsPayload {
 
     // new executor - change owner to payload controller
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
-      GovernanceV3Ethereum.PAYLOADS_CONTROLLER
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
   }
 }
