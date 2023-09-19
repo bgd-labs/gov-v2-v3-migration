@@ -6,30 +6,23 @@ import ATokenWithDelegation from './artifacts/ATokenWithDelegation.sol/ATokenWit
 import UpdateAaveTokenPayload from './artifacts/UpdateAaveTokenPayload.sol/UpdateAaveTokenPayload.json';
 import UpdateAAavePayload from './artifacts/UpdateAAavePayload.sol/UpdateAAavePayload.json';
 import UpdateStkAavePayload from './artifacts/ProposalPayload.sol/UpdateStkAavePayload.json';
-import EthShortMovePermissionsPayload from './artifacts/EthShortMovePermissionsPayload.sol/EthShortMovePermissionsPayload.json';
-import EthLongMovePermissionsPayload from './artifacts/EthLongMovePermissionsPayload.sol/EthLongMovePermissionsPayload.json';
-import {
-  GovernanceV3Ethereum,
-  AaveV3EthereumAssets,
-  AaveMisc,
-  AaveV3Ethereum,
-} from '@bgd-labs/aave-address-book';
+import EthShortMovePermissionsPayload from '../out/EthShortMovePermissionsPayload.sol/EthShortMovePermissionsPayload.json';
+import EthLongMovePermissionsPayload from '../out/EthLongMovePermissionsPayload.sol/EthLongMovePermissionsPayload.json';
+import {GovernanceV3Ethereum, AaveMisc, AaveV3Ethereum} from '@bgd-labs/aave-address-book';
+import {deployContract} from './helpers';
+import {DEPLOYER} from './index';
 
 export const deployAaveImpl = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
   deployer: Address
 ) => {
-  const bytecode = AaveTokenV3.bytecode.object as Hex;
-  const hash = await walletClient.deployContract({
-    abi: AaveTokenV3.abi,
-    account: deployer,
-    bytecode: bytecode,
-    chain: undefined,
-  });
-  const transaction = await publicClient.waitForTransactionReceipt({hash});
-  // console.log('tx: ', transaction);
-  const aaveTokenImplAddress = transaction.contractAddress as Hex;
+  const aaveTokenImplAddress = await deployContract(
+    walletClient,
+    publicClient,
+    deployer,
+    AaveTokenV3
+  );
 
   const {request} = await publicClient.simulateContract({
     address: aaveTokenImplAddress,
@@ -60,8 +53,8 @@ export const deployStkAaveImpl = async (
     bytecode: bytecode,
     chain: undefined,
     args: [
-      AaveV3EthereumAssets.AAVE.UNDERLYING,
-      AaveV3EthereumAssets.AAVE.UNDERLYING,
+      AaveV3Ethereum.ASSETS.AAVE.UNDERLYING,
+      AaveV3Ethereum.ASSETS.AAVE.UNDERLYING,
       unstakeWindow,
       AaveMisc.ECOSYSTEM_RESERVE,
       emissionManager,
@@ -100,7 +93,7 @@ export const deployAAaveImpl = async (
     functionName: 'initialize',
     args: [
       AaveV3Ethereum.POOL,
-      AaveV3EthereumAssets.AAVE.UNDERLYING,
+      AaveV3Ethereum.ASSETS.AAVE.UNDERLYING,
       AaveV3Ethereum.COLLECTOR,
       AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
       18,
@@ -177,40 +170,21 @@ export const deployAAaveTokenPayload = async (
   return transaction.contractAddress as Hex;
 };
 
-// - deploy short executor payload
-export const deployShortPermissionsPayload = async (
+export const executeL2Payload = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
-  deployer: Address
+  executor: Address,
+  payload: Address,
+  abi: any
 ) => {
-  const bytecode = EthShortMovePermissionsPayload.bytecode.object as Hex;
-  const hash = await walletClient.deployContract({
-    abi: EthShortMovePermissionsPayload.abi,
-    account: deployer,
-    bytecode: bytecode,
-    chain: undefined,
+  const {request, result} = await publicClient.simulateContract({
+    address: payload,
+    abi,
+    functionName: 'execute',
     args: [],
+    account: executor,
   });
-  const transaction = await publicClient.waitForTransactionReceipt({hash});
-
-  return transaction.contractAddress as Hex;
-};
-
-// - deploy long executor payload
-export const deployLongPermissionsPayload = async (
-  walletClient: WalletClient,
-  publicClient: PublicClient,
-  deployer: Address
-) => {
-  const bytecode = EthLongMovePermissionsPayload.bytecode.object as Hex;
-  const hash = await walletClient.deployContract({
-    abi: EthLongMovePermissionsPayload.abi,
-    account: deployer,
-    bytecode: bytecode,
-    chain: undefined,
-    args: [],
-  });
-  const transaction = await publicClient.waitForTransactionReceipt({hash});
-
-  return transaction.contractAddress as Hex;
+  const hash = await walletClient.writeContract(request);
+  await publicClient.waitForTransactionReceipt({hash});
+  return result;
 };

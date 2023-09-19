@@ -200,3 +200,22 @@ export const simulateOnTenderly = async (
     },
   };
 };
+
+export const deployContract = async (
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  deployer: Address,
+  artifact: any
+) => {
+  const bytecode = artifact.bytecode.object as Hex;
+  const hash = await walletClient.deployContract({
+    abi: artifact.abi,
+    account: deployer,
+    bytecode: bytecode,
+    chain: undefined,
+    args: [],
+  });
+  const transaction = await publicClient.waitForTransactionReceipt({hash});
+
+  return transaction.contractAddress as Hex;
+};

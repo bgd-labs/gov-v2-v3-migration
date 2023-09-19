@@ -9,10 +9,14 @@ import {
   WalletClient,
 } from 'viem';
 import VotingPortal from './artifacts/VotingPortal.sol/VotingPortal.json';
-import TestV2Payload from './artifacts/PoolPayload.sol/TestV2Payload.json';
-import TestV3Payload from './artifacts/PoolPayload.sol/TestV3Payload.json';
 import {
+  GovernanceV3Arbitrum,
+  GovernanceV3Avalanche,
+  GovernanceV3Base,
   GovernanceV3Ethereum,
+  GovernanceV3Metis,
+  GovernanceV3Optimism,
+  GovernanceV3Polygon,
   ICrossChainController_ABI,
   IExecutor_ABI,
   IGovernanceCore_ABI,
@@ -22,6 +26,7 @@ import {
 import {create3Deploy, create3GetAddress} from './create3';
 import VotingMachine from './artifacts/VotingMachine.sol/VotingMachine.json';
 import {getPayloadsController, tenderly} from '@bgd-labs/aave-cli';
+import {deployContract} from './helpers';
 
 const VOTING_PORTAL_SALT = 'VotingPortal salt test';
 const VOTING_STRATEGY = '0x5642A5A5Ec284B4145563aBF319620204aCCA7f4';
@@ -153,68 +158,42 @@ export const deployAndRegisterTestPayloads = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
   deployer: Address,
-  newVotingPortal: Address,
-  fork: any
+  governanceAddresses: any,
+  payloadArtifacts: any[]
 ) => {
-  const bytecodeV3Payload = TestV3Payload.bytecode.object as Hex;
-  const hashV3Payload = await walletClient.deployContract({
-    abi: TestV3Payload.abi,
-    account: deployer,
-    bytecode: bytecodeV3Payload,
-    chain: undefined,
-    args: [],
-  });
-  const transactionV3Payload = await publicClient.waitForTransactionReceipt({hash: hashV3Payload});
-  const testV3Payload = transactionV3Payload.contractAddress as Hex;
-
-  const bytecodeV2Payload = TestV2Payload.bytecode.object as Hex;
-  const hashV2Payload = await walletClient.deployContract({
-    abi: TestV2Payload.abi,
-    account: deployer,
-    bytecode: bytecodeV2Payload,
-    chain: undefined,
-    args: [],
-  });
-  const transactionV2Payload = await publicClient.waitForTransactionReceipt({hash: hashV2Payload});
-  const testV2Payload = transactionV2Payload.contractAddress as Hex;
-
-  // register payload
   const actions: Actions[] = [];
-  actions.push({
-    target: testV2Payload,
-    withDelegateCall: true,
-    value: 0n,
-    signature: 'execute()',
-    accessLevel: 1,
-    callData: '' as Hex,
-  });
-  actions.push({
-    target: testV3Payload,
-    withDelegateCall: true,
-    value: 0n,
-    signature: 'execute()',
-    accessLevel: 1,
-    callData: '' as Hex,
-  });
+  for (let i = 0; i < payloadArtifacts.length; i++) {
+    const payload = await deployContract(walletClient, publicClient, deployer, payloadArtifacts[i]);
+    actions.push({
+      target: payload,
+      withDelegateCall: true,
+      value: 0n,
+      signature: 'execute()',
+      accessLevel: 1,
+      callData: '' as Hex,
+    });
+  }
 
+  // register payloads
   const {request: payloadRegistered, result: payloadId} = await publicClient.simulateContract({
-    address: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+    address: governanceAddresses.PAYLOADS_CONTROLLER,
     abi: IPayloadsControllerCore_ABI,
     functionName: 'createPayload',
     args: [actions],
     account: deployer,
   });
   await walletClient.writeContract(payloadRegistered);
+  return payloadId;
+};
 
-  // create proposal
-  const payloads: Payload[] = [];
-  payloads.push({
-    payloadsController: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-    chain: 1n,
-    payloadId,
-    accessLevel: 1,
-  });
-
+export const generateProposalAndExecutePayload = async (
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  fork: any,
+  deployer: Address,
+  payloadId: number,
+  chain: any
+) => {
   const govContract = getContract({
     address: GovernanceV3Ethereum.GOVERNANCE,
     abi: IGovernanceCore_ABI,
@@ -224,13 +203,21 @@ export const deployAndRegisterTestPayloads = async (
 
   await tenderly.fundAccount(fork, deployer);
 
+  const payloads: Payload[] = [];
+  payloads.push({
+    payloadsController: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+    chain: chain.id,
+    payloadId,
+    accessLevel: 1,
+  });
+
   const {request, result: proposalId} = await publicClient.simulateContract({
     address: GovernanceV3Ethereum.GOVERNANCE,
     abi: IGovernanceCore_ABI,
     functionName: 'createProposal',
     args: [
       payloads,
-      newVotingPortal,
+      GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
       '0x22f22ad910127d3ca76dc642f94db34397f94ca969485a216b9d82387808cdfa' as Hex,
     ],
     value: fee,
@@ -240,18 +227,11 @@ export const deployAndRegisterTestPayloads = async (
 
   const payloadController = await getPayloadsController(
     GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+    // @ts-ignore
     publicClient
   );
   const payload = await payloadController.getSimulationPayloadForExecution(payloadId);
   await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, payload);
 
-  const execContract = getContract({
-    address: GovernanceV3Ethereum.EXECUTOR_LVL_1,
-    abi: IOwnable_ABI,
-    publicClient,
-  });
-
-  const executorAddress = await execContract.read.owner();
-  console.log('exec address', executorAddress);
-  return proposalId.toString();
+  return proposalId;
 };
