@@ -10,7 +10,7 @@ import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayl
 
 contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 108548784);
+    vm.createSelectFork(vm.rpcUrl('optimism'), 109460125);
   }
 
   function testPermissionsTransfer() public {
@@ -29,10 +29,15 @@ contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3OptimismAssets.DAI_ORACLE,
       AaveV3Optimism.EMISSION_MANAGER,
       AaveV3Optimism.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_OPTIMISM,
+      AaveMisc.PROXY_ADMIN_OPTIMISM
+    );
+
+    _testV3Optional(
+      payload.OPTIMISM_LEVEL_1_EXECUTOR_V3(),
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER
     );
 
     vm.stopPrank();

@@ -5,6 +5,7 @@ import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
+import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -21,6 +22,8 @@ import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 contract EthShortMovePermissionsPayload {
+  address public constant A_AAVE_IMPL = 0xC383AAc4B3dC18D9ce08AB7F63B4632716F1e626;
+
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
   address public constant AAVE_MERKLE_DISTRIBUTOR = 0xa88c6D90eAe942291325f9ae3c66f3563B93FE10;
@@ -148,7 +151,8 @@ contract EthShortMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_ETHEREUM,
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
     );
 
     // MISC ECOSYSTEM
@@ -162,6 +166,9 @@ contract EthShortMovePermissionsPayload {
     // Safety module
     TransparentUpgradeableProxy(ABPT).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
     IBalancerOwnable(ABPT).setController(AaveMisc.PROXY_ADMIN_ETHEREUM);
+
+    Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // EXECUTOR PERMISSIONS
 
@@ -178,7 +185,7 @@ contract EthShortMovePermissionsPayload {
 
     // new executor - change owner to payload controller
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
-      GovernanceV3Ethereum.PAYLOADS_CONTROLLER
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
   }
 
@@ -263,5 +270,22 @@ contract EthShortMovePermissionsPayload {
     ghoToken.grantRole(ghoToken.DEFAULT_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     ghoToken.grantRole(ghoToken.FACILITATOR_MANAGER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     ghoToken.grantRole(ghoToken.BUCKET_MANAGER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+  }
+
+  function upgradeAAave() internal {
+    // update aAave implementation
+
+    ConfiguratorInputTypes.UpdateATokenInput memory input = ConfiguratorInputTypes
+      .UpdateATokenInput({
+        asset: AaveV3EthereumAssets.AAVE_UNDERLYING,
+        treasury: address(AaveV3Ethereum.COLLECTOR),
+        incentivesController: AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
+        name: 'Aave Ethereum AAVE',
+        symbol: 'aEthAAVE',
+        implementation: A_AAVE_IMPL,
+        params: '0x10' // this parameter is not actually used anywhere
+      });
+
+    AaveV3Ethereum.POOL_CONFIGURATOR.updateAToken(input);
   }
 }

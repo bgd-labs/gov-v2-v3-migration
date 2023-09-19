@@ -2,7 +2,9 @@
 pragma solidity ^0.8.0;
 
 import {MovePermissionsTestBase} from './MovePermissionsTestBase.sol';
+import {ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
+import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
@@ -20,17 +22,19 @@ import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.s
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
+  address public constant A_AAVE_IMPL = 0xC383AAc4B3dC18D9ce08AB7F63B4632716F1e626;
+
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
   address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
   address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18035350);
+    vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
   }
 
   function testPayload() public {
-    vm.startPrank(GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
+    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
     vm.stopPrank();
 
@@ -60,22 +64,29 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3EthereumAssets.DAI_ORACLE,
       AaveV3Ethereum.EMISSION_MANAGER,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_ETHEREUM,
-      AaveV3Ethereum.WETH_GATEWAY,
-      AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER
+      AaveMisc.PROXY_ADMIN_ETHEREUM
     );
 
-    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM);
+    _testV3Optional(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      AaveV3Ethereum.WETH_GATEWAY,
+      AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
+      AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
+    );
+
     _testMisc(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       payload.LEND_TO_AAVE_MIGRATOR(),
       payload.AAVE_MERKLE_DISTRIBUTOR()
     );
-    vm.stopPrank();
+
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
-    _testExecutor(GovernanceV3Ethereum.EXECUTOR_LVL_1, GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
+    _testExecutor(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
+    );
 
     _testStkRoles();
 
@@ -96,14 +107,21 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     address lendToAaveMigrator,
     address aaveMerkleDistributor
   ) internal {
+    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM);
+
     // Lend to Aave migrator
     assertEq(
       TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(),
       AaveMisc.PROXY_ADMIN_ETHEREUM
     );
 
+    vm.stopPrank();
+
     // Merkle Distributor
     assertEq(Ownable(aaveMerkleDistributor).owner(), newExecutor);
+
+    assertEq(Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).owner(), newExecutor);
+    assertEq(Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).owner(), newExecutor);
   }
 
   function _testExecutor(address newExecutor, address payloadController) internal {
@@ -146,5 +164,22 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     ghoToken.setFacilitatorBucketCapacity(address(1), 2 ether);
 
     ghoToken.grantRole(ghoToken.FACILITATOR_MANAGER_ROLE(), address(2));
+  }
+
+  function _testAAaveUpgrade() internal {
+    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+      vm,
+      AaveV3EthereumAssets.AAVE_A_TOKEN
+    );
+
+    assertEq(newImpl, A_AAVE_IMPL);
+
+    ReserveConfig[] memory allConfigs = _getReservesConfigs(AaveV3Ethereum.POOL);
+
+    e2eTestAsset(
+      AaveV3Ethereum.POOL,
+      _findReserveConfig(allConfigs, AaveV3EthereumAssets.USDC_UNDERLYING),
+      _findReserveConfig(allConfigs, AaveV3EthereumAssets.AAVE_UNDERLYING)
+    );
   }
 }

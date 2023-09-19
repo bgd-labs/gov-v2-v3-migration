@@ -33,8 +33,13 @@ contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3BaseAssets.USDbC_ORACLE,
       AaveV3Base.EMISSION_MANAGER,
       AaveV3Base.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_BASE,
+      AaveMisc.PROXY_ADMIN_BASE
+    );
+
+    _testV3Optional(
+      payload.BASE_LEVEL_1_EXECUTOR_V3(),
       AaveV3Base.WETH_GATEWAY,
+      address(0),
       address(0),
       address(0)
     );

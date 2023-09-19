@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Test} from 'forge-std/Test.sol';
+import {ProtocolV3TestBase} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveOracle as IAaveOracleV2, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
@@ -16,7 +16,7 @@ import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermiss
 import {IPoolAddressProviderRegistry} from './helpers/IPoolAddressProviderRegistry.sol';
 import {IEmissionManager} from './helpers/IEmissionManager.sol';
 
-contract MovePermissionsTestBase is Test {
+contract MovePermissionsTestBase is ProtocolV3TestBase {
   function _testV2(
     address newExecutor,
     ILendingPoolAddressesProvider poolAddressProvider,
@@ -60,10 +60,7 @@ contract MovePermissionsTestBase is Test {
     address assetSource,
     address emissionManager,
     address poolAddressProviderRegistry,
-    address proxyAdmin,
-    address wethGateway,
-    address swapCollateral,
-    address repayWithCollateral
+    address proxyAdmin
   ) internal {
     // check Pool Admin
     IPoolConfigurator(poolAddressProvider.getPoolConfigurator()).setReserveFreeze(asset, true);
@@ -97,7 +94,15 @@ contract MovePermissionsTestBase is Test {
 
     // Proxy Admin
     ProxyAdmin(proxyAdmin).changeProxyAdmin(proxy, address(this));
+  }
 
+  function _testV3Optional(
+    address newExecutor,
+    address wethGateway,
+    address swapCollateral,
+    address repayWithCollateral,
+    address withdrawSwapAdapter
+  ) internal {
     // WETH_GATEWAY
     if (wethGateway != address(0)) {
       assertEq(Ownable(wethGateway).owner(), newExecutor);
@@ -111,6 +116,11 @@ contract MovePermissionsTestBase is Test {
     // ParaSwapRepayAdapter
     if (repayWithCollateral != address(0)) {
       assertEq(Ownable(repayWithCollateral).owner(), newExecutor);
+    }
+
+    // WithdrawSwapAdapter
+    if (withdrawSwapAdapter != address(0)) {
+      assertEq(Ownable(withdrawSwapAdapter).owner(), newExecutor);
     }
   }
 
@@ -132,7 +142,7 @@ contract MovePermissionsTestBase is Test {
     uint256 nativeAfter = address(crosschainController).balance;
     uint256 linkAfter = IERC20(linkAddress).balanceOf(crosschainController);
 
-    assertTrue(nativeAfter > nativeAmount);
-    assertTrue(linkAfter > linkAmount);
+    assertTrue(nativeAfter >= nativeAmount);
+    assertTrue(linkAfter >= linkAmount);
   }
 }

@@ -21,7 +21,8 @@ contract MetisMovePermissionsPayload {
       AaveMisc.PROXY_ADMIN_METIS,
       address(0), // no need of wEthGateway because Metis token is ERC20 as well
       address(0), // swap collateral adapter not deployed yet
-      address(0) // repay with collateral adapter not deployed yet
+      address(0), // repay with collateral adapter not deployed yet,
+      address(0) // withdraw swap adapter not deployed
     );
   }
 }

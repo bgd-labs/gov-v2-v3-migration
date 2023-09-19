@@ -33,10 +33,7 @@ contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3MetisAssets.mDAI_ORACLE,
       AaveV3Metis.EMISSION_MANAGER,
       AaveV3Metis.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_METIS,
-      address(0),
-      address(0),
-      address(0)
+      AaveMisc.PROXY_ADMIN_METIS
     );
 
     vm.stopPrank();
