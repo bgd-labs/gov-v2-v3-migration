@@ -7,6 +7,7 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
 
@@ -23,10 +24,10 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
 
-    vm.startPrank(payload.POLYGON_LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Polygon.EXECUTOR_LVL_1);
 
     _testV2(
-      payload.POLYGON_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Polygon.EXECUTOR_LVL_1,
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER,
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2PolygonAssets.WBTC_UNDERLYING,
@@ -35,7 +36,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3(
-      payload.POLYGON_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Polygon.EXECUTOR_LVL_1,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
       AaveV3Polygon.COLLECTOR,
       AaveV3PolygonAssets.DAI_UNDERLYING,
@@ -47,7 +48,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3Optional(
-      payload.POLYGON_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Polygon.EXECUTOR_LVL_1,
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,
@@ -55,7 +56,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testCrosschainFunding(
-      payload.CROSSCHAIN_CONTROLLER(),
+      GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
       AaveV3PolygonAssets.LINK_UNDERLYING,
       payload.MATIC_AMOUNT(),
       payload.LINK_AMOUNT()

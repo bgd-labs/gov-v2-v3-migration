@@ -4,14 +4,12 @@ pragma solidity ^0.8.0;
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
+import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
 contract AvaxMovePermissionsPayload {
-  address public constant AVALANCHE_LEVEL_1_EXECUTOR_V3 = address(6);
-  address public constant CROSSCHAIN_CONTROLLER = address(44);
-
   // ~ 20 proposals
   uint256 public constant AVAX_AMOUNT = 120 ether;
   uint256 public constant LINK_AMOUNT = 122 ether;
@@ -21,7 +19,7 @@ contract AvaxMovePermissionsPayload {
     MigratorLib.fundCrosschainController(
       AaveV3Avalanche.COLLECTOR,
       AaveV3Avalanche.POOL,
-      CROSSCHAIN_CONTROLLER,
+      GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
       AaveV3AvalancheAssets.WAVAX_A_TOKEN,
       AVAX_AMOUNT,
       AaveV3Avalanche.WETH_GATEWAY,
@@ -33,7 +31,7 @@ contract AvaxMovePermissionsPayload {
 
     // V2 POOL
     MigratorLib.migrateV2PoolPermissions(
-      AVALANCHE_LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Avalanche.EXECUTOR_LVL_1,
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER,
       AaveV2Avalanche.ORACLE,
       AaveV2Avalanche.LENDING_RATE_ORACLE,
@@ -42,7 +40,7 @@ contract AvaxMovePermissionsPayload {
     );
     // V3 POOL
     MigratorLib.migrateV3PoolPermissions(
-      AVALANCHE_LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Avalanche.EXECUTOR_LVL_1,
       AaveV3Avalanche.ACL_MANAGER,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
       AaveV3Avalanche.EMISSION_MANAGER,
@@ -56,12 +54,16 @@ contract AvaxMovePermissionsPayload {
     );
 
     // Proof of reserve
-    Ownable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(AVALANCHE_LEVEL_1_EXECUTOR_V3);
+    Ownable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(
+      GovernanceV3Avalanche.EXECUTOR_LVL_1
+    );
 
-    Ownable(AaveV3Avalanche.PROOF_OF_RESERVE).transferOwnership(AVALANCHE_LEVEL_1_EXECUTOR_V3);
+    Ownable(AaveV3Avalanche.PROOF_OF_RESERVE).transferOwnership(
+      GovernanceV3Avalanche.EXECUTOR_LVL_1
+    );
     // one per network
     Ownable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
-      AVALANCHE_LEVEL_1_EXECUTOR_V3
+      GovernanceV3Avalanche.EXECUTOR_LVL_1
     );
   }
 }
