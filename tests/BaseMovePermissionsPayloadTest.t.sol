@@ -6,6 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Base, AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {BaseMovePermissionsPayload} from '../src/contracts/BaseMovePermissionsPayload.sol';
@@ -22,10 +23,10 @@ contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.BASE_BRIDGE_EXECUTOR);
 
-    vm.startPrank(payload.BASE_LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Base.EXECUTOR_LVL_1);
 
     _testV3(
-      payload.BASE_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Base.EXECUTOR_LVL_1,
       AaveV3Base.POOL_ADDRESSES_PROVIDER,
       AaveV3Base.COLLECTOR,
       AaveV3BaseAssets.USDbC_UNDERLYING,
@@ -37,7 +38,7 @@ contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3Optional(
-      payload.BASE_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Base.EXECUTOR_LVL_1,
       AaveV3Base.WETH_GATEWAY,
       address(0),
       address(0),

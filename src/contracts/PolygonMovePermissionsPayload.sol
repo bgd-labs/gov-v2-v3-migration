@@ -4,13 +4,11 @@ pragma solidity ^0.8.0;
 import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
 contract PolygonMovePermissionsPayload {
-  address public constant POLYGON_LEVEL_1_EXECUTOR_V3 = address(6);
-  address public constant CROSSCHAIN_CONTROLLER = address(44);
-
   // ~ 20 proposals
   uint256 public constant MATIC_AMOUNT = 2040 ether;
   uint256 public constant LINK_AMOUNT = 114 ether;
@@ -32,7 +30,7 @@ contract PolygonMovePermissionsPayload {
     MigratorLib.fundCrosschainController(
       AaveV3Polygon.COLLECTOR,
       AaveV3Polygon.POOL,
-      CROSSCHAIN_CONTROLLER,
+      GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
       AaveV3PolygonAssets.WMATIC_A_TOKEN,
       MATIC_AMOUNT,
       AaveV3Polygon.WETH_GATEWAY,
@@ -44,7 +42,7 @@ contract PolygonMovePermissionsPayload {
 
     // V2 POOL
     MigratorLib.migrateV2PoolPermissions(
-      POLYGON_LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Polygon.EXECUTOR_LVL_1,
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER,
       AaveV2Polygon.ORACLE,
       AaveV2Polygon.LENDING_RATE_ORACLE,
@@ -54,7 +52,7 @@ contract PolygonMovePermissionsPayload {
 
     // V3 POOL
     MigratorLib.migrateV3PoolPermissions(
-      POLYGON_LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Polygon.EXECUTOR_LVL_1,
       AaveV3Polygon.ACL_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
       AaveV3Polygon.EMISSION_MANAGER,

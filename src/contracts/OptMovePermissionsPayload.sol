@@ -3,16 +3,15 @@ pragma solidity ^0.8.0;
 
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
 contract OptMovePermissionsPayload {
-  address public constant OPTIMISM_LEVEL_1_EXECUTOR_V3 = address(5);
-
   function execute() external {
     // V3 POOL
     MigratorLib.migrateV3PoolPermissions(
-      OPTIMISM_LEVEL_1_EXECUTOR_V3,
+      GovernanceV3Optimism.EXECUTOR_LVL_1,
       AaveV3Optimism.ACL_MANAGER,
       AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
       AaveV3Optimism.EMISSION_MANAGER,
