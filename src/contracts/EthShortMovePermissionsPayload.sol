@@ -19,9 +19,12 @@ import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
 import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
+import {IMediator} from './interfaces/IMediator.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 contract EthShortMovePermissionsPayload {
+  address public immutable MEDIATOR;
+
   address public constant A_AAVE_IMPL = 0xC383AAc4B3dC18D9ce08AB7F63B4632716F1e626;
 
   address payable public constant LEND_TO_AAVE_MIGRATOR =
@@ -39,6 +42,10 @@ contract EthShortMovePermissionsPayload {
   // ~ 20 proposals
   uint256 public constant ETH_AMOUNT = 2 ether;
   uint256 public constant LINK_AMOUNT = 9 ether;
+
+  constructor(address mediator) {
+    MEDIATOR = mediator;
+  }
 
   function execute() external {
     // CC FUNDING
@@ -187,6 +194,9 @@ contract EthShortMovePermissionsPayload {
     Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
+
+    // LONG ADMIN PERMISSIONS
+    IMediator(MEDIATOR).execute();
   }
 
   function migrateStkPermissions() internal {

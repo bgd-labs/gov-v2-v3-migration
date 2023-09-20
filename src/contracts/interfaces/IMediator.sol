@@ -2,16 +2,10 @@
 pragma solidity ^0.8.0;
 
 interface IMediator {
+  error NotGuardianOrNotOverdue();
   error InvalidCaller();
-
-  // error - cancelled
-
-  // error - already executed
-
-  /**
-   * @notice return the execution state of the goverment v2-v3 migration
-   **/
-  function getIsExecuted() external returns (bool);
+  error ProposalNotPassed();
+  error ProposalIsCancelled();
 
   /**
    * @notice return wether the migration was cancelled
@@ -19,14 +13,9 @@ interface IMediator {
   function getIsCancelled() external returns (bool);
 
   /**
-   * @notice accept short executor admin permission
+   * @notice set the overdue date for the migration
    **/
-  function acceptShortAdmin() external;
-
-  /**
-   * @notice accept long executor admin permission
-   **/
-  function acceptLongAdmin() external;
+  function setOverdueDate() external;
 
   /**
    * @notice execute governance v2-v3 migration

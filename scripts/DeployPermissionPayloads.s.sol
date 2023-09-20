@@ -13,8 +13,8 @@ import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermiss
 
 contract DeployMainnetPayload is EthereumScript {
   function run() external broadcast {
-    new EthShortMovePermissionsPayload();
-    new EthLongMovePermissionsPayload();
+    // new EthShortMovePermissionsPayload();
+    // new EthLongMovePermissionsPayload();
   }
 }
 

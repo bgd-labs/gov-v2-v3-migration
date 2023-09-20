@@ -1,61 +1,117 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
+import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
+import {IMediator} from './interfaces/IMediator.sol';
 
 contract Mediator is IMediator {
   bool private _isCancelled;
-  bool private _isExecuted;
+  uint256 private _overdueDate;
+
+  uint256 public constant OVERDUE = 172800; // 2 days
 
   address public constant GUARDIAN = AaveV2Ethereum.EMERGENCY_ADMIN;
 
+  address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
+
+  address public constant STK_AAVE_PROXY = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
+  address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
+
   /**
-   * @dev Throws if the caller is not the guardian.
+   * @dev Throws if the caller is not the short executor.
    */
-  modifier onlyGuardian() {
-    if (msg.sender != AaveV2Ethereum.EMERGENCY_ADMIN) {
+  modifier onlyShortExecutor() {
+    if (msg.sender != AaveGovernanceV2.SHORT_EXECUTOR) {
       revert InvalidCaller();
     }
+    _;
   }
 
-  function getIsExecuted() external returns (bool) {
-    return _isExecuted;
+  /**
+   * @dev Throws if the caller is not the long executor.
+   */
+  modifier onlyLongExecutor() {
+    if (msg.sender != AaveGovernanceV2.LONG_EXECUTOR) {
+      revert InvalidCaller();
+    }
+    _;
   }
 
-  function getIsCancelled() external returns (bool) {
+  function getIsCancelled() external view returns (bool) {
     return _isCancelled;
   }
 
-  function acceptShortAdmin() external {
-    IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
+  function setOverdueDate() external onlyLongExecutor {
+    _overdueDate = block.timestamp + OVERDUE;
   }
 
-  function acceptLongAdmin() external {
-    IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).acceptAdmin();
-  }
-
-  function execute() external {
-    if (
-      IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin() != address(this) ||
-      IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getAdmin() != address(this)
-    ) {
-      revert();
+  function execute() external onlyShortExecutor {
+    if (_isCancelled) {
+      revert ProposalIsCancelled();
     }
 
-    // queue and execute long proposal
+    // UPDATE TOKENS
 
-    // queue and execute short proposal
+    // update Aave token impl
+    ProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+      TransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)),
+      address(AAVE_IMPL),
+      abi.encodeWithSignature('initialize()')
+    );
 
-    // give permissions back to governance v2
+    // upgrade stk aave
+    ProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+      TransparentUpgradeableProxy(payable(STK_AAVE_PROXY)),
+      address(STK_AAVE_IMPL),
+      abi.encodeWithSignature('initialize()')
+    );
 
-    // set executed flag
+    // PROXY ADMIN
+    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+      address(GovernanceV3Ethereum.EXECUTOR_LVL_2)
+    );
+
+    // new executor - call execute payload to accept new permissions
+    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_2).executeTransaction(
+      AaveGovernanceV2.LONG_EXECUTOR,
+      0,
+      'acceptAdmin()',
+      bytes(''),
+      false
+    );
+
+    // new executor - change owner to payload controller
+    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
+    );
   }
 
-  function cancel() external onlyGuardian {
-    if (IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin() == address(this)) {}
+  /**
+   * @dev Will prevent the execution of the migration
+   */
+  function cancel() external {
+    if (msg.sender != AaveV2Ethereum.EMERGENCY_ADMIN && block.timestamp < _overdueDate) {
+      revert NotGuardianOrNotOverdue();
+    }
 
-    if (IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin() == address(this)) {}
-    // give admin permissions back
+    // proxy admin
+    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+      address(AaveGovernanceV2.LONG_EXECUTOR)
+    );
+
+    // new executor - change owner to the mediator contract
+    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
+      address(AaveGovernanceV2.LONG_EXECUTOR)
+    );
+
+    _isCancelled = true;
   }
 }
