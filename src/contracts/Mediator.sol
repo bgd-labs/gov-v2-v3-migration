@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
@@ -75,7 +75,7 @@ contract Mediator is IMediator {
     );
 
     // PROXY ADMIN
-    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+    IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
       address(GovernanceV3Ethereum.EXECUTOR_LVL_2)
     );
 
@@ -89,7 +89,7 @@ contract Mediator is IMediator {
     );
 
     // new executor - change owner to payload controller
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
   }
@@ -103,12 +103,12 @@ contract Mediator is IMediator {
     }
 
     // proxy admin
-    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+    IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
       address(AaveGovernanceV2.LONG_EXECUTOR)
     );
 
     // new executor - change owner to the mediator contract
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
       address(AaveGovernanceV2.LONG_EXECUTOR)
     );
 

@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -165,7 +164,7 @@ contract EthShortMovePermissionsPayload {
     // MISC ECOSYSTEM
 
     // MerkleDistributor
-    Ownable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IOwnable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // LendToAave Migrator
     TransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
@@ -174,8 +173,8 @@ contract EthShortMovePermissionsPayload {
     TransparentUpgradeableProxy(ABPT).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
     IBalancerOwnable(ABPT).setController(AaveMisc.PROXY_ADMIN_ETHEREUM);
 
-    Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IOwnable(AaveMisc.AAVE_SWAPPER_ETHEREUM).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IOwnable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // EXECUTOR PERMISSIONS
 
@@ -191,7 +190,7 @@ contract EthShortMovePermissionsPayload {
     );
 
     // new executor - change owner to payload controller
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
 
@@ -268,10 +267,10 @@ contract EthShortMovePermissionsPayload {
     );
 
     // owner of address provider
-    Ownable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IOwnable(AAVE_V1_ADDRESS_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // owner of price provider
-    Ownable(AAVE_V1_PRICE_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IOwnable(AAVE_V1_PRICE_PROVIDER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
   }
 
   function migrateGHOPermissions() internal {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -25,13 +25,13 @@ contract EthLongMovePermissionsPayload {
     );
 
     // proxy admin
-    Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(address(MEDIATOR));
+    IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(address(MEDIATOR));
 
     // set new executor as th pending admin
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_2));
 
     // new executor - change owner to the mediator contract
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(address(MEDIATOR));
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(address(MEDIATOR));
 
     // set overdue date for the migration
     IMediator(MEDIATOR).setOverdueDate();

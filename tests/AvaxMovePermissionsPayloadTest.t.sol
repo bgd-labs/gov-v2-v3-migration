@@ -7,7 +7,6 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Avalanche, AaveV2AvalancheAssets} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {AvaxMovePermissionsPayload} from '../src/contracts/AvaxMovePermissionsPayload.sol';
 import {IProofOfReserveExecutor} from './helpers/IProofOfReserveExecutor.sol';
 import {IProofOfReserveAggregator} from './helpers/IProofOfReserveAggregator.sol';

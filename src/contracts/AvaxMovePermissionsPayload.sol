@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
@@ -56,11 +56,11 @@ contract AvaxMovePermissionsPayload {
     );
 
     // Proof of reserve
-    Ownable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(AVALANCHE_LEVEL_1_EXECUTOR_V3);
+    IOwnable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(AVALANCHE_LEVEL_1_EXECUTOR_V3);
 
-    Ownable(AaveV3Avalanche.PROOF_OF_RESERVE).transferOwnership(AVALANCHE_LEVEL_1_EXECUTOR_V3);
+    IOwnable(AaveV3Avalanche.PROOF_OF_RESERVE).transferOwnership(AVALANCHE_LEVEL_1_EXECUTOR_V3);
     // one per network
-    Ownable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
+    IOwnable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
       AVALANCHE_LEVEL_1_EXECUTOR_V3
     );
   }

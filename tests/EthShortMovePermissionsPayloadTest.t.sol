@@ -5,7 +5,7 @@ import {MovePermissionsTestBase} from './MovePermissionsTestBase.sol';
 import {ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
@@ -40,11 +40,13 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
   function testPayload() public {
     vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(AaveGovernanceV2.LONG_EXECUTOR);
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(AaveGovernanceV2.LONG_EXECUTOR);
     vm.stopPrank();
 
     vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
+      AaveGovernanceV2.SHORT_EXECUTOR
+    );
     vm.stopPrank();
 
     Mediator mediator = new Mediator();
@@ -138,16 +140,16 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     vm.stopPrank();
 
     // Merkle Distributor
-    assertEq(Ownable(aaveMerkleDistributor).owner(), newExecutor);
+    assertEq(IOwnable(aaveMerkleDistributor).owner(), newExecutor);
 
-    assertEq(Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).owner(), newExecutor);
-    assertEq(Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).owner(), newExecutor);
+    assertEq(IOwnable(AaveMisc.AAVE_SWAPPER_ETHEREUM).owner(), newExecutor);
+    assertEq(IOwnable(AaveMisc.AAVE_POL_ETH_BRIDGE).owner(), newExecutor);
   }
 
   function _testExecutor(address newExecutor, address payloadController) internal {
     assertEq(IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin(), newExecutor);
 
-    assertEq(Ownable(newExecutor).owner(), payloadController);
+    assertEq(IOwnable(newExecutor).owner(), payloadController);
   }
 
   function _testV1(address addressProvider, address priceProvider) internal {
@@ -205,7 +207,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
   function _testLongPermissions() internal {
     assertEq(
-      Ownable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
+      IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
       GovernanceV3Ethereum.EXECUTOR_LVL_2
     );
 
@@ -215,7 +217,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     assertEq(
-      Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(),
+      IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(),
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
   }
