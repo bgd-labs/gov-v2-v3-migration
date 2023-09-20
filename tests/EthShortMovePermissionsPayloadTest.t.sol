@@ -6,7 +6,7 @@ import {ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
+import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -133,7 +133,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     // Lend to Aave migrator
     assertEq(
-      TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(),
+      ITransparentUpgradeableProxy(lendToAaveMigrator).admin(),
       AaveMisc.PROXY_ADMIN_ETHEREUM
     );
 

@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
-import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
+import {ITransparentUpgradeableProxy} from './dependencies/ITransparentUpgradeableProxy.sol';
+import {IProxyAdmin} from './dependencies/IProxyAdmin.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -61,15 +61,15 @@ contract Mediator is IMediator {
     // UPDATE TOKENS
 
     // update Aave token impl
-    ProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
-      TransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)),
+    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+      ITransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)),
       address(AAVE_IMPL),
       abi.encodeWithSignature('initialize()')
     );
 
     // upgrade stk aave
-    ProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
-      TransparentUpgradeableProxy(payable(STK_AAVE_PROXY)),
+    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+      ITransparentUpgradeableProxy(payable(STK_AAVE_PROXY)),
       address(STK_AAVE_IMPL),
       abi.encodeWithSignature('initialize()')
     );
