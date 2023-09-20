@@ -21,6 +21,7 @@ import {AaveV3PayloadArbitrum} from 'aave-helpers/v3-config-engine/AaveV3Payload
 import {AaveV3PayloadOptimism} from 'aave-helpers/v3-config-engine/AaveV3PayloadOptimism.sol';
 import {AaveV3PayloadBase} from 'aave-helpers/v3-config-engine/AaveV3PayloadBase.sol';
 import {AaveV3PayloadMetis} from 'aave-helpers/v3-config-engine/AaveV3PayloadMetis.sol';
+import {AaveV3PayloadBasenet} from 'aave-helpers/v3-config-engine/AaveV3PayloadBasenet.sol';
 
 contract TestV3PayloadEthereum is AaveV3PayloadEthereum {
   function capsUpdates() public pure override returns (IEngine.CapsUpdate[] memory) {
@@ -129,19 +130,19 @@ contract TestV3PayloadOptimism is AaveV3PayloadOptimism {
   }
 }
 
-//contract TestV3PayloadBase is AaveV3PayloadBase {
-//  function capsUpdates() public pure override returns (IEngine.CapsUpdate[] memory) {
-//    IEngine.CapsUpdate[] memory capsUpdate = new IEngine.CapsUpdate[](1);
-//
-//    capsUpdate[0] = IEngine.CapsUpdate({
-//      asset: AaveV3BaseAssets.WETH_UNDERLYING,
-//      supplyCap: 0,
-//      borrowCap: EngineFlags.KEEP_CURRENT
-//    });
-//
-//    return capsUpdate;
-//  }
-//}
+contract TestV3PayloadBase is AaveV3PayloadBasenet {
+  function capsUpdates() public pure override returns (IEngine.CapsUpdate[] memory) {
+    IEngine.CapsUpdate[] memory capsUpdate = new IEngine.CapsUpdate[](1);
+
+    capsUpdate[0] = IEngine.CapsUpdate({
+      asset: AaveV3BaseAssets.WETH_UNDERLYING,
+      supplyCap: 0,
+      borrowCap: EngineFlags.KEEP_CURRENT
+    });
+
+    return capsUpdate;
+  }
+}
 
 contract TestV3PayloadMetis is AaveV3PayloadMetis {
   function capsUpdates() public pure override returns (IEngine.CapsUpdate[] memory) {
