@@ -51,6 +51,8 @@ contract Mediator is IMediator {
 
   function setOverdueDate() external onlyLongExecutor {
     _overdueDate = block.timestamp + OVERDUE;
+
+    emit OverdueDateUpdated(_overdueDate);
   }
 
   function execute() external onlyShortExecutor {
@@ -92,6 +94,8 @@ contract Mediator is IMediator {
     IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
+
+    emit Executed();
   }
 
   /**
@@ -102,16 +106,21 @@ contract Mediator is IMediator {
       revert NotGuardianOrNotOverdue();
     }
 
+    if (_isCancelled) {
+      revert ProposalIsCancelled();
+    }
+
     // proxy admin
     IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
       address(AaveGovernanceV2.LONG_EXECUTOR)
     );
 
-    // new executor - change owner to the mediator contract
+    // new executor - change owner from the mediator contract to LongExecutor
     IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(
       address(AaveGovernanceV2.LONG_EXECUTOR)
     );
 
     _isCancelled = true;
+    emit Cancelled();
   }
 }

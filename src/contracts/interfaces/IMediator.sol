@@ -7,6 +7,10 @@ interface IMediator {
   error ProposalNotPassed();
   error ProposalIsCancelled();
 
+  event OverdueDateUpdated(uint256 overdueDate);
+  event Executed();
+  event Cancelled();
+
   /**
    * @notice return wether the migration was cancelled
    **/
