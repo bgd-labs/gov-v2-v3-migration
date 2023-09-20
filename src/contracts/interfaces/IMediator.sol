@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 interface IMediator {
   error NotGuardianOrNotOverdue();
   error InvalidCaller();
-  error ProposalNotPassed();
   error ProposalIsCancelled();
+  error LongProposalNotExecuted();
 
   event OverdueDateUpdated(uint256 overdueDate);
   event Executed();

@@ -12,6 +12,12 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IMediator} from './interfaces/IMediator.sol';
 
+/**
+ * @title Mediator
+ * @notice Accept the stkAave and aave token permissions from the Long executor to transfer
+ * them to the new v3 executor level 2 for the synchronization of the migration from governance v2 to v3.
+ * @author BGD Labs
+ **/
 contract Mediator is IMediator {
   bool private _isCancelled;
   uint256 private _overdueDate;
@@ -58,6 +64,10 @@ contract Mediator is IMediator {
   function execute() external onlyShortExecutor {
     if (_isCancelled) {
       revert ProposalIsCancelled();
+    }
+
+    if (_overdueDate == 0) {
+      revert LongProposalNotExecuted();
     }
 
     // UPDATE TOKENS
