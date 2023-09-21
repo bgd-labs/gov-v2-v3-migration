@@ -26,6 +26,6 @@
     "viem": "^1.9.3"
   },
   "dependencies": {
-    "@bgd-labs/aave-address-book": "2.4.1"
+    "@bgd-labs/aave-address-book": "2.4.2"
   }
 }

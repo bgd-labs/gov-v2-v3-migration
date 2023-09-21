@@ -5,8 +5,8 @@ import {MovePermissionsTestBase} from './MovePermissionsTestBase.sol';
 import {ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
-import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
+import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -19,6 +19,8 @@ import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
 import {IGhoAccessControl} from '../src/contracts/dependencies/IGhoAccessControl.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
+import {Mediator} from '../src/contracts/Mediator.sol';
+import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
@@ -29,16 +31,32 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
   address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
 
+  address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
+  address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
+
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
   }
 
   function testPayload() public {
     vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
-    Ownable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(AaveGovernanceV2.LONG_EXECUTOR);
     vm.stopPrank();
 
-    EthShortMovePermissionsPayload payload = new EthShortMovePermissionsPayload();
+    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
+    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
+      AaveGovernanceV2.SHORT_EXECUTOR
+    );
+    vm.stopPrank();
+
+    Mediator mediator = new Mediator();
+
+    EthLongMovePermissionsPayload longPayload = new EthLongMovePermissionsPayload(
+      address(mediator)
+    );
+    EthShortMovePermissionsPayload payload = new EthShortMovePermissionsPayload(address(mediator));
+
+    GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
 
@@ -100,6 +118,10 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testGhoPermissions();
 
     vm.stopPrank();
+
+    _testLongPermissions();
+    _testAaveTokenUpgrade();
+    _testStkAaveTokenUpgrade();
   }
 
   function _testMisc(
@@ -111,23 +133,23 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     // Lend to Aave migrator
     assertEq(
-      TransparentUpgradeableProxy(payable(lendToAaveMigrator)).admin(),
+      ITransparentUpgradeableProxy(lendToAaveMigrator).admin(),
       AaveMisc.PROXY_ADMIN_ETHEREUM
     );
 
     vm.stopPrank();
 
     // Merkle Distributor
-    assertEq(Ownable(aaveMerkleDistributor).owner(), newExecutor);
+    assertEq(IOwnable(aaveMerkleDistributor).owner(), newExecutor);
 
-    assertEq(Ownable(AaveMisc.AAVE_SWAPPER_ETHEREUM).owner(), newExecutor);
-    assertEq(Ownable(AaveMisc.AAVE_POL_ETH_BRIDGE).owner(), newExecutor);
+    assertEq(IOwnable(AaveMisc.AAVE_SWAPPER_ETHEREUM).owner(), newExecutor);
+    assertEq(IOwnable(AaveMisc.AAVE_POL_ETH_BRIDGE).owner(), newExecutor);
   }
 
   function _testExecutor(address newExecutor, address payloadController) internal {
     assertEq(IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin(), newExecutor);
 
-    assertEq(Ownable(newExecutor).owner(), payloadController);
+    assertEq(IOwnable(newExecutor).owner(), payloadController);
   }
 
   function _testV1(address addressProvider, address priceProvider) internal {
@@ -181,5 +203,48 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       _findReserveConfig(allConfigs, AaveV3EthereumAssets.USDC_UNDERLYING),
       _findReserveConfig(allConfigs, AaveV3EthereumAssets.AAVE_UNDERLYING)
     );
+  }
+
+  function _testLongPermissions() internal {
+    assertEq(
+      IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_2
+    );
+
+    assertEq(
+      IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getAdmin(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_2
+    );
+
+    assertEq(
+      IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(),
+      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
+    );
+  }
+
+  function _testAaveTokenUpgrade() internal {
+    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+      vm,
+      AaveV3EthereumAssets.AAVE_UNDERLYING
+    );
+
+    assertEq(newImpl, 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322);
+
+    ReserveConfig[] memory allConfigs = _getReservesConfigs(AaveV3Ethereum.POOL);
+
+    e2eTestAsset(
+      AaveV3Ethereum.POOL,
+      _findReserveConfig(allConfigs, AaveV3EthereumAssets.USDC_UNDERLYING),
+      _findReserveConfig(allConfigs, AaveV3EthereumAssets.AAVE_UNDERLYING)
+    );
+  }
+
+  function _testStkAaveTokenUpgrade() internal {
+    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+      vm,
+      STK_AAVE_ADDRESS
+    );
+
+    assertEq(newImpl, STK_AAVE_IMPL);
   }
 }

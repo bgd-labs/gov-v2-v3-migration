@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {ILendingPoolAddressesProvider, IAaveOracle, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
 import {IACLManager, IPoolAddressesProvider, IPool} from 'aave-address-book/AaveV3.sol';
@@ -18,18 +18,18 @@ library MigratorLib {
     address poolAddressesProviderRegistry
   ) internal {
     poolAddressesProvider.setPoolAdmin(executor);
-    Ownable(address(poolAddressesProvider)).transferOwnership(executor);
-    Ownable(wETHGateway).transferOwnership(executor);
+    IOwnable(address(poolAddressesProvider)).transferOwnership(executor);
+    IOwnable(wETHGateway).transferOwnership(executor);
 
     // this components are common across different pools, and maybe already transfered
-    if (Ownable(address(oracle)).owner() == address(this)) {
-      Ownable(address(oracle)).transferOwnership(executor);
+    if (IOwnable(address(oracle)).owner() == address(this)) {
+      IOwnable(address(oracle)).transferOwnership(executor);
     }
-    if (Ownable(address(lendingRateOracle)).owner() == address(this)) {
-      Ownable(address(lendingRateOracle)).transferOwnership(executor);
+    if (IOwnable(address(lendingRateOracle)).owner() == address(this)) {
+      IOwnable(address(lendingRateOracle)).transferOwnership(executor);
     }
-    if (Ownable(address(poolAddressesProviderRegistry)).owner() == address(this)) {
-      Ownable(poolAddressesProviderRegistry).transferOwnership(executor);
+    if (IOwnable(address(poolAddressesProviderRegistry)).owner() == address(this)) {
+      IOwnable(poolAddressesProviderRegistry).transferOwnership(executor);
     }
   }
 
@@ -57,31 +57,31 @@ library MigratorLib {
     poolAddressesProvider.setACLAdmin(executor);
 
     // transfer pool address provider ownership
-    Ownable(address(poolAddressesProvider)).transferOwnership(executor);
+    IOwnable(address(poolAddressesProvider)).transferOwnership(executor);
 
-    Ownable(emissionManager).transferOwnership(executor);
+    IOwnable(emissionManager).transferOwnership(executor);
 
-    Ownable(poolAddressesProviderRegistry).transferOwnership(executor);
+    IOwnable(poolAddressesProviderRegistry).transferOwnership(executor);
 
     collector.setFundsAdmin(executor);
 
-    Ownable(proxyAdmin).transferOwnership(executor);
+    IOwnable(proxyAdmin).transferOwnership(executor);
 
     // Optional components
     if (wETHGateway != address(0)) {
-      Ownable(wETHGateway).transferOwnership(executor);
+      IOwnable(wETHGateway).transferOwnership(executor);
     }
 
     if (swapCollateralAdapter != address(0)) {
-      Ownable(swapCollateralAdapter).transferOwnership(executor);
+      IOwnable(swapCollateralAdapter).transferOwnership(executor);
     }
 
     if (repayWithCollateralAdapter != address(0)) {
-      Ownable(repayWithCollateralAdapter).transferOwnership(executor);
+      IOwnable(repayWithCollateralAdapter).transferOwnership(executor);
     }
 
     if (withdrawSwapAdapter != address(0)) {
-      Ownable(withdrawSwapAdapter).transferOwnership(executor);
+      IOwnable(withdrawSwapAdapter).transferOwnership(executor);
     }
   }
 

@@ -10,8 +10,6 @@ import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {BaseMovePermissionsPayload} from '../src/contracts/BaseMovePermissionsPayload.sol';
-import {IPoolAddressProviderRegistry} from './helpers/IPoolAddressProviderRegistry.sol';
-import {IEmissionManager} from './helpers/IEmissionManager.sol';
 
 contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
