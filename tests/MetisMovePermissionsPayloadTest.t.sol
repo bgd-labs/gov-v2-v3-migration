@@ -6,6 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Metis, AaveV3MetisAssets} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 import {MetisMovePermissionsPayload} from '../src/contracts/MetisMovePermissionsPayload.sol';
 
 contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
@@ -18,10 +19,10 @@ contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.METIS_BRIDGE_EXECUTOR);
 
-    vm.startPrank(payload.METIS_LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Metis.EXECUTOR_LVL_1);
 
     _testV3(
-      payload.METIS_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Metis.EXECUTOR_LVL_1,
       AaveV3Metis.POOL_ADDRESSES_PROVIDER,
       AaveV3Metis.COLLECTOR,
       AaveV3MetisAssets.mDAI_UNDERLYING,

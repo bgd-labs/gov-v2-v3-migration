@@ -6,6 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayload.sol';
 
 contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
@@ -18,10 +19,10 @@ contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
 
-    vm.startPrank(payload.OPTIMISM_LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Optimism.EXECUTOR_LVL_1);
 
     _testV3(
-      payload.OPTIMISM_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Optimism.EXECUTOR_LVL_1,
       AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
       AaveV3Optimism.COLLECTOR,
       AaveV3OptimismAssets.DAI_UNDERLYING,
@@ -33,7 +34,7 @@ contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3Optional(
-      payload.OPTIMISM_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Optimism.EXECUTOR_LVL_1,
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
       AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,

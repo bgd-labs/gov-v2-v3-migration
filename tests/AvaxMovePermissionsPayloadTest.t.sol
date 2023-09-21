@@ -7,6 +7,7 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Avalanche, AaveV2AvalancheAssets} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {AvaxMovePermissionsPayload} from '../src/contracts/AvaxMovePermissionsPayload.sol';
 import {IProofOfReserveExecutor} from './helpers/IProofOfReserveExecutor.sol';
 import {IProofOfReserveAggregator} from './helpers/IProofOfReserveAggregator.sol';
@@ -23,10 +24,10 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     GovHelpers.executePayload(vm, address(payload), AVALANCHE_GUARDIAN);
 
-    vm.startPrank(payload.AVALANCHE_LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Avalanche.EXECUTOR_LVL_1);
 
     _testV2(
-      payload.AVALANCHE_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Avalanche.EXECUTOR_LVL_1,
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER,
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2AvalancheAssets.WBTCe_UNDERLYING,
@@ -35,7 +36,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3(
-      payload.AVALANCHE_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Avalanche.EXECUTOR_LVL_1,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
       AaveV3Avalanche.COLLECTOR,
       AaveV3AvalancheAssets.DAIe_UNDERLYING,
@@ -47,7 +48,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3Optional(
-      payload.AVALANCHE_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Avalanche.EXECUTOR_LVL_1,
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,
@@ -57,7 +58,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testProofOfReserve();
 
     _testCrosschainFunding(
-      payload.CROSSCHAIN_CONTROLLER(),
+      GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
       AaveV3AvalancheAssets.LINKe_UNDERLYING,
       payload.AVAX_AMOUNT(),
       (payload.LINK_AMOUNT() + 100000000000000000) // some link is currently stuck

@@ -6,6 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {ArbMovePermissionsPayload} from '../src/contracts/ArbMovePermissionsPayload.sol';
 
 contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
@@ -18,10 +19,10 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
 
-    vm.startPrank(payload.ARBITRUM_LEVEL_1_EXECUTOR_V3());
+    vm.startPrank(GovernanceV3Arbitrum.EXECUTOR_LVL_1);
 
     _testV3(
-      payload.ARBITRUM_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Arbitrum.EXECUTOR_LVL_1,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
       AaveV3Arbitrum.COLLECTOR,
       AaveV3ArbitrumAssets.DAI_UNDERLYING,
@@ -33,7 +34,7 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     _testV3Optional(
-      payload.ARBITRUM_LEVEL_1_EXECUTOR_V3(),
+      GovernanceV3Arbitrum.EXECUTOR_LVL_1,
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,
