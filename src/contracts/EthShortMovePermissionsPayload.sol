@@ -37,8 +37,8 @@ contract EthShortMovePermissionsPayload {
   address public constant AAVE_V1_PRICE_PROVIDER = 0x76B47460d7F7c5222cFb6b6A75615ab10895DDe4;
 
   // ~ 20 proposals
-  uint256 public constant ETH_AMOUNT = 2 ether;
-  uint256 public constant LINK_AMOUNT = 9 ether;
+  uint256 public constant ETH_AMOUNT = 0.2 ether;
+  uint256 public constant LINK_AMOUNT = 20 ether;
 
   constructor(address mediator) {
     MEDIATOR = mediator;
