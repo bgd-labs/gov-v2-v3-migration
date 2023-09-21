@@ -12,6 +12,7 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
@@ -28,9 +29,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
-  address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
-  address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
-
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
@@ -39,16 +37,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function testPayload() public {
-    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
-    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(AaveGovernanceV2.LONG_EXECUTOR);
-    vm.stopPrank();
-
-    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
-    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
-      AaveGovernanceV2.SHORT_EXECUTOR
-    );
-    vm.stopPrank();
-
     Mediator mediator = new Mediator();
 
     EthLongMovePermissionsPayload longPayload = new EthLongMovePermissionsPayload(
@@ -167,8 +155,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
   function _testStkRoles() internal {
     // stk tokens - set admin roles
-    IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
-    IStakedToken stkABPT = IStakedToken(STK_ABPT_ADDRESS);
+    IStakedToken stkAave = IStakedToken(AaveSafetyModule.STK_AAVE);
+    IStakedToken stkABPT = IStakedToken(AaveSafetyModule.STK_ABPT);
 
     stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), address(1));
     stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), address(2));
@@ -242,7 +230,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testStkAaveTokenUpgrade() internal {
     address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
       vm,
-      STK_AAVE_ADDRESS
+      AaveSafetyModule.STK_AAVE
     );
 
     assertEq(newImpl, STK_AAVE_IMPL);

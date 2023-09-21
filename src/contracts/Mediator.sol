@@ -9,6 +9,7 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IMediator} from './interfaces/IMediator.sol';
 
@@ -27,8 +28,6 @@ contract Mediator is IMediator {
   address public constant GUARDIAN = AaveV2Ethereum.EMERGENCY_ADMIN;
 
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
-
-  address public constant STK_AAVE_PROXY = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
   /**
@@ -81,7 +80,7 @@ contract Mediator is IMediator {
 
     // upgrade stk aave
     IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
-      ITransparentUpgradeableProxy(payable(STK_AAVE_PROXY)),
+      ITransparentUpgradeableProxy(payable(AaveSafetyModule.STK_AAVE)),
       address(STK_AAVE_IMPL),
       abi.encodeWithSignature('initialize()')
     );

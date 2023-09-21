@@ -11,6 +11,7 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {IStakedToken} from './dependencies/IStakedToken.sol';
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
@@ -34,9 +35,6 @@ contract EthShortMovePermissionsPayload {
   address public constant AAVE_V1_ADDRESS_PROVIDER = 0x24a42fD28C976A61Df5D00D0599C34c4f90748c8;
 
   address public constant AAVE_V1_PRICE_PROVIDER = 0x76B47460d7F7c5222cFb6b6A75615ab10895DDe4;
-
-  address public constant STK_AAVE_ADDRESS = 0x4da27a545c0c5B758a6BA100e3a049001de870f5;
-  address public constant STK_ABPT_ADDRESS = 0xa1116930326D21fB917d5A27F1E9943A9595fb47;
 
   // ~ 20 proposals
   uint256 public constant ETH_AMOUNT = 2 ether;
@@ -62,65 +60,7 @@ contract EthShortMovePermissionsPayload {
     );
 
     // STK TOKENS - SET ADMIN ROLES
-    IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
-    IStakedToken stkABPT = IStakedToken(STK_ABPT_ADDRESS);
-
-    stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    stkAave.setPendingAdmin(stkAave.CLAIM_HELPER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-
-    stkABPT.setPendingAdmin(stkABPT.SLASH_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    stkABPT.setPendingAdmin(stkABPT.COOLDOWN_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    stkABPT.setPendingAdmin(stkABPT.CLAIM_HELPER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-
-    // new executor - call execute payload to accept new permissions
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(stkAave),
-      0,
-      'claimRoleAdmin(uint256)',
-      abi.encode(stkAave.SLASH_ADMIN_ROLE()),
-      false
-    );
-
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(stkAave),
-      0,
-      'claimRoleAdmin(uint256)',
-      abi.encode(stkAave.COOLDOWN_ADMIN_ROLE()),
-      false
-    );
-
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(stkAave),
-      0,
-      'claimRoleAdmin(uint256)',
-      abi.encode(stkAave.CLAIM_HELPER_ROLE()),
-      false
-    );
-
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(stkABPT),
-      0,
-      'claimRoleAdmin(uint256)',
-      abi.encode(stkABPT.SLASH_ADMIN_ROLE()),
-      false
-    );
-
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(stkABPT),
-      0,
-      'claimRoleAdmin(uint256)',
-      abi.encode(stkABPT.COOLDOWN_ADMIN_ROLE()),
-      false
-    );
-
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(stkABPT),
-      0,
-      'claimRoleAdmin(uint256)',
-      abi.encode(stkABPT.CLAIM_HELPER_ROLE()),
-      false
-    );
+    migrateStkPermissions();
 
     // GHO
     migrateGHOPermissions();
@@ -199,8 +139,8 @@ contract EthShortMovePermissionsPayload {
   }
 
   function migrateStkPermissions() internal {
-    IStakedToken stkAave = IStakedToken(STK_AAVE_ADDRESS);
-    IStakedToken stkABPT = IStakedToken(STK_ABPT_ADDRESS);
+    IStakedToken stkAave = IStakedToken(AaveSafetyModule.STK_AAVE);
+    IStakedToken stkABPT = IStakedToken(AaveSafetyModule.STK_ABPT);
 
     stkAave.setPendingAdmin(stkAave.SLASH_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     stkAave.setPendingAdmin(stkAave.COOLDOWN_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);

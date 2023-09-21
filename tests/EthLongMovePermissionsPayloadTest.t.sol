@@ -20,10 +20,6 @@ contract EthLongMovePermissionsPayloadTest is ProtocolV3TestBase {
   }
 
   function testPayload() public {
-    vm.startPrank(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER));
-    IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(AaveGovernanceV2.LONG_EXECUTOR);
-    vm.stopPrank();
-
     Mediator mediator = new Mediator();
     EthLongMovePermissionsPayload payload = new EthLongMovePermissionsPayload(address(mediator));
 
