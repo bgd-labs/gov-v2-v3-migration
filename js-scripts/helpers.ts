@@ -205,7 +205,8 @@ export const deployContract = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
   deployer: Address,
-  artifact: any
+  artifact: any,
+  args: any[] = []
 ) => {
   const bytecode = artifact.bytecode.object as Hex;
   const hash = await walletClient.deployContract({
@@ -213,7 +214,7 @@ export const deployContract = async (
     account: deployer,
     bytecode: bytecode,
     chain: undefined,
-    args: [],
+    args: args,
   });
   const transaction = await publicClient.waitForTransactionReceipt({hash});
 

@@ -3,15 +3,7 @@ import {tenderly} from '@bgd-labs/aave-cli';
 import path from 'path';
 import {Address, createPublicClient, createWalletClient, http} from 'viem';
 import {arbitrum, avalanche, base, mainnet, metis, optimism, polygon} from 'viem/chains';
-import {
-  deployAAaveImpl,
-  deployAAaveTokenPayload,
-  deployAaveImpl,
-  deployAaveTokenPayload,
-  deployStkAaveImpl,
-  deployStkAaveTokenPayload,
-  executeL2Payload,
-} from './payloadsV2';
+import {executeL2Payload} from './payloadsV2';
 import {createV2Proposal, executeV2Proposals} from './proposalsV2';
 import {
   AaveGovernanceV2,
@@ -51,6 +43,7 @@ import TestV3PayloadMetis from '../out/PoolPayload.sol/TestV3PayloadMetis.json';
 import {deployContract} from './helpers';
 import EthShortMovePermissionsPayload from '../out/EthShortMovePermissionsPayload.sol/EthShortMovePermissionsPayload.json';
 import EthLongMovePermissionsPayload from '../out/EthLongMovePermissionsPayload.sol/EthLongMovePermissionsPayload.json';
+import Mediator from '../out/Mediator.sol/Mediator.json';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
@@ -119,57 +112,39 @@ const deployAndExecuteL2Payload = async (
 const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
-  // deploy token implementations
-  const aaveTokenV3Impl = await deployAaveImpl(walletClient, publicClient, DEPLOYER);
-  const stkAaveTokenV3 = await deployStkAaveImpl(walletClient, publicClient, DEPLOYER);
-  const aAaveTokenV3 = await deployAAaveImpl(walletClient, publicClient, DEPLOYER);
-
-  // deploy token payloads
-  const aaveTokenPayload = await deployAaveTokenPayload(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    aaveTokenV3Impl
-  );
-  const stkAaveTokenPayload = await deployStkAaveTokenPayload(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    stkAaveTokenV3
-  );
-  const aAaveTokenPayload = await deployAAaveTokenPayload(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    aAaveTokenV3
-  );
-
   // deploy migration payloads
+  const mediatorAddress = await deployContract(walletClient, publicClient, DEPLOYER, Mediator);
+
   const shortMigrationPayload = await deployContract(
     walletClient,
     publicClient,
     DEPLOYER,
-    EthShortMovePermissionsPayload
+    EthShortMovePermissionsPayload,
+    [mediatorAddress]
   );
   const longMigrationPayload = await deployContract(
     walletClient,
     publicClient,
     DEPLOYER,
-    EthLongMovePermissionsPayload
+    EthLongMovePermissionsPayload,
+    [mediatorAddress]
   );
 
   // create proposal on v2
-  const shortProposalId = await createV2Proposal(
-    walletClient,
-    publicClient,
-    [aAaveTokenPayload, shortMigrationPayload],
-    AaveGovernanceV2.SHORT_EXECUTOR
-  );
   const longProposalId = await createV2Proposal(
     walletClient,
     publicClient,
-    [stkAaveTokenPayload, aaveTokenPayload, longMigrationPayload],
+    [longMigrationPayload],
     AaveGovernanceV2.LONG_EXECUTOR
+  );
+
+  await tenderly.warpTime(fork, 1382400n); // 16 days
+
+  const shortProposalId = await createV2Proposal(
+    walletClient,
+    publicClient,
+    [shortMigrationPayload],
+    AaveGovernanceV2.SHORT_EXECUTOR
   );
 
   // execute proposals
