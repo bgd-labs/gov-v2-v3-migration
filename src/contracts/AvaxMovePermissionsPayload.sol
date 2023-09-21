@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
@@ -11,8 +11,8 @@ import {MigratorLib} from './MigratorLib.sol';
 
 contract AvaxMovePermissionsPayload {
   // ~ 20 proposals
-  uint256 public constant AVAX_AMOUNT = 120 ether;
-  uint256 public constant LINK_AMOUNT = 122 ether;
+  uint256 public constant AVAX_AMOUNT = 361 ether;
+  uint256 public constant LINK_AMOUNT = 250 ether;
 
   function execute() external {
     // CC FUNDING
@@ -54,15 +54,15 @@ contract AvaxMovePermissionsPayload {
     );
 
     // Proof of reserve
-    Ownable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(
+    IOwnable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(
       GovernanceV3Avalanche.EXECUTOR_LVL_1
     );
 
-    Ownable(AaveV3Avalanche.PROOF_OF_RESERVE).transferOwnership(
+    IOwnable(AaveV3Avalanche.PROOF_OF_RESERVE).transferOwnership(
       GovernanceV3Avalanche.EXECUTOR_LVL_1
     );
     // one per network
-    Ownable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
+    IOwnable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
       GovernanceV3Avalanche.EXECUTOR_LVL_1
     );
   }

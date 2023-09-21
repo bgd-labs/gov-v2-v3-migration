@@ -10,8 +10,8 @@ import {MigratorLib} from './MigratorLib.sol';
 
 contract PolygonMovePermissionsPayload {
   // ~ 20 proposals
-  uint256 public constant MATIC_AMOUNT = 2040 ether;
-  uint256 public constant LINK_AMOUNT = 114 ether;
+  uint256 public constant MATIC_AMOUNT = 6154 ether;
+  uint256 public constant LINK_AMOUNT = 250 ether;
 
   address public constant GELATO_ADDRESS = 0x73495115E38A307DA3419Bf062bb050b96f68Cf3;
   uint256 public constant GELATO_AMOUNT = 10_000e6;

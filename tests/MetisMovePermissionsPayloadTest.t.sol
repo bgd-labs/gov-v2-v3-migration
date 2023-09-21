@@ -7,11 +7,7 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Metis, AaveV3MetisAssets} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
-import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {MetisMovePermissionsPayload} from '../src/contracts/MetisMovePermissionsPayload.sol';
-import {IPoolAddressProviderRegistry} from './helpers/IPoolAddressProviderRegistry.sol';
-import {IEmissionManager} from './helpers/IEmissionManager.sol';
 
 contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {

@@ -8,7 +8,7 @@ import {ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveOracle as 
 import {IPoolAddressesProvider, IPoolConfigurator, IACLManager, IAaveOracle as IAaveOracleV3} from 'aave-address-book/AaveV3.sol';
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
@@ -48,7 +48,7 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     );
 
     // WETH_GATEWAY
-    assertEq(Ownable(wethGateway).owner(), newExecutor);
+    assertEq(IOwnable(wethGateway).owner(), newExecutor);
   }
 
   function _testV3(
@@ -105,22 +105,22 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
   ) internal {
     // WETH_GATEWAY
     if (wethGateway != address(0)) {
-      assertEq(Ownable(wethGateway).owner(), newExecutor);
+      assertEq(IOwnable(wethGateway).owner(), newExecutor);
     }
 
     // ParaSwapLiquiditySwapAdapter
     if (swapCollateral != address(0)) {
-      assertEq(Ownable(swapCollateral).owner(), newExecutor);
+      assertEq(IOwnable(swapCollateral).owner(), newExecutor);
     }
 
     // ParaSwapRepayAdapter
     if (repayWithCollateral != address(0)) {
-      assertEq(Ownable(repayWithCollateral).owner(), newExecutor);
+      assertEq(IOwnable(repayWithCollateral).owner(), newExecutor);
     }
 
     // WithdrawSwapAdapter
     if (withdrawSwapAdapter != address(0)) {
-      assertEq(Ownable(withdrawSwapAdapter).owner(), newExecutor);
+      assertEq(IOwnable(withdrawSwapAdapter).owner(), newExecutor);
     }
   }
 

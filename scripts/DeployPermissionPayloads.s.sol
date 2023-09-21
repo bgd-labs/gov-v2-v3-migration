@@ -10,11 +10,13 @@ import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermi
 import {MetisMovePermissionsPayload} from '../src/contracts/MetisMovePermissionsPayload.sol';
 import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayload.sol';
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
+import {Mediator} from '../src/contracts/Mediator.sol';
 
 contract DeployMainnetPayload is EthereumScript {
   function run() external broadcast {
-    new EthShortMovePermissionsPayload();
-    new EthLongMovePermissionsPayload();
+    Mediator mediator = new Mediator();
+    new EthShortMovePermissionsPayload(address(mediator));
+    new EthLongMovePermissionsPayload(address(mediator));
   }
 }
 
