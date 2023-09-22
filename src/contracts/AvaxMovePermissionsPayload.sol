@@ -11,8 +11,8 @@ import {MigratorLib} from './MigratorLib.sol';
 
 contract AvaxMovePermissionsPayload {
   // ~ 20 proposals
-  uint256 public constant AVAX_AMOUNT = 120 ether;
-  uint256 public constant LINK_AMOUNT = 122 ether;
+  uint256 public constant AVAX_AMOUNT = 361 ether;
+  uint256 public constant LINK_AMOUNT = 250 ether;
 
   function execute() external {
     // CC FUNDING

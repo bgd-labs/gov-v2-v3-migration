@@ -153,23 +153,23 @@ const deployPayloadsEthereum = async () => {
 
   // execute proposals
   await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork);
-  //
-  // const payloadId = await deployAndRegisterTestPayloads(
-  //   walletClient,
-  //   publicClient,
-  //   DEPLOYER,
-  //   GovernanceV3Ethereum,
-  //   [TestV2PayloadEthereum, TestV3PayloadEthereum]
-  // );
-  // const proposalId = await generateProposalAndExecutePayload(
-  //   walletClient,
-  //   publicClient,
-  //   fork,
-  //   AaveMisc.ECOSYSTEM_RESERVE,
-  //   payloadId,
-  //   mainnet
-  // );
-  // console.log('proposalId: ', proposalId);
+
+  const payloadId = await deployAndRegisterTestPayloads(
+    walletClient,
+    publicClient,
+    DEPLOYER,
+    GovernanceV3Ethereum,
+    [TestV2PayloadEthereum, TestV3PayloadEthereum]
+  );
+  const proposalId = await generateProposalAndExecutePayload(
+    walletClient,
+    publicClient,
+    fork,
+    AaveMisc.ECOSYSTEM_RESERVE,
+    payloadId,
+    mainnet
+  );
+  console.log('proposalId: ', proposalId);
 };
 
 deployPayloadsEthereum().then().catch(console.log);

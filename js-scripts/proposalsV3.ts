@@ -211,19 +211,33 @@ export const generateProposalAndExecutePayload = async (
     accessLevel: 1,
   });
 
-  const {request, result: proposalId} = await publicClient.simulateContract({
+  // const {request, result: proposalId} = await publicClient.simulateContract({
+  //   address: GovernanceV3Ethereum.GOVERNANCE,
+  //   abi: IGovernanceCore_ABI,
+  //   functionName: 'createProposal',
+  //   args: [
+  //     payloads,
+  //     GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
+  //     '0x22f22ad910127d3ca76dc642f94db34397f94ca969485a216b9d82387808cdfa' as Hex,
+  //   ],
+  //   value: fee,
+  //   account: deployer,
+  // });
+  // await walletClient.writeContract(request);
+
+  await walletClient.writeContract({
     address: GovernanceV3Ethereum.GOVERNANCE,
     abi: IGovernanceCore_ABI,
     functionName: 'createProposal',
+    account: deployer,
+    value: fee,
     args: [
       payloads,
       GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
       '0x22f22ad910127d3ca76dc642f94db34397f94ca969485a216b9d82387808cdfa' as Hex,
     ],
-    value: fee,
-    account: deployer,
+    chain: undefined,
   });
-  await walletClient.writeContract(request);
 
   const payloadController = await getPayloadsController(
     GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
