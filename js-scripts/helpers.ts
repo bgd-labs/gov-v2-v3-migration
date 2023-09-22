@@ -147,7 +147,7 @@ export const simulateOnTenderly = async (
 
   // construct the earliest possible header for execution
   const blockHeader = {
-    timestamp: toHex(startTimestamp + ((duration as bigint) + 1n) * 12n + (delay as bigint) + 1n),
+    timestamp: toHex(startTimestamp), // toHex(startTimestamp + ((duration as bigint) + 1n) * 12n + (delay as bigint) + 1n),
     number: toHex(endBlockNumber),
   };
 

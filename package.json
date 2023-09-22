@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/bgd-labs/bgd-forge-template#readme",
   "devDependencies": {
-    "@bgd-labs/aave-cli": "0.0.24-482c6ae22236e4055d4b285285d09100eb1e03d0.0",
+    "@bgd-labs/aave-cli": "0.0.24-a9d76bece0615d9573652f76c6ce4584ffe76045.0",
     "dotenv": "^16.3.1",
     "prettier": "2.8.7",
     "prettier-plugin-solidity": "1.1.3",

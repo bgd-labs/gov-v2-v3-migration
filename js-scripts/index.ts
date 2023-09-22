@@ -139,9 +139,10 @@ const deployPayloadsEthereum = async () => {
     AaveGovernanceV2.LONG_EXECUTOR
   );
 
-  const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 16;
+  const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15;
 
   await tenderly.warpTime(fork, BigInt(timeToWarpTo));
+  const currentBlock = await publicClient.getBlockNumber();
 
   const shortProposalId = await createV2Proposal(
     walletClient,
