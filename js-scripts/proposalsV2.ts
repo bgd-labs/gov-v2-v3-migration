@@ -59,8 +59,8 @@ export const executeV2Proposals = async (
   publicClient: PublicClient,
   fork: any
 ) => {
-  const shortProposalObject = await simulateOnTenderly(publicClient, walletClient, shortProposalId);
   const longProposalObject = await simulateOnTenderly(publicClient, walletClient, longProposalId);
+  const shortProposalObject = await simulateOnTenderly(publicClient, walletClient, shortProposalId);
 
   await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, longProposalObject);
   await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, shortProposalObject);

@@ -44,6 +44,7 @@ import {deployContract} from './helpers';
 import EthShortMovePermissionsPayload from '../out/EthShortMovePermissionsPayload.sol/EthShortMovePermissionsPayload.json';
 import EthLongMovePermissionsPayload from '../out/EthLongMovePermissionsPayload.sol/EthLongMovePermissionsPayload.json';
 import Mediator from '../out/Mediator.sol/Mediator.json';
+import {stringToBigNumber} from '../lib/aave-governance-v3/lib/aave-token-v3/lib/aave-token-v2/helpers/misc-utils';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
@@ -138,7 +139,9 @@ const deployPayloadsEthereum = async () => {
     AaveGovernanceV2.LONG_EXECUTOR
   );
 
-  await tenderly.warpTime(fork, 1382400n); // 16 days
+  const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 16;
+
+  await tenderly.warpTime(fork, BigInt(timeToWarpTo));
 
   const shortProposalId = await createV2Proposal(
     walletClient,
@@ -149,83 +152,83 @@ const deployPayloadsEthereum = async () => {
 
   // execute proposals
   await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork);
-
-  const payloadId = await deployAndRegisterTestPayloads(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    GovernanceV3Ethereum,
-    [TestV2PayloadEthereum, TestV3PayloadEthereum]
-  );
-  const proposalId = await generateProposalAndExecutePayload(
-    walletClient,
-    publicClient,
-    fork,
-    AaveMisc.ECOSYSTEM_RESERVE,
-    payloadId,
-    mainnet
-  );
-  console.log('proposalId: ', proposalId);
+  //
+  // const payloadId = await deployAndRegisterTestPayloads(
+  //   walletClient,
+  //   publicClient,
+  //   DEPLOYER,
+  //   GovernanceV3Ethereum,
+  //   [TestV2PayloadEthereum, TestV3PayloadEthereum]
+  // );
+  // const proposalId = await generateProposalAndExecutePayload(
+  //   walletClient,
+  //   publicClient,
+  //   fork,
+  //   AaveMisc.ECOSYSTEM_RESERVE,
+  //   payloadId,
+  //   mainnet
+  // );
+  // console.log('proposalId: ', proposalId);
 };
 
 deployPayloadsEthereum().then().catch(console.log);
 
-deployAndExecuteL2Payload(
-  polygon,
-  AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-  PolygonMovePermissionsPayload,
-  GovernanceV3Polygon,
-  [TestV2PayloadPolygon, TestV3PayloadPolygon]
-)
-  .then()
-  .catch(console.log);
-
-deployAndExecuteL2Payload(
-  avalanche,
-  AVAX_GUARDIAN,
-  AvaxMovePermissionsPayload,
-  GovernanceV3Avalanche,
-  [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
-)
-  .then()
-  .catch(console.log);
-
-deployAndExecuteL2Payload(
-  arbitrum,
-  AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-  ArbMovePermissionsPayload,
-  GovernanceV3Arbitrum,
-  [TestV3PayloadArbitrum]
-)
-  .then()
-  .catch(console.log);
-
-deployAndExecuteL2Payload(
-  optimism,
-  AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-  OptMovePermissionsPayload,
-  GovernanceV3Optimism,
-  [TestV3PayloadOptimism]
-)
-  .then()
-  .catch(console.log);
-
-deployAndExecuteL2Payload(
-  base,
-  AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-  BaseMovePermissionsPayload,
-  GovernanceV3Base,
-  [TestV3PayloadBase]
-)
-  .then()
-  .catch(console.log);
-
-deployAndExecuteL2Payload(
-  metis,
-  AaveGovernanceV2.METIS_BRIDGE_EXECUTOR,
-  MetisMovePermissionsPayload,
-  GovernanceV3Metis,
-  [TestV3PayloadMetis]
-)
-  .then()
-  .catch(console.log);
+// deployAndExecuteL2Payload(
+//   polygon,
+//   AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
+//   PolygonMovePermissionsPayload,
+//   GovernanceV3Polygon,
+//   [TestV2PayloadPolygon, TestV3PayloadPolygon]
+// )
+//   .then()
+//   .catch(console.log);
+//
+// deployAndExecuteL2Payload(
+//   avalanche,
+//   AVAX_GUARDIAN,
+//   AvaxMovePermissionsPayload,
+//   GovernanceV3Avalanche,
+//   [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
+// )
+//   .then()
+//   .catch(console.log);
+//
+// deployAndExecuteL2Payload(
+//   arbitrum,
+//   AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
+//   ArbMovePermissionsPayload,
+//   GovernanceV3Arbitrum,
+//   [TestV3PayloadArbitrum]
+// )
+//   .then()
+//   .catch(console.log);
+//
+// deployAndExecuteL2Payload(
+//   optimism,
+//   AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
+//   OptMovePermissionsPayload,
+//   GovernanceV3Optimism,
+//   [TestV3PayloadOptimism]
+// )
+//   .then()
+//   .catch(console.log);
+//
+// deployAndExecuteL2Payload(
+//   base,
+//   AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
+//   BaseMovePermissionsPayload,
+//   GovernanceV3Base,
+//   [TestV3PayloadBase]
+// )
+//   .then()
+//   .catch(console.log);
+//
+// deployAndExecuteL2Payload(
+//   metis,
+//   AaveGovernanceV2.METIS_BRIDGE_EXECUTOR,
+//   MetisMovePermissionsPayload,
+//   GovernanceV3Metis,
+//   [TestV3PayloadMetis]
+// )
+//   .then()
+//   .catch(console.log);
