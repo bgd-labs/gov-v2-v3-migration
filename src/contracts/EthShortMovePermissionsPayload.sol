@@ -49,17 +49,17 @@ contract EthShortMovePermissionsPayload {
     IMediator(MEDIATOR).execute();
 
     // CC FUNDING
-    MigratorLib.fundCrosschainController(
+    MigratorLib.fundCrosschainControllerNative(
       AaveV3Ethereum.COLLECTOR,
-      AaveV3Ethereum.POOL,
       GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.WETH_A_TOKEN,
       ETH_AMOUNT,
-      AaveV3Ethereum.WETH_GATEWAY,
+      AaveV3Ethereum.WETH_GATEWAY
+    );
+    AaveV3Ethereum.COLLECTOR.transfer(
       AaveV3EthereumAssets.LINK_UNDERLYING,
-      address(0),
-      LINK_AMOUNT,
-      false
+      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+      LINK_AMOUNT
     );
 
     // STK TOKENS - SET ADMIN ROLES

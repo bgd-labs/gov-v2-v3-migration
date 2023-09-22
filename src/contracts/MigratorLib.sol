@@ -85,17 +85,12 @@ library MigratorLib {
     }
   }
 
-  function fundCrosschainController(
+  function fundCrosschainControllerNative(
     ICollector collector,
-    IPool pool,
     address crosschainController,
     address nativeAToken,
     uint256 nativeAmount,
-    address wethGateway,
-    address linkToken,
-    address linkAToken,
-    uint256 linkAmount,
-    bool withdrawALink
+    address wethGateway
   ) internal {
     // transfer native a token
     collector.transfer(nativeAToken, address(this), nativeAmount);
@@ -108,19 +103,5 @@ library MigratorLib {
       nativeAmount,
       crosschainController
     );
-
-    if (withdrawALink) {
-      // transfer aLink token from the treasury to the current address
-      collector.transfer(linkAToken, address(this), linkAmount);
-
-      // withdraw aLINK from the aave pool and receive LINK
-      pool.withdraw(linkToken, linkAmount, address(this));
-
-      // transfer LINK to the CC
-      IERC20(linkToken).transfer(crosschainController, IERC20(linkToken).balanceOf(address(this)));
-    } else {
-      // transfer Link to CC
-      collector.transfer(linkToken, crosschainController, linkAmount);
-    }
   }
 }

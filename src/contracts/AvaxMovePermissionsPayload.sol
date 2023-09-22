@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
@@ -16,18 +17,15 @@ contract AvaxMovePermissionsPayload {
 
   function execute() external {
     // CC FUNDING
-    MigratorLib.fundCrosschainController(
+    MigratorLib.fundCrosschainControllerNative(
       AaveV3Avalanche.COLLECTOR,
-      AaveV3Avalanche.POOL,
       GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
       AaveV3AvalancheAssets.WAVAX_A_TOKEN,
       AVAX_AMOUNT,
-      AaveV3Avalanche.WETH_GATEWAY,
-      AaveV3AvalancheAssets.LINKe_UNDERLYING,
-      AaveV3AvalancheAssets.LINKe_A_TOKEN,
-      LINK_AMOUNT,
-      true
+      AaveV3Avalanche.WETH_GATEWAY
     );
+
+    _fundCrosschainControllerLink();
 
     // V2 POOL
     MigratorLib.migrateV2PoolPermissions(
@@ -64,6 +62,28 @@ contract AvaxMovePermissionsPayload {
     // one per network
     IOwnable(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR).transferOwnership(
       GovernanceV3Avalanche.EXECUTOR_LVL_1
+    );
+  }
+
+  function _fundCrosschainControllerLink() internal {
+    // transfer aLink token from the treasury to the current address
+    AaveV3Avalanche.COLLECTOR.transfer(
+      AaveV3AvalancheAssets.LINKe_A_TOKEN,
+      address(this),
+      LINK_AMOUNT
+    );
+
+    // withdraw aLINK from the aave pool and receive LINK
+    AaveV3Avalanche.POOL.withdraw(
+      AaveV3AvalancheAssets.LINKe_UNDERLYING,
+      LINK_AMOUNT,
+      address(this)
+    );
+
+    // transfer LINK to the CC
+    IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).transfer(
+      GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
+      IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).balanceOf(address(this))
     );
   }
 }

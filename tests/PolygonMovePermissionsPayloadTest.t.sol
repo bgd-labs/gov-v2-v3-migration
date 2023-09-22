@@ -12,6 +12,8 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
 
 contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
+  address public constant ERC677_LINK = 0xb0897686c545045aFc77CF20eC7A532E3120E0F1;
+
   address public constant GELATO_ADDRESS = 0x73495115E38A307DA3419Bf062bb050b96f68Cf3;
   uint256 public constant GELATO_AMOUNT = 10_000e6;
 
@@ -57,7 +59,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     _testCrosschainFunding(
       GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
-      AaveV3PolygonAssets.LINK_UNDERLYING,
+      ERC677_LINK,
       payload.MATIC_AMOUNT(),
       payload.LINK_AMOUNT()
     );
