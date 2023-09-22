@@ -174,6 +174,12 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     ghoToken.setFacilitatorBucketCapacity(address(1), 2 ether);
 
     ghoToken.grantRole(ghoToken.FACILITATOR_MANAGER_ROLE(), address(2));
+
+    assertTrue(!ghoToken.hasRole(ghoToken.DEFAULT_ADMIN_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR));
+    assertTrue(
+      !ghoToken.hasRole(ghoToken.FACILITATOR_MANAGER_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR)
+    );
+    assertTrue(!ghoToken.hasRole(ghoToken.BUCKET_MANAGER_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR));
   }
 
   function _testAAaveUpgrade() internal {
