@@ -45,6 +45,9 @@ contract EthShortMovePermissionsPayload {
   }
 
   function execute() external {
+    // LONG ADMIN PERMISSIONS
+    IMediator(MEDIATOR).execute();
+
     // CC FUNDING
     MigratorLib.fundCrosschainController(
       AaveV3Ethereum.COLLECTOR,
@@ -64,6 +67,9 @@ contract EthShortMovePermissionsPayload {
 
     // GHO
     migrateGHOPermissions();
+
+    // aAave
+    upgradeAAave();
 
     // V1 POOL
     migrateV1Pool();
@@ -133,9 +139,6 @@ contract EthShortMovePermissionsPayload {
     IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
-
-    // LONG ADMIN PERMISSIONS
-    IMediator(MEDIATOR).execute();
   }
 
   function migrateStkPermissions() internal {
@@ -219,6 +222,10 @@ contract EthShortMovePermissionsPayload {
     ghoToken.grantRole(ghoToken.DEFAULT_ADMIN_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     ghoToken.grantRole(ghoToken.FACILITATOR_MANAGER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     ghoToken.grantRole(ghoToken.BUCKET_MANAGER_ROLE(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    ghoToken.renounceRole(ghoToken.DEFAULT_ADMIN_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR);
+    ghoToken.renounceRole(ghoToken.FACILITATOR_MANAGER_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR);
+    ghoToken.renounceRole(ghoToken.BUCKET_MANAGER_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR);
   }
 
   function upgradeAAave() internal {
@@ -232,7 +239,7 @@ contract EthShortMovePermissionsPayload {
         name: 'Aave Ethereum AAVE',
         symbol: 'aEthAAVE',
         implementation: A_AAVE_IMPL,
-        params: '0x10' // this parameter is not actually used anywhere
+        params: bytes('') // this parameter is not actually used anywhere
       });
 
     AaveV3Ethereum.POOL_CONFIGURATOR.updateAToken(input);

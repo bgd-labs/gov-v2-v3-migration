@@ -26,13 +26,13 @@ contract EthLongMovePermissionsPayload {
     // proxy admin
     IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(address(MEDIATOR));
 
-    // set new executor as th pending admin
+    // set the new executor as the pending admin
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_2));
 
     // new executor - change owner to the mediator contract
     IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).transferOwnership(address(MEDIATOR));
 
-    // set overdue date for the migration
+    // set the overdue date for the migration
     IMediator(MEDIATOR).setOverdueDate();
   }
 }

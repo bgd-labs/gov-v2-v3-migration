@@ -115,6 +115,10 @@ contract Mediator is IMediator {
       revert NotGuardianOrNotOverdue();
     }
 
+    if (msg.sender != AaveV2Ethereum.EMERGENCY_ADMIN && block.timestamp < _overdueDate) {
+      revert NotGuardianOrNotOverdue();
+    }
+
     if (_isCancelled) {
       revert ProposalIsCancelled();
     }
