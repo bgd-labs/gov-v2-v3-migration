@@ -7,15 +7,24 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
+import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
 import {ArbMovePermissionsPayload} from '../src/contracts/ArbMovePermissionsPayload.sol';
 
 contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
+  address public KEEPER_REGISTRY = 0x75c0530885F385721fddA23C539AF3701d6183D4;
+
+  ArbMovePermissionsPayload public payload;
+
+  IKeeperRegistry.State public registryState;
+
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('arbitrum'), 130402128);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPermissionsTransfer() public {
-    ArbMovePermissionsPayload payload = new ArbMovePermissionsPayload();
+    payload = new ArbMovePermissionsPayload();
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
 
@@ -42,5 +51,28 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     vm.stopPrank();
+  }
+
+  function testRobotMigration() public {
+    payload = new ArbMovePermissionsPayload();
+
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
+
+    uint256 executionChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce)
+        )
+      )
+    );
+
+    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      executionChainKeeperId
+    );
+
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Arbitrum.EXECUTOR_LVL_1);
+    assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
   }
 }

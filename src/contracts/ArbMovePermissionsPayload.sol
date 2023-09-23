@@ -24,6 +24,16 @@ contract ArbMovePermissionsPayload {
   uint256 public constant LINK_AMOUNT_ROBOT_EXECUTION_CHAIN = 50 ether;
 
   function execute() external {
+    // GET LINK TOKENS FROM COLLECTOR
+    MigratorLib.fetchLinkTokens(
+      AaveV3Arbitrum.COLLECTOR,
+      address(AaveV3Arbitrum.POOL),
+      AaveV3ArbitrumAssets.LINK_UNDERLYING,
+      AaveV3ArbitrumAssets.LINK_A_TOKEN,
+      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN,
+      true
+    );
+
     // ROBOT
     migrateKeepers();
 
