@@ -20,6 +20,8 @@ import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
 import {IGhoAccessControl} from '../src/contracts/dependencies/IGhoAccessControl.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
+import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {Mediator} from '../src/contracts/Mediator.sol';
 import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
@@ -32,8 +34,15 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
+  address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
+
+  EthShortMovePermissionsPayload public payload;
+
+  IKeeperRegistry.State public registryState;
+
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
@@ -42,7 +51,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     EthLongMovePermissionsPayload longPayload = new EthLongMovePermissionsPayload(
       address(mediator)
     );
-    EthShortMovePermissionsPayload payload = new EthShortMovePermissionsPayload(address(mediator));
+
+    payload = new EthShortMovePermissionsPayload(address(mediator));
 
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
 
@@ -99,9 +109,11 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testCrosschainFunding(
       GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.LINK_UNDERLYING,
-      payload.ETH_AMOUNT(),
-      payload.LINK_AMOUNT()
+      payload.ETH_AMOUNT_CROSSCHAIN_CONTROLLER(),
+      payload.LINK_AMOUNT_CROSSCHAIN_CONTROLLER()
     );
+
+    _testRobot();
 
     _testGhoPermissions();
 
@@ -240,5 +252,55 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     assertEq(newImpl, STK_AAVE_IMPL);
+  }
+
+  function _testRobot() internal {
+    uint256 govChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce)
+        )
+      )
+    );
+    uint256 votingChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
+      )
+    );
+    uint256 executionChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 2)
+        )
+      )
+    );
+
+    (address govChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      govChainKeeperId
+    );
+    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      votingChainKeeperId
+    );
+    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      executionChainKeeperId
+    );
+
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    assertEq(govChainKeeperTarget, payload.GOV_CHAIN_ROBOT());
+    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
+    assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
+
+    assertEq(
+      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
+      IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER())
+    );
   }
 }

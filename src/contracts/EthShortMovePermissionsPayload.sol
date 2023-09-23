@@ -94,7 +94,10 @@ contract EthShortMovePermissionsPayload {
       ETH_AMOUNT_CROSSCHAIN_CONTROLLER,
       AaveV3Ethereum.WETH_GATEWAY
     );
-    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).transfer(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER, LINK_AMOUNT_CROSSCHAIN_CONTROLLER);
+    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).transfer(
+      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+      LINK_AMOUNT_CROSSCHAIN_CONTROLLER
+    );
 
     // ROBOT
     migrateKeepers();
@@ -272,7 +275,9 @@ contract EthShortMovePermissionsPayload {
     // REGISTER NEW KEEPER (GOV CHAIN, VOTING CHAIN, EXECUTION CHAIN)
     IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).approve(
       ROBOT_OPERATOR,
-      LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
+      LINK_AMOUNT_ROBOT_GOV_CHAIN +
+        LINK_AMOUNT_ROBOT_VOTING_CHAIN +
+        LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
     );
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
@@ -283,13 +288,13 @@ contract EthShortMovePermissionsPayload {
     );
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Voting Chain Keeper',
-      GOV_CHAIN_ROBOT,
+      VOTING_CHAIN_ROBOT,
       5000000,
       LINK_AMOUNT_ROBOT_VOTING_CHAIN.toUint96()
     );
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',
-      GOV_CHAIN_ROBOT,
+      EXECUTION_CHAIN_ROBOT,
       5000000,
       LINK_AMOUNT_ROBOT_EXECUTION_CHAIN.toUint96()
     );
