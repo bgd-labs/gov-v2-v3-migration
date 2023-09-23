@@ -257,11 +257,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testRobot() internal {
     uint256 govChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(
-          blockhash(block.number - 1),
-          KEEPER_REGISTRY,
-          uint32(registryState.nonce)
-        )
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
       )
     );
     uint256 votingChainKeeperId = uint256(
