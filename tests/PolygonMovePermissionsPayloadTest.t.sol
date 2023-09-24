@@ -8,6 +8,8 @@ import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygo
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
+import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
 
@@ -17,12 +19,18 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant GELATO_ADDRESS = 0x73495115E38A307DA3419Bf062bb050b96f68Cf3;
   uint256 public constant GELATO_AMOUNT = 10_000e6;
 
+  address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
+
+  PolygonMovePermissionsPayload public payload;
+  IKeeperRegistry.State public registryState;
+
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), 47447966);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
-    PolygonMovePermissionsPayload payload = new PolygonMovePermissionsPayload();
+    payload = new PolygonMovePermissionsPayload();
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
 
@@ -60,11 +68,13 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testCrosschainFunding(
       GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
       ERC677_LINK,
-      payload.MATIC_AMOUNT(),
-      payload.LINK_AMOUNT()
+      payload.MATIC_AMOUNT_CROSSCHAIN_CONTROLLER(),
+      payload.LINK_AMOUNT_CROSSCHAIN_CONTROLLER()
     );
 
     _testGelatoFunding(GELATO_ADDRESS, GELATO_AMOUNT);
+
+    _testRobot();
 
     vm.stopPrank();
   }
@@ -72,5 +82,42 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testGelatoFunding(address gelatoAddress, uint256 gelatoAmount) internal {
     uint256 gelatoBalance = IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).balanceOf(gelatoAddress);
     assertEq(gelatoBalance, gelatoAmount);
+  }
+
+  function _testRobot() internal {
+    uint256 votingChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce)
+        )
+      )
+    );
+    uint256 executionChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
+      )
+    );
+
+    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      votingChainKeeperId
+    );
+    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      executionChainKeeperId
+    );
+
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Polygon.EXECUTOR_LVL_1);
+    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
+    assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
+
+    assertEq(
+      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
+      IERC20(payload.ERC677_LINK()).balanceOf(payload.ROOTS_CONSUMER())
+    );
   }
 }
