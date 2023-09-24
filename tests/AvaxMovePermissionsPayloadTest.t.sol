@@ -9,18 +9,37 @@ import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Av
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {AvaxMovePermissionsPayload} from '../src/contracts/AvaxMovePermissionsPayload.sol';
+import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IProofOfReserveExecutor} from './helpers/IProofOfReserveExecutor.sol';
 import {IProofOfReserveAggregator} from './helpers/IProofOfReserveAggregator.sol';
 
 contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
   address constant AVALANCHE_GUARDIAN = 0xa35b76E4935449E33C56aB24b23fcd3246f13470;
 
+  address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
+
+  address public LINK_WHALE = 0x3801582a0A8D4138333f7f1322477Aa232093990;
+
+  AvaxMovePermissionsPayload public payload;
+  IKeeperRegistry.State public registryState;
+
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 35088925);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 35600965);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
-    AvaxMovePermissionsPayload payload = new AvaxMovePermissionsPayload();
+    payload = new AvaxMovePermissionsPayload();
+
+    // expect the collector to have sufficient link tokens during payload execution
+    vm.startPrank(LINK_WHALE);
+    IERC20(AaveV3AvalancheAssets.LINKe_A_TOKEN).transfer(
+      address(AaveV3Avalanche.COLLECTOR),
+      payload.TOTAL_LINK_AMOUNT()
+    );
+    vm.stopPrank();
 
     GovHelpers.executePayload(vm, address(payload), AVALANCHE_GUARDIAN);
 
@@ -60,9 +79,12 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testCrosschainFunding(
       GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
       AaveV3AvalancheAssets.LINKe_UNDERLYING,
-      payload.AVAX_AMOUNT(),
-      (payload.LINK_AMOUNT() + 100000000000000000) // some link is currently stuck
+      payload.AVAX_AMOUNT_CROSSCHAIN_CONTROLLER(),
+      payload.LINK_AMOUNT_CROSSCHAIN_CONTROLLER()
     );
+
+    // TODO: update after deploying the robot operator
+    // _testRobot();
 
     vm.stopPrank();
   }
@@ -81,5 +103,42 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
     // Proof or reserve aggregator
     IProofOfReserveAggregator(AaveV3Avalanche.PROOF_OF_RESERVE_AGGREGATOR)
       .disableProofOfReserveFeed(AaveV3AvalancheAssets.AAVEe_UNDERLYING);
+  }
+
+  function _testRobot() internal {
+    uint256 votingChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
+      )
+    );
+    uint256 executionChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 2)
+        )
+      )
+    );
+
+    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      votingChainKeeperId
+    );
+    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      executionChainKeeperId
+    );
+
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Avalanche.EXECUTOR_LVL_1);
+    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
+    assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
+
+    assertEq(
+      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
+      IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER())
+    );
   }
 }

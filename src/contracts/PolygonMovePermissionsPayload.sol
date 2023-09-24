@@ -106,10 +106,18 @@ contract PolygonMovePermissionsPayload {
 
   function _fetchLinkTokens() internal {
     // transfer aLINK token from the treasury to the current address
-    AaveV3Polygon.COLLECTOR.transfer(AaveV3PolygonAssets.LINK_A_TOKEN, address(this), TOTAL_LINK_AMOUNT);
+    AaveV3Polygon.COLLECTOR.transfer(
+      AaveV3PolygonAssets.LINK_A_TOKEN,
+      address(this),
+      TOTAL_LINK_AMOUNT
+    );
 
     // withdraw aLINK from the aave pool and receive LINK
-    AaveV3Polygon.POOL.withdraw(AaveV3PolygonAssets.LINK_UNDERLYING, TOTAL_LINK_AMOUNT, address(this));
+    AaveV3Polygon.POOL.withdraw(
+      AaveV3PolygonAssets.LINK_UNDERLYING,
+      TOTAL_LINK_AMOUNT,
+      address(this)
+    );
 
     // Swap ERC-20 link to ERC-677 link
     IERC20(AaveV3PolygonAssets.LINK_UNDERLYING).forceApprove(address(PEGSWAP), TOTAL_LINK_AMOUNT);
@@ -123,8 +131,7 @@ contract PolygonMovePermissionsPayload {
     // REGISTER NEW KEEPER (VOTING CHAIN, EXECUTION CHAIN)
     IERC20(ERC677_LINK).approve(
       ROBOT_OPERATOR,
-        LINK_AMOUNT_ROBOT_VOTING_CHAIN +
-        LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
+      LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
     );
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
@@ -141,10 +148,7 @@ contract PolygonMovePermissionsPayload {
     );
 
     // FUND ROOTS CONSUMER
-    IERC20(ERC677_LINK).transfer(
-      ROOTS_CONSUMER,
-      LINK_AMOUNT_ROOTS_CONSUMER
-    );
+    IERC20(ERC677_LINK).transfer(ROOTS_CONSUMER, LINK_AMOUNT_ROOTS_CONSUMER);
 
     // TRANSFER PERMISSION OF ROBOT OPERATOR
     IOwnable(ROBOT_OPERATOR).transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);
