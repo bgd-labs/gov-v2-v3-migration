@@ -60,11 +60,7 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     uint256 executionChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(
-          blockhash(block.number - 1),
-          KEEPER_REGISTRY,
-          uint32(registryState.nonce)
-        )
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
       )
     );
 
