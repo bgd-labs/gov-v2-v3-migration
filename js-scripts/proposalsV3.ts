@@ -158,7 +158,7 @@ export const deployAndRegisterTestPayloads = async (
   walletClient: WalletClient,
   publicClient: PublicClient,
   deployer: Address,
-  governanceAddresses: any,
+  controller: any,
   payloadArtifacts: any[]
 ) => {
   const actions: Actions[] = [];
@@ -173,10 +173,9 @@ export const deployAndRegisterTestPayloads = async (
       callData: '' as Hex,
     });
   }
-
   // register payloads
   const {request: payloadRegistered, result: payloadId} = await publicClient.simulateContract({
-    address: governanceAddresses.PAYLOADS_CONTROLLER,
+    address: controller,
     abi: IPayloadsControllerCore_ABI,
     functionName: 'createPayload',
     args: [actions],

@@ -46,6 +46,7 @@ import EthLongMovePermissionsPayload from '../out/EthLongMovePermissionsPayload.
 import Mediator from '../out/Mediator.sol/Mediator.json';
 import {stringToBigNumber} from '../lib/aave-governance-v3/lib/aave-token-v3/lib/aave-token-v2/helpers/misc-utils';
 import {getPayloadsController} from '@bgd-labs/aave-cli/dist';
+import {createAndExecuteGovernanceV3Payload} from './payloadsV3';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
@@ -67,22 +68,28 @@ const getFork = async (chain: any) => {
   return {fork, walletClient, publicClient};
 };
 
-const deployAndExecuteL2Payload = async (chain: any, executor: Address, artifact: any) => {
-  const {fork, walletClient, publicClient} = await getFork(chain);
-
-  const payload = await deployContract(walletClient, publicClient, DEPLOYER, artifact);
-  await executeL2Payload(walletClient, publicClient, executor, payload, fork);
-};
-
-const deployAndExecuteL2PayloadViaGuardian = async (
+const deployAndExecuteL2Payload = async (
   chain: any,
   executor: Address,
-  artifact: any
+  artifact: any,
+  governanceAddresses: any,
+  payloadArtifacts: any[]
 ) => {
   const {fork, walletClient, publicClient} = await getFork(chain);
 
   const payload = await deployContract(walletClient, publicClient, DEPLOYER, artifact);
-  await executeL2PayloadViaGuardian(walletClient, publicClient, executor, payload, fork);
+  if (chain.id !== avalanche.id) {
+    await executeL2Payload(walletClient, publicClient, executor, payload, fork);
+  } else {
+    await executeL2PayloadViaGuardian(walletClient, publicClient, executor, payload, fork);
+  }
+  await createAndExecuteGovernanceV3Payload(
+    governanceAddresses.PAYLOADS_CONTROLLER,
+    publicClient,
+    walletClient,
+    fork,
+    payloadArtifacts
+  );
 };
 
 const deployPayloadsEthereum = async () => {
@@ -148,44 +155,56 @@ const deployPayloadsEthereum = async () => {
 
 // deployPayloadsEthereum().then().catch(console.log);
 
-deployAndExecuteL2Payload(
-  polygon,
-  AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-  PolygonMovePermissionsPayload
-)
-  .then()
-  .catch(console.log);
+async function upgradeL2s() {
+  await deployAndExecuteL2Payload(
+    polygon,
+    AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
+    PolygonMovePermissionsPayload,
+    GovernanceV3Polygon,
+    [TestV2PayloadPolygon, TestV3PayloadPolygon]
+  );
 
-deployAndExecuteL2PayloadViaGuardian(avalanche, AVAX_GUARDIAN, AvaxMovePermissionsPayload)
-  .then()
-  .catch(console.log);
+  await deployAndExecuteL2Payload(
+    avalanche,
+    AVAX_GUARDIAN,
+    AvaxMovePermissionsPayload,
+    GovernanceV3Avalanche,
+    [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
+  );
 
-deployAndExecuteL2Payload(
-  arbitrum,
-  AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-  ArbMovePermissionsPayload
-)
-  .then()
-  .catch(console.log);
+  await deployAndExecuteL2Payload(
+    arbitrum,
+    AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
+    ArbMovePermissionsPayload,
+    GovernanceV3Arbitrum,
+    [TestV3PayloadArbitrum]
+  );
 
-deployAndExecuteL2Payload(
-  optimism,
-  AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-  OptMovePermissionsPayload
-)
-  .then()
-  .catch(console.log);
+  await deployAndExecuteL2Payload(
+    optimism,
+    AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
+    OptMovePermissionsPayload,
+    GovernanceV3Optimism,
+    [TestV3PayloadOptimism]
+  );
 
-deployAndExecuteL2Payload(base, AaveGovernanceV2.BASE_BRIDGE_EXECUTOR, BaseMovePermissionsPayload)
-  .then()
-  .catch(console.log);
-//
-// deployAndExecuteL2Payload(
-//   metis,
-//   AaveGovernanceV2.METIS_BRIDGE_EXECUTOR,
-//   MetisMovePermissionsPayload,
-//   GovernanceV3Metis,
-//   [TestV3PayloadMetis]
-// )
-//   .then()
-//   .catch(console.log);
+  await deployAndExecuteL2Payload(
+    base,
+    AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
+    BaseMovePermissionsPayload,
+    GovernanceV3Base,
+    [TestV3PayloadBase]
+  );
+  //
+  // deployAndExecuteL2Payload(
+  //   metis,
+  //   AaveGovernanceV2.METIS_BRIDGE_EXECUTOR,
+  //   MetisMovePermissionsPayload,
+  //   GovernanceV3Metis,
+  //   [TestV3PayloadMetis]
+  // )
+  //   .then()
+  //   .catch(console.log);
+}
+
+upgradeL2s();
