@@ -11,6 +11,12 @@ import {IPegSwap} from './dependencies/IPegSwap.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title AvaxMovePermissionsPayload
+ * @notice Migrate permissions for Aave V2 and V3 Pools on Avalanche from governance v2 to v3,
+ * fund cross chain controller and gelato.
+ * @author BGD Labs
+ **/
 contract PolygonMovePermissionsPayload {
   using SafeERC20 for IERC20;
 
@@ -29,11 +35,9 @@ contract PolygonMovePermissionsPayload {
     // GELATO FUNDING
     AaveV3Polygon.COLLECTOR.transfer(
       AaveV3PolygonAssets.USDC_A_TOKEN,
-      address(this),
+      GELATO_ADDRESS,
       GELATO_AMOUNT
     );
-
-    AaveV3Polygon.POOL.withdraw(AaveV3PolygonAssets.USDC_UNDERLYING, GELATO_AMOUNT, GELATO_ADDRESS);
 
     // CC FUNDING
     MigratorLib.fundCrosschainControllerNative(

@@ -70,7 +70,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function _testGelatoFunding(address gelatoAddress, uint256 gelatoAmount) internal {
-    uint256 gelatoBalance = IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).balanceOf(gelatoAddress);
+    uint256 gelatoBalance = IERC20(AaveV3PolygonAssets.USDC_A_TOKEN).balanceOf(gelatoAddress);
     assertEq(gelatoBalance, gelatoAmount);
   }
 }

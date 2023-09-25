@@ -10,6 +10,12 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title AvaxMovePermissionsPayload
+ * @notice Migrate permissions for Aave V2 and V3 Pools on Avalanche from governance v2 to v3
+ * and fund cross chain controller
+ * @author BGD Labs
+ **/
 contract AvaxMovePermissionsPayload {
   // ~ 20 proposals
   uint256 public constant AVAX_AMOUNT = 361 ether;

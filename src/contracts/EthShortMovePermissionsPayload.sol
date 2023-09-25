@@ -22,6 +22,12 @@ import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
 import {IMediator} from './interfaces/IMediator.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title EthShortMovePermissionsPayload
+ * @notice Migrate permissions for Aave V1, V2 and V3 pools on Ethereum from governance v2 to v3.
+ * Migrate GHO permissions to the new governance, fund cross chain controller and execute long permissions move.
+ * @author BGD Labs
+ **/
 contract EthShortMovePermissionsPayload {
   address public immutable MEDIATOR;
 

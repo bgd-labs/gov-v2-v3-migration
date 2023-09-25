@@ -8,6 +8,11 @@ import {IACLManager, IPoolAddressesProvider, IPool} from 'aave-address-book/Aave
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
 import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 
+/**
+ * @title MigratorLib
+ * @notice Library to migrate permissions from governance V2 to V3.
+ * @author BGD Labs
+ **/
 library MigratorLib {
   function migrateV2PoolPermissions(
     address executor,
