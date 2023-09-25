@@ -8,14 +8,24 @@ export const executeL2Payload = async (
   payload: Address,
   abi: any
 ) => {
-  const {request, result} = await publicClient.simulateContract({
+  // const {request, result} = await publicClient.simulateContract({
+  //   address: payload,
+  //   abi,
+  //   functionName: 'execute',
+  //   args: [],
+  //   account: executor,
+  // });
+  // const hash = await walletClient.writeContract(request);
+  // await publicClient.waitForTransactionReceipt({hash});
+
+  await walletClient.writeContract({
     address: payload,
     abi,
     functionName: 'execute',
     args: [],
     account: executor,
+    chain: undefined,
   });
-  const hash = await walletClient.writeContract(request);
-  await publicClient.waitForTransactionReceipt({hash});
-  return result;
+
+  // return result;
 };

@@ -40,11 +40,12 @@ import TestV3PayloadArbitrum from '../out/PoolPayload.sol/TestV3PayloadArbitrum.
 import TestV3PayloadOptimism from '../out/PoolPayload.sol/TestV3PayloadOptimism.json';
 import TestV3PayloadBase from '../out/PoolPayload.sol/TestV3PayloadBase.json';
 import TestV3PayloadMetis from '../out/PoolPayload.sol/TestV3PayloadMetis.json';
-import {deployContract} from './helpers';
+import {deployContract, simulateOnTenderly} from './helpers';
 import EthShortMovePermissionsPayload from '../out/EthShortMovePermissionsPayload.sol/EthShortMovePermissionsPayload.json';
 import EthLongMovePermissionsPayload from '../out/EthLongMovePermissionsPayload.sol/EthLongMovePermissionsPayload.json';
 import Mediator from '../out/Mediator.sol/Mediator.json';
 import {stringToBigNumber} from '../lib/aave-governance-v3/lib/aave-token-v3/lib/aave-token-v2/helpers/misc-utils';
+import {getPayloadsController} from '@bgd-labs/aave-cli/dist';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
@@ -74,40 +75,48 @@ const deployAndExecuteL2Payload = async (
   payloadArtifacts: any[]
 ) => {
   const {fork, walletClient, publicClient} = await getFork(chain);
-
-  const payload = await deployContract(walletClient, publicClient, DEPLOYER, artifact);
-
-  await executeL2Payload(walletClient, publicClient, executor, payload, artifact.abi);
-
-  const payloadId = await deployAndRegisterTestPayloads(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    governanceAddresses,
-    payloadArtifacts
-  );
-
-  const payloads: Payload[] = [];
-  payloads.push({
-    payloadsController: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-    chain: chain.id,
-    payloadId: payloadId,
-    accessLevel: 1,
-  });
   const {
     fork: mainnetFork,
     walletClient: mainnetWalletClient,
     publicClient: mainnetPublicClient,
   } = await getFork(mainnet);
 
-  await generateProposalAndExecutePayload(
-    mainnetWalletClient,
-    mainnetPublicClient,
-    mainnetFork,
-    AaveMisc.ECOSYSTEM_RESERVE,
-    payloadId,
-    chain
-  );
+  const payload = await deployContract(walletClient, publicClient, DEPLOYER, artifact);
+  console.log('executor: ', executor);
+
+  await executeL2Payload(walletClient, publicClient, executor, payload, artifact.abi);
+
+  // const payloadId = await deployAndRegisterTestPayloads(
+  //   walletClient,
+  //   publicClient,
+  //   DEPLOYER,
+  //   governanceAddresses,
+  //   payloadArtifacts
+  // );
+
+  // const payloads: Payload[] = [];
+  // payloads.push({
+  //   payloadsController: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+  //   chain: chain.id,
+  //   payloadId: payloadId,
+  //   accessLevel: 1,
+  // });
+
+  // await generateProposalAndExecutePayload(
+  //   mainnetWalletClient,
+  //   mainnetPublicClient,
+  //   mainnetFork,
+  //   AaveMisc.ECOSYSTEM_RESERVE,
+  //   payloadId,
+  //   chain
+  // );
+  // const payloadController = await getPayloadsController(
+  //   governanceAddresses.PAYLOADS_CONTROLLER,
+  //   // @ts-ignore
+  //   publicClient
+  // );
+  // const payloadV3 = await payloadController.getSimulationPayloadForExecution(payloadId);
+  // await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, payloadV3);
 };
 
 const deployPayloadsEthereum = async () => {
@@ -172,18 +181,18 @@ const deployPayloadsEthereum = async () => {
   console.log('proposalId: ', proposalId);
 };
 
-deployPayloadsEthereum().then().catch(console.log);
+// deployPayloadsEthereum().then().catch(console.log);
 
-// deployAndExecuteL2Payload(
-//   polygon,
-//   AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-//   PolygonMovePermissionsPayload,
-//   GovernanceV3Polygon,
-//   [TestV2PayloadPolygon, TestV3PayloadPolygon]
-// )
-//   .then()
-//   .catch(console.log);
-//
+deployAndExecuteL2Payload(
+  polygon,
+  AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
+  PolygonMovePermissionsPayload,
+  GovernanceV3Polygon,
+  [TestV2PayloadPolygon, TestV3PayloadPolygon]
+)
+  .then()
+  .catch(console.log);
+
 // deployAndExecuteL2Payload(
 //   avalanche,
 //   AVAX_GUARDIAN,
