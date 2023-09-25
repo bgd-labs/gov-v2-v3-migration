@@ -153,7 +153,7 @@ const deployPayloadsEthereum = async () => {
   console.log('proposalId: ', proposalId);
 };
 
-// deployPayloadsEthereum().then().catch(console.log);
+deployPayloadsEthereum().then().catch(console.log);
 
 async function upgradeL2s() {
   await deployAndExecuteL2Payload(
