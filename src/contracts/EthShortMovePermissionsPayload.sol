@@ -22,6 +22,12 @@ import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
 import {IMediator} from './interfaces/IMediator.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title EthShortMovePermissionsPayload
+ * @notice Migrate permissions for Aave V1, V2 and V3 pools on Ethereum from governance v2 to v3.
+ * Migrate GHO permissions to the new governance, fund cross chain controller and execute long permissions move.
+ * @author BGD Labs
+ **/
 contract EthShortMovePermissionsPayload {
   address public immutable MEDIATOR;
 
@@ -49,17 +55,17 @@ contract EthShortMovePermissionsPayload {
     IMediator(MEDIATOR).execute();
 
     // CC FUNDING
-    MigratorLib.fundCrosschainController(
+    MigratorLib.fundCrosschainControllerNative(
       AaveV3Ethereum.COLLECTOR,
-      AaveV3Ethereum.POOL,
       GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.WETH_A_TOKEN,
       ETH_AMOUNT,
-      AaveV3Ethereum.WETH_GATEWAY,
+      AaveV3Ethereum.WETH_GATEWAY
+    );
+    AaveV3Ethereum.COLLECTOR.transfer(
       AaveV3EthereumAssets.LINK_UNDERLYING,
-      address(0),
-      LINK_AMOUNT,
-      false
+      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+      LINK_AMOUNT
     );
 
     // STK TOKENS - SET ADMIN ROLES

@@ -7,6 +7,11 @@ import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title BaseMovePermissionsPayload
+ * @notice Migrate permissions for Aave Pool V3 on Metis from governance v2 to v3.
+ * @author BGD Labs
+ **/
 contract MetisMovePermissionsPayload {
   function execute() external {
     // V3 POOL

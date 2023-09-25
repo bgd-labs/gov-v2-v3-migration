@@ -25,8 +25,6 @@ contract Mediator is IMediator {
 
   uint256 public constant OVERDUE = 172800; // 2 days
 
-  address public constant GUARDIAN = AaveV2Ethereum.EMERGENCY_ADMIN;
-
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
@@ -111,10 +109,6 @@ contract Mediator is IMediator {
    * @dev Will prevent the execution of the migration
    */
   function cancel() external {
-    if (msg.sender != AaveV2Ethereum.EMERGENCY_ADMIN && block.timestamp < _overdueDate) {
-      revert NotGuardianOrNotOverdue();
-    }
-
     if (msg.sender != AaveV2Ethereum.EMERGENCY_ADMIN && block.timestamp < _overdueDate) {
       revert NotGuardianOrNotOverdue();
     }
