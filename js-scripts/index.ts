@@ -3,7 +3,7 @@ import {tenderly} from '@bgd-labs/aave-cli';
 import path from 'path';
 import {Address, createPublicClient, createWalletClient, http} from 'viem';
 import {arbitrum, avalanche, base, mainnet, metis, optimism, polygon} from 'viem/chains';
-import {executeL2Payload} from './payloadsV2';
+import {executeL2Payload, executeL2PayloadViaGuardian} from './payloadsV2';
 import {createV2Proposal, executeV2Proposals} from './proposalsV2';
 import {
   AaveGovernanceV2,
@@ -67,56 +67,22 @@ const getFork = async (chain: any) => {
   return {fork, walletClient, publicClient};
 };
 
-const deployAndExecuteL2Payload = async (
-  chain: any,
-  executor: Address,
-  artifact: any,
-  governanceAddresses: any,
-  payloadArtifacts: any[]
-) => {
+const deployAndExecuteL2Payload = async (chain: any, executor: Address, artifact: any) => {
   const {fork, walletClient, publicClient} = await getFork(chain);
-  const {
-    fork: mainnetFork,
-    walletClient: mainnetWalletClient,
-    publicClient: mainnetPublicClient,
-  } = await getFork(mainnet);
 
   const payload = await deployContract(walletClient, publicClient, DEPLOYER, artifact);
-  console.log('executor: ', executor);
+  await executeL2Payload(walletClient, publicClient, executor, payload, fork);
+};
 
-  await executeL2Payload(walletClient, publicClient, executor, payload, artifact.abi);
+const deployAndExecuteL2PayloadViaGuardian = async (
+  chain: any,
+  executor: Address,
+  artifact: any
+) => {
+  const {fork, walletClient, publicClient} = await getFork(chain);
 
-  // const payloadId = await deployAndRegisterTestPayloads(
-  //   walletClient,
-  //   publicClient,
-  //   DEPLOYER,
-  //   governanceAddresses,
-  //   payloadArtifacts
-  // );
-
-  // const payloads: Payload[] = [];
-  // payloads.push({
-  //   payloadsController: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-  //   chain: chain.id,
-  //   payloadId: payloadId,
-  //   accessLevel: 1,
-  // });
-
-  // await generateProposalAndExecutePayload(
-  //   mainnetWalletClient,
-  //   mainnetPublicClient,
-  //   mainnetFork,
-  //   AaveMisc.ECOSYSTEM_RESERVE,
-  //   payloadId,
-  //   chain
-  // );
-  // const payloadController = await getPayloadsController(
-  //   governanceAddresses.PAYLOADS_CONTROLLER,
-  //   // @ts-ignore
-  //   publicClient
-  // );
-  // const payloadV3 = await payloadController.getSimulationPayloadForExecution(payloadId);
-  // await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, payloadV3);
+  const payload = await deployContract(walletClient, publicClient, DEPLOYER, artifact);
+  await executeL2PayloadViaGuardian(walletClient, publicClient, executor, payload, fork);
 };
 
 const deployPayloadsEthereum = async () => {
@@ -151,7 +117,6 @@ const deployPayloadsEthereum = async () => {
   const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15;
 
   await tenderly.warpTime(fork, BigInt(timeToWarpTo));
-  const currentBlock = await publicClient.getBlockNumber();
 
   const shortProposalId = await createV2Proposal(
     walletClient,
@@ -186,52 +151,34 @@ const deployPayloadsEthereum = async () => {
 deployAndExecuteL2Payload(
   polygon,
   AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-  PolygonMovePermissionsPayload,
-  GovernanceV3Polygon,
-  [TestV2PayloadPolygon, TestV3PayloadPolygon]
+  PolygonMovePermissionsPayload
 )
   .then()
   .catch(console.log);
 
-// deployAndExecuteL2Payload(
-//   avalanche,
-//   AVAX_GUARDIAN,
-//   AvaxMovePermissionsPayload,
-//   GovernanceV3Avalanche,
-//   [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
-// )
-//   .then()
-//   .catch(console.log);
-//
-// deployAndExecuteL2Payload(
-//   arbitrum,
-//   AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-//   ArbMovePermissionsPayload,
-//   GovernanceV3Arbitrum,
-//   [TestV3PayloadArbitrum]
-// )
-//   .then()
-//   .catch(console.log);
-//
-// deployAndExecuteL2Payload(
-//   optimism,
-//   AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-//   OptMovePermissionsPayload,
-//   GovernanceV3Optimism,
-//   [TestV3PayloadOptimism]
-// )
-//   .then()
-//   .catch(console.log);
-//
-// deployAndExecuteL2Payload(
-//   base,
-//   AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-//   BaseMovePermissionsPayload,
-//   GovernanceV3Base,
-//   [TestV3PayloadBase]
-// )
-//   .then()
-//   .catch(console.log);
+deployAndExecuteL2PayloadViaGuardian(avalanche, AVAX_GUARDIAN, AvaxMovePermissionsPayload)
+  .then()
+  .catch(console.log);
+
+deployAndExecuteL2Payload(
+  arbitrum,
+  AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
+  ArbMovePermissionsPayload
+)
+  .then()
+  .catch(console.log);
+
+deployAndExecuteL2Payload(
+  optimism,
+  AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
+  OptMovePermissionsPayload
+)
+  .then()
+  .catch(console.log);
+
+deployAndExecuteL2Payload(base, AaveGovernanceV2.BASE_BRIDGE_EXECUTOR, BaseMovePermissionsPayload)
+  .then()
+  .catch(console.log);
 //
 // deployAndExecuteL2Payload(
 //   metis,
