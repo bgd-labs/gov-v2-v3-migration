@@ -1,6 +1,75 @@
-# Migration from Governance V2 to Governance V3
+## Migration Governance v2→v3
 
+This repository contains payloads which are necessary for migration of all the Aave deployments from governance v2 to v3.
+
+Activating Aave Governance v3 requires passing both Level 1 (Short) and Level 2 (Long) proposals on Aave Governance v2, but as the execution of both should be atomic, the global procedure needs to be more sophisticated than usual.
+
+The following diagram gives an overview of how this process will be.
 ![Execution timeline](./proposal_timeline.png)
+
+## List of contracts and actions:
+
+- [Mediator contract](./src/contracts/Mediator.sol). In order to execute sync/atomically both Level 1 and Level 2 proposals, we have created the so-called mediator smart contract, which will receive permissions from the Level 2 executor (long), allowing for the Level 1 executor to do its own execution in sync.
+  This is mandatory, because in any situation of Level 1 passing and Level 2 not (or vice versa), the whole Aave Governance v2 & v3 systems will not be operative.
+
+- [Level 2 (Long executor) proposal, Ethereum](./src/contracts/EthLongMovePermissionsPayload.sol).
+
+  - Transfer the proxy admin permissions from the AAVE token to the ProxyAdmin Level 2 contract.
+  - Transfer the ownership of the ProxyAdmin Level 2 contract to the Mediator.
+  - Transfer the pendingAdmin role of Governance v2 Level 2 Executor to the Governance v3 Level 2 Executor.
+  - Change ownership of Governance v3 Level 2 Executor to the Mediator contract.
+
+- [Level 1 (Short executor) proposal, Ethereum](./src/contracts/EthShortMovePermissionsPayload.sol)
+
+  - **Trigger the execution of the Mediator.**
+  - Fund CCC contract on a.DI from Aave Collector.
+  - Fund execution robot.
+  - Migrate all “minor” permissions of stkAAVE to the Governance v3 Level 1 Executor.
+  - Migrate all GHO permissions to the Governance v3 Level 1 Executor.
+  - Migrate all permissions of Aave v1 Ethereum to the Governance v3 Level 1 Executor.
+  - Migrate all permissions of Aave v2 Ethereum to the Governance v3 Level 1 Executor.
+  - Migrate all permissions of Aave v2 Ethereum AMM to the Governance v3 Level 1 Executor.
+  - Migrate all permissions of Aave v3 Ethereum to the Governance v3 Level 1 Executor.
+  - Migrate permissions of Aave MerkleDistributor (rescue mission) to the Governance v3 Level 1 Executor.
+  - Migrate admin of LendToAaveMigrator to the Governance v3 Level 1 Executor.
+  - Migrate permissions of Balancer v1 ABPT to the Governance v3 Level 1 Executor.
+  - Transfer the ownership of the Aave Swapper contract to the Governance v3 Level 1 Executor.
+  - Transfer the ownership of the Aave Collector Polygon→Ethereum bridge to the Governance v3 level 1 Executor.
+  - Migrate the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
+  - Change ownership of Governance v3 Level 1 Executor to the Governance v2 Payloads Controller.
+
+- [Polygon PoS](./src/contracts/PolygonMovePermissionsPayload.sol)
+
+  - Fund Gelato for Aave gas tank.
+  - Fund CCC contract on a.DI from Aave Collector.
+  - Fund execution robot.
+  - Migrate all permissions of Aave v2 Polygon to the Governance v3 Level 1 Executor.
+  - Migrate all permissions of Aave v3 Polygon to the Governance v3 Level 1 Executor.
+
+- [Avalanche](./src/contracts/ArbMovePermissionsPayload.sol)
+
+  - Fund CCC contract on a.DI from Aave Collector.
+  - Fund execution robot.
+  - Migrate all permissions of Aave v2 Avalanche to the Governance v3 Level 1 Executor.
+  - Migrate all permissions of Aave v3 Avalanche to the Governance v3 Level 1 Executor.
+  - Migrate permissions of Proof of Reserve to the Governance v3 Level 1 Executor.
+
+- [Arbitrum](./src/contracts/ArbMovePermissionsPayload.sol)
+
+  - Fund execution robot.
+  - Migrate all permissions of Aave v3 Arbitrum to the Governance v3 Level 1 Executor.
+
+- [Optimism](./src/contracts/OptMovePermissionsPayload.sol)
+
+  - Fund execution robot.
+  - Migrate all permissions of Aave v3 Optimism to the Governance v3 Level 1 Executor.
+
+- [Metis](./src/contracts/MetisMovePermissionsPayload.sol)
+
+  - Migrate all permissions of Aave v3 Metis to the Governance v3 Level 1 Executor.
+
+- [Base](./src/contracts/BaseMovePermissionsPayload.sol)
+  - Migrate all permissions of Aave v3 Base to the Governance v3 Level 1 Executor.
 
 ## Development
 
@@ -19,20 +88,3 @@ forge install
 ```sh
 forge test
 ```
-
-## Advanced features
-
-### Diffing
-
-For contracts upgrading implementations it's quite important to diff the implementation code to spot potential issues and ensure only the intended changes are included.
-Therefore the `Makefile` includes some commands to streamline the diffing process.
-
-#### Download
-
-You can `download` the current contract code of a deployed contract via `make download chain=polygon address=0x00`. This will download the contract source for specified address to `src/etherscan/chain_address`. This command works for all chains with a etherscan compatible block explorer.
-
-#### Git diff
-
-You can `git-diff` a downloaded contract against your src via `make git-diff before=./etherscan/chain_address after=./src out=filename`. This command will diff the two folders via git patience algorithm and write the output to `diffs/filename.md`.
-
-**Caveat**: If the onchain implementation was verified using flatten, for generating the diff you need to flatten the new contract via `forge flatten` and supply the flattened file instead fo the whole `./src` folder.
