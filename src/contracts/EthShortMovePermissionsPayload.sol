@@ -31,7 +31,7 @@ import {MigratorLib} from './MigratorLib.sol';
 contract EthShortMovePermissionsPayload {
   address public immutable MEDIATOR;
 
-  address public constant A_AAVE_IMPL = 0xC383AAc4B3dC18D9ce08AB7F63B4632716F1e626;
+  address public constant A_AAVE_IMPL = 0xEe96b77129cF54581B5a8FECCcC50A6A067034a1;
 
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);

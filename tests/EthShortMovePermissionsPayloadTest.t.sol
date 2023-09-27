@@ -25,7 +25,7 @@ import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermiss
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
-  address public constant A_AAVE_IMPL = 0xC383AAc4B3dC18D9ce08AB7F63B4632716F1e626;
+  address public constant A_AAVE_IMPL = 0xEe96b77129cF54581B5a8FECCcC50A6A067034a1;
 
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
