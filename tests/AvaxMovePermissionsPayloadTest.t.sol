@@ -26,7 +26,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 35718169);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 35725134);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -87,8 +87,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       payload.LINK_AMOUNT_CROSSCHAIN_CONTROLLER()
     );
 
-    // TODO: update after deploying the robot operator
-    // _testRobot();
+    _testRobot();
 
     vm.stopPrank();
   }
@@ -115,7 +114,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
         abi.encodePacked(
           blockhash(block.number - 1),
           KEEPER_REGISTRY,
-          uint32(registryState.nonce + 1)
+          uint32(registryState.nonce)
         )
       )
     );
@@ -124,7 +123,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
         abi.encodePacked(
           blockhash(block.number - 1),
           KEEPER_REGISTRY,
-          uint32(registryState.nonce + 2)
+          uint32(registryState.nonce + 1)
         )
       )
     );

@@ -20,8 +20,7 @@ import {MigratorLib} from './MigratorLib.sol';
 contract AvaxMovePermissionsPayload {
   using SafeCast for uint256;
 
-  // TODO: update after deploying
-  address public constant ROBOT_OPERATOR = 0xb0A73671C97BAC9Ba899CD1a23604Fd2278cD02A;
+  address public constant ROBOT_OPERATOR = 0x7A9ff54A6eE4a21223036890bB8c4ea2D62c686b;
 
   uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 50 ether;
   uint256 public constant LINK_AMOUNT_ROBOT_EXECUTION_CHAIN = 50 ether;
@@ -38,8 +37,8 @@ contract AvaxMovePermissionsPayload {
       LINK_AMOUNT_ROOTS_CONSUMER;
 
   // TODO: update after deploying
-  address public constant VOTING_CHAIN_ROBOT = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
-  address public constant EXECUTION_CHAIN_ROBOT = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
+  address public constant VOTING_CHAIN_ROBOT = 0x696d07D76A969C1D353a414cf6360002cD36395F;
+  address public constant EXECUTION_CHAIN_ROBOT = 0x696d07D76A969C1D353a414cf6360002cD36395F;
   address public constant ROOTS_CONSUMER = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
 
   function execute() external {
@@ -68,9 +67,8 @@ contract AvaxMovePermissionsPayload {
       LINK_AMOUNT_CROSSCHAIN_CONTROLLER
     );
 
-    // TODO: uncomment after deploying aave robot operator
     // ROBOT
-    // migrateKeepers();
+    migrateKeepers();
 
     // V2 POOL
     MigratorLib.migrateV2PoolPermissions(
@@ -124,13 +122,13 @@ contract AvaxMovePermissionsPayload {
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Voting Chain Keeper',
       VOTING_CHAIN_ROBOT,
-      5000000,
+      5_000_000,
       LINK_AMOUNT_ROBOT_VOTING_CHAIN.toUint96()
     );
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',
       EXECUTION_CHAIN_ROBOT,
-      5000000,
+      5_000_000,
       LINK_AMOUNT_ROBOT_EXECUTION_CHAIN.toUint96()
     );
 
@@ -139,5 +137,8 @@ contract AvaxMovePermissionsPayload {
       ROOTS_CONSUMER,
       LINK_AMOUNT_ROOTS_CONSUMER
     );
+
+    // TRANSFER PERMISSION OF ROBOT OPERATOR
+    IOwnable(ROBOT_OPERATOR).transferOwnership(GovernanceV3Avalanche.EXECUTOR_LVL_1);
   }
 }
