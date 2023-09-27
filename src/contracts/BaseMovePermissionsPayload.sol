@@ -26,7 +26,8 @@ contract BaseMovePermissionsPayload {
       AaveV3Base.WETH_GATEWAY,
       address(0), // swap collateral adapter not deployed yet
       address(0), // repay with collateral adapter not deployed yet
-      address(0) // withdraw swap adapter not deployed
+      address(0), // withdraw swap adapter not deployed
+      address(0) // debt swap adapter not deployed
     );
   }
 }

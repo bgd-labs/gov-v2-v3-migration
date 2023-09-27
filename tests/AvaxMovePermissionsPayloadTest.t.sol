@@ -52,7 +52,8 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER
+      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Avalanche.DEBT_SWAP_ADAPTER
     );
 
     _testProofOfReserve();
@@ -61,7 +62,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
       AaveV3AvalancheAssets.LINKe_UNDERLYING,
       payload.AVAX_AMOUNT(),
-      (payload.LINK_AMOUNT() + 100000000000000000) // some link is currently stuck
+      (payload.LINK_AMOUNT()) // some link is currently stuck
     );
 
     vm.stopPrank();

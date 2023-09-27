@@ -101,7 +101,8 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     address wethGateway,
     address swapCollateral,
     address repayWithCollateral,
-    address withdrawSwapAdapter
+    address withdrawSwapAdapter,
+    address debtSwapAdapter
   ) internal {
     // WETH_GATEWAY
     if (wethGateway != address(0)) {
@@ -121,6 +122,11 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     // WithdrawSwapAdapter
     if (withdrawSwapAdapter != address(0)) {
       assertEq(IOwnable(withdrawSwapAdapter).owner(), newExecutor);
+    }
+
+    // DebtSwapAdapter
+    if (debtSwapAdapter != address(0)) {
+      assertEq(IOwnable(debtSwapAdapter).owner(), newExecutor);
     }
   }
 

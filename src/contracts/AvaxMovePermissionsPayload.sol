@@ -54,7 +54,8 @@ contract AvaxMovePermissionsPayload {
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER
+      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Avalanche.DEBT_SWAP_ADAPTER
     );
 
     // Proof of reserve
@@ -83,13 +84,7 @@ contract AvaxMovePermissionsPayload {
     AaveV3Avalanche.POOL.withdraw(
       AaveV3AvalancheAssets.LINKe_UNDERLYING,
       LINK_AMOUNT,
-      address(this)
-    );
-
-    // transfer LINK to the CC
-    IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).transfer(
-      GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
-      IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).balanceOf(address(this))
+      GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER
     );
   }
 }

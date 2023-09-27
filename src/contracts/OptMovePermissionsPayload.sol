@@ -26,7 +26,8 @@ contract OptMovePermissionsPayload {
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
       AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER
+      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Optimism.DEBT_SWAP_ADAPTER
     );
   }
 }

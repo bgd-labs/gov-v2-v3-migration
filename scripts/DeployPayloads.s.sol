@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {EthereumScript, ArbitrumScript, AvalancheScript, MetisScript, OptimismScript, PolygonScript} from 'aave-helpers/ScriptUtils.sol';
+import {EthereumScript, ArbitrumScript, AvalancheScript, MetisScript, OptimismScript, PolygonScript, BaseScript} from 'aave-helpers/ScriptUtils.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ArbMovePermissionsPayload} from '../src/contracts/ArbMovePermissionsPayload.sol';
 import {AvaxMovePermissionsPayload} from '../src/contracts/AvaxMovePermissionsPayload.sol';
@@ -10,9 +10,10 @@ import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermi
 import {MetisMovePermissionsPayload} from '../src/contracts/MetisMovePermissionsPayload.sol';
 import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayload.sol';
 import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
+import {BaseMovePermissionsPayload} from '../src/contracts/BaseMovePermissionsPayload.sol';
 import {Mediator} from '../src/contracts/Mediator.sol';
 
-contract DeployMainnetPayload is EthereumScript {
+contract DeployMainnet is EthereumScript {
   function run() external broadcast {
     Mediator mediator = new Mediator();
     new EthShortMovePermissionsPayload(address(mediator));
@@ -20,32 +21,38 @@ contract DeployMainnetPayload is EthereumScript {
   }
 }
 
-contract DeployArbitrumPayload is ArbitrumScript {
+contract DeployArbitrum is ArbitrumScript {
   function run() external broadcast {
     new ArbMovePermissionsPayload();
   }
 }
 
-contract DeployAvalanchePayload is AvalancheScript {
+contract DeployAvalanche is AvalancheScript {
   function run() external broadcast {
     new AvaxMovePermissionsPayload();
   }
 }
 
-contract DeployMetisPayload is MetisScript {
+contract DeployMetis is MetisScript {
   function run() external broadcast {
     new MetisMovePermissionsPayload();
   }
 }
 
-contract DeployOptimismPayload is OptimismScript {
+contract DeployOptimism is OptimismScript {
   function run() external broadcast {
     new OptMovePermissionsPayload();
   }
 }
 
-contract DeployPolygonPayload is PolygonScript {
+contract DeployPolygon is PolygonScript {
   function run() external broadcast {
     new PolygonMovePermissionsPayload();
+  }
+}
+
+contract DeployBase is BaseScript {
+  function run() external broadcast {
+    new BaseMovePermissionsPayload();
   }
 }

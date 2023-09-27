@@ -54,7 +54,8 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER
+      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Polygon.DEBT_SWAP_ADAPTER
     );
 
     _testCrosschainFunding(

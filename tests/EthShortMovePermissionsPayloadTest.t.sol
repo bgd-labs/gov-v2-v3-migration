@@ -13,7 +13,6 @@ import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethe
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
 import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
@@ -78,7 +77,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Ethereum.DEBT_SWAP_ADAPTER
     );
 
     _testMisc(

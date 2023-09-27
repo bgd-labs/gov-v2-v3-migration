@@ -110,7 +110,8 @@ contract EthShortMovePermissionsPayload {
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Ethereum.DEBT_SWAP_ADAPTER
     );
 
     // MISC ECOSYSTEM
