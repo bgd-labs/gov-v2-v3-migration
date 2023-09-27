@@ -47,7 +47,8 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Arbitrum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Arbitrum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Arbitrum.DEBT_SWAP_ADAPTER
     );
 
     vm.stopPrank();

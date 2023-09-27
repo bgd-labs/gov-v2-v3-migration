@@ -24,6 +24,12 @@ import {IMediator} from './interfaces/IMediator.sol';
 import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title EthShortMovePermissionsPayload
+ * @notice Migrate permissions for Aave V1, V2 and V3 pools on Ethereum from governance v2 to v3.
+ * Migrate GHO permissions to the new governance, fund cross chain controller and execute long permissions move.
+ * @author BGD Labs
+ **/
 contract EthShortMovePermissionsPayload {
   using SafeCast for uint256;
 
@@ -121,7 +127,10 @@ contract EthShortMovePermissionsPayload {
       AaveV2Ethereum.ORACLE,
       AaveV2Ethereum.LENDING_RATE_ORACLE,
       AaveV2Ethereum.WETH_GATEWAY,
-      AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0), // swap collateral adapter owned by https://etherscan.io/address/0x36fedc70fec3b77caaf50e6c524fd7e5dfbd629a#code
+      address(0), // repay with collateral adapter owned by https://etherscan.io/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      AaveV2Ethereum.DEBT_SWAP_ADAPTER
     );
     MigratorLib.migrateV2PoolPermissions(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
@@ -129,7 +138,10 @@ contract EthShortMovePermissionsPayload {
       AaveV2EthereumAMM.ORACLE,
       AaveV2EthereumAMM.LENDING_RATE_ORACLE,
       AaveV2EthereumAMM.WETH_GATEWAY,
-      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0),
+      address(0),
+      address(0)
     );
 
     // V3 POOL
@@ -144,7 +156,8 @@ contract EthShortMovePermissionsPayload {
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Ethereum.DEBT_SWAP_ADAPTER
     );
 
     // MISC ECOSYSTEM

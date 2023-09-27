@@ -8,6 +8,11 @@ import {IACLManager, IPoolAddressesProvider, IPool} from 'aave-address-book/Aave
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
 import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 
+/**
+ * @title MigratorLib
+ * @notice Library to migrate permissions from governance V2 to V3.
+ * @author BGD Labs
+ **/
 library MigratorLib {
   function migrateV2PoolPermissions(
     address executor,
@@ -15,7 +20,10 @@ library MigratorLib {
     IAaveOracle oracle, // per chain
     ILendingRateOracle lendingRateOracle, // per chain
     address wETHGateway,
-    address poolAddressesProviderRegistry
+    address poolAddressesProviderRegistry,
+    address swapCollateralAdapter,
+    address repayWithCollateralAdapter,
+    address debtSwapAdapter
   ) internal {
     poolAddressesProvider.setPoolAdmin(executor);
     IOwnable(address(poolAddressesProvider)).transferOwnership(executor);
@@ -31,6 +39,18 @@ library MigratorLib {
     if (IOwnable(address(poolAddressesProviderRegistry)).owner() == address(this)) {
       IOwnable(poolAddressesProviderRegistry).transferOwnership(executor);
     }
+
+    if (swapCollateralAdapter != address(0)) {
+      IOwnable(swapCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (repayWithCollateralAdapter != address(0)) {
+      IOwnable(repayWithCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (debtSwapAdapter != address(0)) {
+      IOwnable(debtSwapAdapter).transferOwnership(executor);
+    }
   }
 
   function migrateV3PoolPermissions(
@@ -44,7 +64,8 @@ library MigratorLib {
     address wETHGateway,
     address swapCollateralAdapter,
     address repayWithCollateralAdapter,
-    address withdrawSwapAdapter
+    address withdrawSwapAdapter,
+    address debtSwapAdapter
   ) internal {
     // grant pool admin role
     aclManager.grantRole(aclManager.POOL_ADMIN_ROLE(), executor);
@@ -82,6 +103,10 @@ library MigratorLib {
 
     if (withdrawSwapAdapter != address(0)) {
       IOwnable(withdrawSwapAdapter).transferOwnership(executor);
+    }
+
+    if (debtSwapAdapter != address(0)) {
+      IOwnable(debtSwapAdapter).transferOwnership(executor);
     }
   }
 

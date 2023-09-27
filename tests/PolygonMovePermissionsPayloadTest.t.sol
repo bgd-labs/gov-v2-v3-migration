@@ -42,7 +42,10 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2PolygonAssets.WBTC_UNDERLYING,
       AaveV2PolygonAssets.WBTC_ORACLE,
-      AaveV2Polygon.WETH_GATEWAY
+      AaveV2Polygon.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV3Polygon.DEBT_SWAP_ADAPTER
     );
 
     _testV3(
@@ -62,7 +65,8 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER
+      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Polygon.DEBT_SWAP_ADAPTER
     );
 
     _testCrosschainFunding(
@@ -80,7 +84,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function _testGelatoFunding(address gelatoAddress, uint256 gelatoAmount) internal {
-    uint256 gelatoBalance = IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).balanceOf(gelatoAddress);
+    uint256 gelatoBalance = IERC20(AaveV3PolygonAssets.USDC_A_TOKEN).balanceOf(gelatoAddress);
     assertEq(gelatoBalance, gelatoAmount);
   }
 

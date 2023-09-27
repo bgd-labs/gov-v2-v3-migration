@@ -23,7 +23,10 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     address poolAddressProviderRegistry,
     address asset,
     address assetSource,
-    address wethGateway
+    address wethGateway,
+    address swapCollateral,
+    address repayWithCollateral,
+    address debtSwapAdapter
   ) internal {
     // check Pool Admin
     ILendingPoolConfigurator(poolAddressProvider.getLendingPoolConfigurator()).freezeReserve(asset);
@@ -49,6 +52,21 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
 
     // WETH_GATEWAY
     assertEq(IOwnable(wethGateway).owner(), newExecutor);
+
+    // ParaSwapLiquiditySwapAdapter
+    if (swapCollateral != address(0)) {
+      assertEq(IOwnable(swapCollateral).owner(), newExecutor);
+    }
+
+    // ParaSwapRepayAdapter
+    if (repayWithCollateral != address(0)) {
+      assertEq(IOwnable(repayWithCollateral).owner(), newExecutor);
+    }
+
+    // DebtSwapAdapter
+    if (debtSwapAdapter != address(0)) {
+      assertEq(IOwnable(debtSwapAdapter).owner(), newExecutor);
+    }
   }
 
   function _testV3(
@@ -101,7 +119,8 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     address wethGateway,
     address swapCollateral,
     address repayWithCollateral,
-    address withdrawSwapAdapter
+    address withdrawSwapAdapter,
+    address debtSwapAdapter
   ) internal {
     // WETH_GATEWAY
     if (wethGateway != address(0)) {
@@ -121,6 +140,11 @@ contract MovePermissionsTestBase is ProtocolV3TestBase {
     // WithdrawSwapAdapter
     if (withdrawSwapAdapter != address(0)) {
       assertEq(IOwnable(withdrawSwapAdapter).owner(), newExecutor);
+    }
+
+    // DebtSwapAdapter
+    if (debtSwapAdapter != address(0)) {
+      assertEq(IOwnable(debtSwapAdapter).owner(), newExecutor);
     }
   }
 

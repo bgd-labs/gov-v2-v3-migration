@@ -13,6 +13,12 @@ import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
 import {IPegSwap} from './dependencies/IPegSwap.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title AvaxMovePermissionsPayload
+ * @notice Migrate permissions for Aave V2 and V3 Pools on Avalanche from governance v2 to v3,
+ * fund cross chain controller and gelato.
+ * @author BGD Labs
+ **/
 contract PolygonMovePermissionsPayload {
   using SafeERC20 for IERC20;
   using SafeCast for uint256;
@@ -52,11 +58,9 @@ contract PolygonMovePermissionsPayload {
     // GELATO FUNDING
     AaveV3Polygon.COLLECTOR.transfer(
       AaveV3PolygonAssets.USDC_A_TOKEN,
-      address(this),
+      GELATO_ADDRESS,
       GELATO_AMOUNT
     );
-
-    AaveV3Polygon.POOL.withdraw(AaveV3PolygonAssets.USDC_UNDERLYING, GELATO_AMOUNT, GELATO_ADDRESS);
 
     // CC FUNDING
     MigratorLib.fundCrosschainControllerNative(
@@ -85,7 +89,10 @@ contract PolygonMovePermissionsPayload {
       AaveV2Polygon.ORACLE,
       AaveV2Polygon.LENDING_RATE_ORACLE,
       AaveV2Polygon.WETH_GATEWAY,
-      AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0), // by https://polygonscan.com/address/0x46df4eb6f7a3b0adf526f6955b15d3fe02c618b7
+      address(0), // by https://polygonscan.com/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      AaveV2Polygon.DEBT_SWAP_ADAPTER
     );
 
     // V3 POOL
@@ -100,7 +107,8 @@ contract PolygonMovePermissionsPayload {
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER
+      AaveV3Polygon.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Polygon.DEBT_SWAP_ADAPTER
     );
   }
 

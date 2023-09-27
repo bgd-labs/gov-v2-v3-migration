@@ -10,6 +10,11 @@ import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IMediator} from './interfaces/IMediator.sol';
 
+/**
+ * @title EthLongMovePermissionsPayload
+ * @notice Migrate permissions for stkAave and Aave tokens from Long executor to the mediator contract.
+ * @author BGD Labs
+ **/
 contract EthLongMovePermissionsPayload {
   address public immutable MEDIATOR;
 

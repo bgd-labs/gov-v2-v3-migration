@@ -10,6 +10,11 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title BaseMovePermissionsPayload
+ * @notice Migrate permissions for Aave Pool V3 on Optimism from governance v2 to v3.
+ * @author BGD Labs
+ **/
 contract OptMovePermissionsPayload {
   using SafeCast for uint256;
 
@@ -49,7 +54,8 @@ contract OptMovePermissionsPayload {
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
       AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER
+      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Optimism.DEBT_SWAP_ADAPTER
     );
   }
 

@@ -10,6 +10,11 @@ import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title ArbMovePermissionsPayload
+ * @notice Migrate permissions for Aave Pool V3 on Arbitrum from governance v2 to v3.
+ * @author BGD Labs
+ **/
 contract ArbMovePermissionsPayload {
   using SafeCast for uint256;
 
@@ -49,7 +54,8 @@ contract ArbMovePermissionsPayload {
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Arbitrum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Arbitrum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Arbitrum.DEBT_SWAP_ADAPTER
     );
   }
 

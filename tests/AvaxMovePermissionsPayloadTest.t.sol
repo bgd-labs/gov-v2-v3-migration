@@ -26,7 +26,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 35600965);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 35718169);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -51,7 +51,10 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2AvalancheAssets.WBTCe_UNDERLYING,
       AaveV2AvalancheAssets.WBTCe_ORACLE,
-      AaveV2Avalanche.WETH_GATEWAY
+      AaveV2Avalanche.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV2Avalanche.DEBT_SWAP_ADAPTER
     );
 
     _testV3(
@@ -71,7 +74,8 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER
+      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Avalanche.DEBT_SWAP_ADAPTER
     );
 
     _testProofOfReserve();

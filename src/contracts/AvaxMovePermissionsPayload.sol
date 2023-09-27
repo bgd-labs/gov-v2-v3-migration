@@ -11,6 +11,12 @@ import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title AvaxMovePermissionsPayload
+ * @notice Migrate permissions for Aave V2 and V3 Pools on Avalanche from governance v2 to v3
+ * and fund cross chain controller
+ * @author BGD Labs
+ **/
 contract AvaxMovePermissionsPayload {
   using SafeCast for uint256;
 
@@ -73,7 +79,10 @@ contract AvaxMovePermissionsPayload {
       AaveV2Avalanche.ORACLE,
       AaveV2Avalanche.LENDING_RATE_ORACLE,
       AaveV2Avalanche.WETH_GATEWAY,
-      AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0), // swap collateral adapter owned by https://snowtrace.io/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      address(0), // repay with collateral adapter owned by https://snowtrace.io/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      AaveV2Avalanche.DEBT_SWAP_ADAPTER
     );
     // V3 POOL
     MigratorLib.migrateV3PoolPermissions(
@@ -87,7 +96,8 @@ contract AvaxMovePermissionsPayload {
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER
+      AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Avalanche.DEBT_SWAP_ADAPTER
     );
 
     // Proof of reserve

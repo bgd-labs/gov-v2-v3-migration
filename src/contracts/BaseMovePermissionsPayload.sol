@@ -7,9 +7,12 @@ import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 
 import {MigratorLib} from './MigratorLib.sol';
 
+/**
+ * @title BaseMovePermissionsPayload
+ * @notice Migrate permissions for Aave Pool V3 on Base from governance v2 to v3.
+ * @author BGD Labs
+ **/
 contract BaseMovePermissionsPayload {
-  address public constant BASE_LEVEL_1_EXECUTOR_V3 = address(6);
-
   function execute() external {
     // V3 POOL
     MigratorLib.migrateV3PoolPermissions(
@@ -23,7 +26,8 @@ contract BaseMovePermissionsPayload {
       AaveV3Base.WETH_GATEWAY,
       address(0), // swap collateral adapter not deployed yet
       address(0), // repay with collateral adapter not deployed yet
-      address(0) // withdraw swap adapter not deployed
+      address(0), // withdraw swap adapter not deployed
+      address(0) // debt swap adapter not deployed
     );
   }
 }

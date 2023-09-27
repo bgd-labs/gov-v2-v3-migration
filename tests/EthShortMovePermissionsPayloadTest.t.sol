@@ -10,10 +10,10 @@ import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITrans
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
 import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
@@ -41,7 +41,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18120076);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -68,7 +68,22 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2EthereumAssets.WBTC_UNDERLYING,
       AaveV2EthereumAssets.WBTC_ORACLE,
-      AaveV2Ethereum.WETH_GATEWAY
+      AaveV2Ethereum.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV2Ethereum.DEBT_SWAP_ADAPTER
+    );
+
+    _testV2(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER,
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      AaveV2EthereumAMMAssets.WBTC_UNDERLYING,
+      AaveV2EthereumAMMAssets.WBTC_ORACLE,
+      AaveV2EthereumAMM.WETH_GATEWAY,
+      address(0),
+      address(0),
+      address(0)
     );
 
     _testV3(
@@ -88,7 +103,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Ethereum.DEBT_SWAP_ADAPTER
     );
 
     _testMisc(
