@@ -22,6 +22,8 @@ contract AvaxMovePermissionsPayload {
 
   address public constant ROBOT_OPERATOR = 0x7A9ff54A6eE4a21223036890bB8c4ea2D62c686b;
 
+  address public constant AAVE_MERKLE_DISTRIBUTOR = 0xA065d5A299E618CD84a87641d5eEbC7916Fdf32E;
+
   uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 50 ether;
   uint256 public constant LINK_AMOUNT_ROBOT_EXECUTION_CHAIN = 50 ether;
   uint256 public constant LINK_AMOUNT_ROOTS_CONSUMER = 100 ether;
@@ -96,6 +98,9 @@ contract AvaxMovePermissionsPayload {
       AaveV3Avalanche.WITHDRAW_SWAP_ADAPTER,
       AaveV3Avalanche.DEBT_SWAP_ADAPTER
     );
+
+    // MerkleDistributor
+    IOwnable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Avalanche.EXECUTOR_LVL_1);
 
     // Proof of reserve
     IOwnable(AaveV2Avalanche.PROOF_OF_RESERVE).transferOwnership(

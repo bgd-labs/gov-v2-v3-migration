@@ -18,6 +18,8 @@ import {MigratorLib} from './MigratorLib.sol';
 contract OptMovePermissionsPayload {
   using SafeCast for uint256;
 
+  address public constant AAVE_MERKLE_DISTRIBUTOR = 0x1685D81212580DD4cDA287616C2f6F4794927e18;
+
   uint256 public constant GOV_V2_ROBOT_ID =
     14511291151503490097406614071718050938575520605993697066624566563051111599185;
 
@@ -56,6 +58,9 @@ contract OptMovePermissionsPayload {
       AaveV3Optimism.WITHDRAW_SWAP_ADAPTER,
       AaveV3Optimism.DEBT_SWAP_ADAPTER
     );
+
+    // MerkleDistributor
+    IOwnable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Optimism.EXECUTOR_LVL_1);
   }
 
   function migrateKeepers() internal {

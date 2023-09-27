@@ -23,6 +23,8 @@ contract PolygonMovePermissionsPayload {
   using SafeERC20 for IERC20;
   using SafeCast for uint256;
 
+  address public constant AAVE_MERKLE_DISTRIBUTOR = 0x7A9ff54A6eE4a21223036890bB8c4ea2D62c686b;
+
   address public constant ERC677_LINK = 0xb0897686c545045aFc77CF20eC7A532E3120E0F1;
 
   uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 50 ether;
@@ -109,6 +111,9 @@ contract PolygonMovePermissionsPayload {
       AaveV3Polygon.WITHDRAW_SWAP_ADAPTER,
       AaveV3Polygon.DEBT_SWAP_ADAPTER
     );
+
+    // MerkleDistributor
+    IOwnable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);
   }
 
   function _fetchLinkTokens() internal {
