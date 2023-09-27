@@ -56,7 +56,10 @@ contract PolygonMovePermissionsPayload {
       AaveV2Polygon.ORACLE,
       AaveV2Polygon.LENDING_RATE_ORACLE,
       AaveV2Polygon.WETH_GATEWAY,
-      AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0), // by https://polygonscan.com/address/0x46df4eb6f7a3b0adf526f6955b15d3fe02c618b7
+      address(0), // by https://polygonscan.com/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      AaveV2Polygon.DEBT_SWAP_ADAPTER
     );
 
     // V3 POOL

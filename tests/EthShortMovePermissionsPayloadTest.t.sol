@@ -10,6 +10,7 @@ import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITrans
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
@@ -32,7 +33,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18120076);
   }
 
   function testPayload() public {
@@ -57,7 +58,22 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2EthereumAssets.WBTC_UNDERLYING,
       AaveV2EthereumAssets.WBTC_ORACLE,
-      AaveV2Ethereum.WETH_GATEWAY
+      AaveV2Ethereum.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV2Ethereum.DEBT_SWAP_ADAPTER
+    );
+
+    _testV2(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER,
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      AaveV2EthereumAMMAssets.WBTC_UNDERLYING,
+      AaveV2EthereumAMMAssets.WBTC_ORACLE,
+      AaveV2EthereumAMM.WETH_GATEWAY,
+      address(0),
+      address(0),
+      address(0)
     );
 
     _testV3(

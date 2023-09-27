@@ -16,7 +16,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
   address constant AVALANCHE_GUARDIAN = 0xa35b76E4935449E33C56aB24b23fcd3246f13470;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 35088925);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 35718169);
   }
 
   function testPayload() public {
@@ -32,7 +32,10 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2AvalancheAssets.WBTCe_UNDERLYING,
       AaveV2AvalancheAssets.WBTCe_ORACLE,
-      AaveV2Avalanche.WETH_GATEWAY
+      AaveV2Avalanche.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV2Avalanche.DEBT_SWAP_ADAPTER
     );
 
     _testV3(

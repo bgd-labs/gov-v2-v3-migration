@@ -34,7 +34,10 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2PolygonAssets.WBTC_UNDERLYING,
       AaveV2PolygonAssets.WBTC_ORACLE,
-      AaveV2Polygon.WETH_GATEWAY
+      AaveV2Polygon.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV3Polygon.DEBT_SWAP_ADAPTER
     );
 
     _testV3(

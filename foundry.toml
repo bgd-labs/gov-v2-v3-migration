@@ -23,7 +23,7 @@ metis = "${RPC_METIS}"
 base = "${RPC_BASE}"
 
 [etherscan]
-ethereum={key="${ETHERSCAN_API_KEY_MAINNET}", chain=1 }
+mainnet={key="${ETHERSCAN_API_KEY_MAINNET}", chain=1 }
 optimism={key="${ETHERSCAN_API_KEY_OPTIMISM}",chain=10}
 avalanche={key="${ETHERSCAN_API_KEY_AVALANCHE}",chain=43114}
 polygon={key="${ETHERSCAN_API_KEY_POLYGON}",chain=137}

@@ -87,7 +87,10 @@ contract EthShortMovePermissionsPayload {
       AaveV2Ethereum.ORACLE,
       AaveV2Ethereum.LENDING_RATE_ORACLE,
       AaveV2Ethereum.WETH_GATEWAY,
-      AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0), // swap collateral adapter owned by https://etherscan.io/address/0x36fedc70fec3b77caaf50e6c524fd7e5dfbd629a#code
+      address(0), // repay with collateral adapter owned by https://etherscan.io/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      AaveV2Ethereum.DEBT_SWAP_ADAPTER
     );
     MigratorLib.migrateV2PoolPermissions(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
@@ -95,7 +98,10 @@ contract EthShortMovePermissionsPayload {
       AaveV2EthereumAMM.ORACLE,
       AaveV2EthereumAMM.LENDING_RATE_ORACLE,
       AaveV2EthereumAMM.WETH_GATEWAY,
-      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0),
+      address(0),
+      address(0)
     );
 
     // V3 POOL

@@ -40,7 +40,10 @@ contract AvaxMovePermissionsPayload {
       AaveV2Avalanche.ORACLE,
       AaveV2Avalanche.LENDING_RATE_ORACLE,
       AaveV2Avalanche.WETH_GATEWAY,
-      AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY
+      AaveV2Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      address(0), // swap collateral adapter owned by https://snowtrace.io/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      address(0), // repay with collateral adapter owned by https://snowtrace.io/address/0x05182e579fdfcf69e4390c3411d8fea1fb6467cf
+      AaveV2Avalanche.DEBT_SWAP_ADAPTER
     );
     // V3 POOL
     MigratorLib.migrateV3PoolPermissions(

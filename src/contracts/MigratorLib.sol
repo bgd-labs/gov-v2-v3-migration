@@ -20,7 +20,10 @@ library MigratorLib {
     IAaveOracle oracle, // per chain
     ILendingRateOracle lendingRateOracle, // per chain
     address wETHGateway,
-    address poolAddressesProviderRegistry
+    address poolAddressesProviderRegistry,
+    address swapCollateralAdapter,
+    address repayWithCollateralAdapter,
+    address debtSwapAdapter
   ) internal {
     poolAddressesProvider.setPoolAdmin(executor);
     IOwnable(address(poolAddressesProvider)).transferOwnership(executor);
@@ -35,6 +38,18 @@ library MigratorLib {
     }
     if (IOwnable(address(poolAddressesProviderRegistry)).owner() == address(this)) {
       IOwnable(poolAddressesProviderRegistry).transferOwnership(executor);
+    }
+
+    if (swapCollateralAdapter != address(0)) {
+      IOwnable(swapCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (repayWithCollateralAdapter != address(0)) {
+      IOwnable(repayWithCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (debtSwapAdapter != address(0)) {
+      IOwnable(debtSwapAdapter).transferOwnership(executor);
     }
   }
 
