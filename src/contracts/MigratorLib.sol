@@ -129,4 +129,23 @@ library MigratorLib {
       crosschainController
     );
   }
+
+  function fetchLinkTokens(
+    ICollector collector,
+    address pool,
+    address linkToken,
+    address linkAToken,
+    uint256 linkAmount,
+    bool withdrawALink
+  ) internal {
+    if (withdrawALink) {
+      // transfer aLINK token from the treasury to the current address
+      collector.transfer(linkAToken, address(this), linkAmount);
+
+      // withdraw aLINK from the aave pool and receive LINK
+      IPool(pool).withdraw(linkToken, linkAmount, address(this));
+    } else {
+      collector.transfer(linkToken, address(this), linkAmount);
+    }
+  }
 }

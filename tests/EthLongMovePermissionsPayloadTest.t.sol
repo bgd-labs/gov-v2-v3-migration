@@ -15,7 +15,7 @@ import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermiss
 
 contract EthLongMovePermissionsPayloadTest is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18113580);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18227528);
   }
 
   function testPayload() public {
