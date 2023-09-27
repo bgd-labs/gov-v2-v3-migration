@@ -49,10 +49,9 @@ contract PolygonMovePermissionsPayload {
 
   IPegSwap public constant PEGSWAP = IPegSwap(0xAA1DC356dc4B18f30C347798FD5379F3D77ABC5b);
 
-  // TODO: update after deploying
-  address public constant VOTING_CHAIN_ROBOT = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
-  address public constant EXECUTION_CHAIN_ROBOT = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
-  address public constant ROOTS_CONSUMER = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
+  address public constant VOTING_CHAIN_ROBOT = 0xbe7998712402B6A63975515A532Ce503437998b7;
+  address public constant EXECUTION_CHAIN_ROBOT = 0x249396a890F89D47F89326d7EE116b1d374Fb3A9;
+  address public constant ROOTS_CONSUMER = 0xE77aF99210AC55939e1ba0bFC6A9a20E1Da73b25;
 
   function execute() external {
     // GELATO FUNDING

@@ -41,7 +41,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18120076);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18227528);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 

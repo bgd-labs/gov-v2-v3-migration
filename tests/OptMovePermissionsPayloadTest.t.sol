@@ -19,7 +19,7 @@ contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 109460125);
+    vm.createSelectFork(vm.rpcUrl('optimism'), 110112497);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 

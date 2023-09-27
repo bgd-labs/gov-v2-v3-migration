@@ -36,10 +36,9 @@ contract AvaxMovePermissionsPayload {
       LINK_AMOUNT_ROBOT_EXECUTION_CHAIN +
       LINK_AMOUNT_ROOTS_CONSUMER;
 
-  // TODO: update after deploying
-  address public constant VOTING_CHAIN_ROBOT = 0x696d07D76A969C1D353a414cf6360002cD36395F;
-  address public constant EXECUTION_CHAIN_ROBOT = 0x696d07D76A969C1D353a414cf6360002cD36395F;
-  address public constant ROOTS_CONSUMER = 0xDa98B308be8766501ec7Fe3eD9a48EfBD6c31a7B;
+  address public constant VOTING_CHAIN_ROBOT = 0x10E49034306EaA663646773C04b7B67E81eD0D52;
+  address public constant EXECUTION_CHAIN_ROBOT = 0x7B74938583Eb03e06042fcB651046BaF0bf15644;
+  address public constant ROOTS_CONSUMER = 0x6264E51782D739caf515a1Bd4F9ae6881B58621b;
 
   function execute() external {
     // CC FUNDING

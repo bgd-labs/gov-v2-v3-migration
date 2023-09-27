@@ -23,8 +23,7 @@ contract OptMovePermissionsPayload {
 
   address public constant ROBOT_OPERATOR = 0x4f830bc2DdaC99307a3709c85F7533842BdA7c63;
 
-  // TODO: update after deploying
-  address public constant EXECUTION_CHAIN_ROBOT = 0x102Bf2C03c1901AdBA191457A8c4A4eF18b40029;
+  address public constant EXECUTION_CHAIN_ROBOT = 0xa0195539e21A6553243344A3BE6b874B5d3EC7b9;
 
   uint256 public constant LINK_AMOUNT_ROBOT_EXECUTION_CHAIN = 50 ether;
 

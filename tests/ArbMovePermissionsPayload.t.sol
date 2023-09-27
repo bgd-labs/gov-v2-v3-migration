@@ -19,7 +19,7 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('arbitrum'), 130402128);
+    vm.createSelectFork(vm.rpcUrl('arbitrum'), 135126485);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 

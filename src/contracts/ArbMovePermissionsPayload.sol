@@ -23,8 +23,7 @@ contract ArbMovePermissionsPayload {
 
   address public constant ROBOT_OPERATOR = 0xb0A73671C97BAC9Ba899CD1a23604Fd2278cD02A;
 
-  // TODO: update after deploying
-  address public constant EXECUTION_CHAIN_ROBOT = 0x864a6Aa4b8D4d84A7570fE2d0E4eCE8077AbcabB;
+  address public constant EXECUTION_CHAIN_ROBOT = 0x64093fe5f8Cf62aFb4377cf7EF4373537fe9155B;
 
   uint256 public constant LINK_AMOUNT_ROBOT_EXECUTION_CHAIN = 50 ether;
 
