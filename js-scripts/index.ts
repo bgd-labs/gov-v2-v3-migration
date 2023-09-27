@@ -139,7 +139,7 @@ const deployPayloadsEthereum = async () => {
     walletClient,
     publicClient,
     DEPLOYER,
-    GovernanceV3Ethereum,
+    GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
     [TestV2PayloadEthereum, TestV3PayloadEthereum]
   );
   const proposalId = await generateProposalAndExecutePayload(
