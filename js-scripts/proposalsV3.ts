@@ -10,15 +10,8 @@ import {
 } from 'viem';
 import VotingPortal from './artifacts/VotingPortal.sol/VotingPortal.json';
 import {
-  GovernanceV3Arbitrum,
-  GovernanceV3Avalanche,
-  GovernanceV3Base,
   GovernanceV3Ethereum,
-  GovernanceV3Metis,
-  GovernanceV3Optimism,
-  GovernanceV3Polygon,
   ICrossChainController_ABI,
-  IExecutor_ABI,
   IGovernanceCore_ABI,
   IOwnable_ABI,
   IPayloadsControllerCore_ABI,
@@ -223,20 +216,6 @@ export const generateProposalAndExecutePayload = async (
     account: deployer,
   });
   await walletClient.writeContract(request);
-
-  // await walletClient.writeContract({
-  //   address: GovernanceV3Ethereum.GOVERNANCE,
-  //   abi: IGovernanceCore_ABI,
-  //   functionName: 'createProposal',
-  //   account: deployer,
-  //   value: fee,
-  //   args: [
-  //     payloads,
-  //     GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH,
-  //     '0x22f22ad910127d3ca76dc642f94db34397f94ca969485a216b9d82387808cdfa' as Hex,
-  //   ],
-  //   chain: undefined,
-  // });
 
   const payloadController = await getPayloadsController(
     GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
