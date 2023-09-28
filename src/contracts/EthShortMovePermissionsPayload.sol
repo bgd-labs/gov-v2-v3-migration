@@ -71,7 +71,7 @@ contract EthShortMovePermissionsPayload {
   address public constant GOV_CHAIN_ROBOT = 0x011824f238AEE05329213d5Ae029e899e5412343;
   address public constant VOTING_CHAIN_ROBOT = 0x9aaB9F0b6E19907e346420Edc0d3029Edb5e8616;
   address public constant EXECUTION_CHAIN_ROBOT = 0x365d47ceD3D7Eb6a9bdB3814aA23cc06B2D33Ef8;
-  address public constant ROOTS_CONSUMER = 0xe3FD707583932a99513a5c65c8463De769f5DAdF;
+  address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
   constructor(address mediator) {
     MEDIATOR = mediator;

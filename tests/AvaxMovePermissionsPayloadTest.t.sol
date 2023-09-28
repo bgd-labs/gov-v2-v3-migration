@@ -27,20 +27,12 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 35727962);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 35767232);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
     payload = new AvaxMovePermissionsPayload();
-
-    // expect the collector to have sufficient link tokens during payload execution
-    vm.startPrank(LINK_WHALE);
-    IERC20(AaveV3AvalancheAssets.LINKe_A_TOKEN).transfer(
-      address(AaveV3Avalanche.COLLECTOR),
-      payload.TOTAL_LINK_AMOUNT()
-    );
-    vm.stopPrank();
 
     GovHelpers.executePayload(vm, address(payload), AVALANCHE_GUARDIAN);
 
