@@ -27,7 +27,7 @@ import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermiss
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
-  address public constant A_AAVE_IMPL = 0xEe96b77129cF54581B5a8FECCcC50A6A067034a1;
+  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
@@ -41,7 +41,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18227528);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18230033);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 

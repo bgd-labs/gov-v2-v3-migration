@@ -35,7 +35,7 @@ contract EthShortMovePermissionsPayload {
 
   address public immutable MEDIATOR;
 
-  address public constant A_AAVE_IMPL = 0xEe96b77129cF54581B5a8FECCcC50A6A067034a1;
+  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
