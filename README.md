@@ -35,7 +35,6 @@ The following diagram gives an overview of how this process will be.
   - Migrate permissions of Balancer v1 ABPT to the Governance v3 Level 1 Executor.
   - Transfer the ownership of the Aave Swapper contract to the Governance v3 Level 1 Executor.
   - Transfer the ownership of the Aave Collector Polygon→Ethereum bridge to the Governance v3 level 1 Executor.
-  - Transfer the ownership of the Aave Merkle Distributor contract to the Governance v3 Level 1 Executor.
   - Migrate the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
   - Change ownership of Governance v3 Level 1 Executor to the Governance v2 Payloads Controller.
 
