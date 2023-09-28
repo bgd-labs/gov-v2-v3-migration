@@ -1,5 +1,5 @@
 {
-  "name": "bgd-forge-template",
+  "name": "gov-v2-v3-migration",
   "version": "1.0.0",
   "scripts": {
     "lint": "prettier ./",
@@ -7,15 +7,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bgd-labs/bgd-forge-template.git"
+    "url": "git+https://github.com/bgd-labs/gov-v2-v3-migration.git"
   },
   "keywords": [],
   "author": "BGD labs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bgd-labs/bgd-forge-template/issues"
+    "url": "https://github.com/bgd-labs/gov-v2-v3-migration/issues"
   },
-  "homepage": "https://github.com/bgd-labs/bgd-forge-template#readme",
+  "homepage": "https://github.com/bgd-labs/gov-v2-v3-migration#readme",
   "devDependencies": {
     "prettier": "2.8.7",
     "prettier-plugin-solidity": "1.1.3"

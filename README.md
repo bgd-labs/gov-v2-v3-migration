@@ -71,11 +71,6 @@ The following diagram gives an overview of how this process will be.
 - [Base](./src/contracts/BaseMovePermissionsPayload.sol)
   - Migrate all permissions of Aave v3 Base to the Governance v3 Level 1 Executor.
 
-## Development
-
-This project uses [Foundry](https://getfoundry.sh). See the [book](https://book.getfoundry.sh/getting-started/installation.html) for detailed instructions on how to install and use Foundry.
-The template ships with sensible default so you can use default `foundry` commands without resorting to `MakeFile`.
-
 ### Setup
 
 ```sh
@@ -83,8 +78,17 @@ cp .env.example .env
 forge install
 ```
 
-### Test
+## Security
 
-```sh
-forge test
-```
+- Internal testing and review by the BGD Labs team.
+  - [Test suite](./tests/)
+
+<br>
+
+## Copyright
+
+Copyright © 2023, Aave DAO, represented by its governance smart contracts.
+
+Created by [BGD Labs](https://bgdlabs.com/).
+
+[MIT license](./LICENSE)
