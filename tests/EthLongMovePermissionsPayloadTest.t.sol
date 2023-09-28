@@ -9,14 +9,13 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {Mediator} from '../src/contracts/Mediator.sol';
 import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
 
 contract EthLongMovePermissionsPayloadTest is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18113580);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18227528);
   }
 
   function testPayload() public {

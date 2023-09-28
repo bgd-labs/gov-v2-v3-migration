@@ -12,4 +12,4 @@
 	url = https://github.com/bgd-labs/solidity-utils
 [submodule "lib/aave-governance-v3"]
 	path = lib/aave-governance-v3
-	url = git@github.com:bgd-labs/aave-governance-v3.git
+	url = https://github.com/bgd-labs/aave-governance-v3

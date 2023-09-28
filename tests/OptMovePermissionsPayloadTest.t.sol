@@ -7,15 +7,24 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
+import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
+import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
 import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayload.sol';
 
 contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
+  address public KEEPER_REGISTRY = 0x75c0530885F385721fddA23C539AF3701d6183D4;
+
+  OptMovePermissionsPayload public payload;
+
+  IKeeperRegistry.State public registryState;
+
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 109460125);
+    vm.createSelectFork(vm.rpcUrl('optimism'), 110112497);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPermissionsTransfer() public {
-    OptMovePermissionsPayload payload = new OptMovePermissionsPayload();
+    payload = new OptMovePermissionsPayload();
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
 
@@ -38,9 +47,29 @@ contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
       AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER
+      AaveV3Optimism.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Optimism.DEBT_SWAP_ADAPTER
     );
 
     vm.stopPrank();
+  }
+
+  function testRobotMigration() public {
+    payload = new OptMovePermissionsPayload();
+
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
+
+    uint256 executionChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
+      )
+    );
+
+    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      executionChainKeeperId
+    );
+
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Optimism.EXECUTOR_LVL_1);
+    assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
   }
 }

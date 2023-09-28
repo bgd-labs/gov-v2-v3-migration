@@ -20,7 +20,10 @@ library MigratorLib {
     IAaveOracle oracle, // per chain
     ILendingRateOracle lendingRateOracle, // per chain
     address wETHGateway,
-    address poolAddressesProviderRegistry
+    address poolAddressesProviderRegistry,
+    address swapCollateralAdapter,
+    address repayWithCollateralAdapter,
+    address debtSwapAdapter
   ) internal {
     poolAddressesProvider.setPoolAdmin(executor);
     IOwnable(address(poolAddressesProvider)).transferOwnership(executor);
@@ -36,6 +39,18 @@ library MigratorLib {
     if (IOwnable(address(poolAddressesProviderRegistry)).owner() == address(this)) {
       IOwnable(poolAddressesProviderRegistry).transferOwnership(executor);
     }
+
+    if (swapCollateralAdapter != address(0)) {
+      IOwnable(swapCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (repayWithCollateralAdapter != address(0)) {
+      IOwnable(repayWithCollateralAdapter).transferOwnership(executor);
+    }
+
+    if (debtSwapAdapter != address(0)) {
+      IOwnable(debtSwapAdapter).transferOwnership(executor);
+    }
   }
 
   function migrateV3PoolPermissions(
@@ -49,7 +64,8 @@ library MigratorLib {
     address wETHGateway,
     address swapCollateralAdapter,
     address repayWithCollateralAdapter,
-    address withdrawSwapAdapter
+    address withdrawSwapAdapter,
+    address debtSwapAdapter
   ) internal {
     // grant pool admin role
     aclManager.grantRole(aclManager.POOL_ADMIN_ROLE(), executor);
@@ -88,6 +104,10 @@ library MigratorLib {
     if (withdrawSwapAdapter != address(0)) {
       IOwnable(withdrawSwapAdapter).transferOwnership(executor);
     }
+
+    if (debtSwapAdapter != address(0)) {
+      IOwnable(debtSwapAdapter).transferOwnership(executor);
+    }
   }
 
   function fundCrosschainControllerNative(
@@ -108,5 +128,24 @@ library MigratorLib {
       nativeAmount,
       crosschainController
     );
+  }
+
+  function fetchLinkTokens(
+    ICollector collector,
+    address pool,
+    address linkToken,
+    address linkAToken,
+    uint256 linkAmount,
+    bool withdrawALink
+  ) internal {
+    if (withdrawALink) {
+      // transfer aLINK token from the treasury to the current address
+      collector.transfer(linkAToken, address(this), linkAmount);
+
+      // withdraw aLINK from the aave pool and receive LINK
+      IPool(pool).withdraw(linkToken, linkAmount, address(this));
+    } else {
+      collector.transfer(linkToken, address(this), linkAmount);
+    }
   }
 }

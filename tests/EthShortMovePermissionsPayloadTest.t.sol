@@ -10,30 +10,39 @@ import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITrans
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
 import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
 import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
 import {IGhoAccessControl} from '../src/contracts/dependencies/IGhoAccessControl.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
+import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {Mediator} from '../src/contracts/Mediator.sol';
 import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
-  address public constant A_AAVE_IMPL = 0xC383AAc4B3dC18D9ce08AB7F63B4632716F1e626;
+  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
 
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
+  address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
+
+  EthShortMovePermissionsPayload public payload;
+
+  IKeeperRegistry.State public registryState;
+
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('ethereum'), 18120076);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18230033);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
@@ -42,7 +51,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     EthLongMovePermissionsPayload longPayload = new EthLongMovePermissionsPayload(
       address(mediator)
     );
-    EthShortMovePermissionsPayload payload = new EthShortMovePermissionsPayload(address(mediator));
+
+    payload = new EthShortMovePermissionsPayload(address(mediator));
 
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
 
@@ -58,7 +68,22 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV2Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV2EthereumAssets.WBTC_UNDERLYING,
       AaveV2EthereumAssets.WBTC_ORACLE,
-      AaveV2Ethereum.WETH_GATEWAY
+      AaveV2Ethereum.WETH_GATEWAY,
+      address(0),
+      address(0),
+      AaveV2Ethereum.DEBT_SWAP_ADAPTER
+    );
+
+    _testV2(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER,
+      AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER_REGISTRY,
+      AaveV2EthereumAMMAssets.WBTC_UNDERLYING,
+      AaveV2EthereumAMMAssets.WBTC_ORACLE,
+      AaveV2EthereumAMM.WETH_GATEWAY,
+      address(0),
+      address(0),
+      address(0)
     );
 
     _testV3(
@@ -78,7 +103,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
-      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER
+      AaveV3Ethereum.WITHDRAW_SWAP_ADAPTER,
+      AaveV3Ethereum.DEBT_SWAP_ADAPTER
     );
 
     _testMisc(
@@ -99,9 +125,11 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testCrosschainFunding(
       GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.LINK_UNDERLYING,
-      payload.ETH_AMOUNT(),
-      payload.LINK_AMOUNT()
+      payload.ETH_AMOUNT_CROSSCHAIN_CONTROLLER(),
+      payload.LINK_AMOUNT_CROSSCHAIN_CONTROLLER()
     );
+
+    _testRobot();
 
     _testGhoPermissions();
 
@@ -240,5 +268,51 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
 
     assertEq(newImpl, STK_AAVE_IMPL);
+  }
+
+  function _testRobot() internal {
+    uint256 govChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
+      )
+    );
+    uint256 votingChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
+      )
+    );
+    uint256 executionChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 2)
+        )
+      )
+    );
+
+    (address govChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      govChainKeeperId
+    );
+    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      votingChainKeeperId
+    );
+    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      executionChainKeeperId
+    );
+
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    assertEq(govChainKeeperTarget, payload.GOV_CHAIN_ROBOT());
+    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
+    assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
+
+    assertEq(
+      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
+      IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER())
+    );
   }
 }

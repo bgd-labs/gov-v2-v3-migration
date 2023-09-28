@@ -1,5 +1,5 @@
 {
-  "name": "bgd-forge-template",
+  "name": "gov-v2-v3-migration",
   "version": "1.0.0",
   "scripts": {
     "lint": "prettier ./",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bgd-labs/bgd-forge-template.git"
+    "url": "git+https://github.com/bgd-labs/gov-v2-v3-migration.git"
   },
   "keywords": [],
   "author": "BGD labs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bgd-labs/bgd-forge-template/issues"
+    "url": "https://github.com/bgd-labs/gov-v2-v3-migration/issues"
   },
-  "homepage": "https://github.com/bgd-labs/bgd-forge-template#readme",
+  "homepage": "https://github.com/bgd-labs/gov-v2-v3-migration#readme",
   "devDependencies": {
     "@bgd-labs/aave-cli": "0.0.26-0396806c8f74afae2d425f537a3103af9b5ebd34.0",
     "dotenv": "^16.3.1",

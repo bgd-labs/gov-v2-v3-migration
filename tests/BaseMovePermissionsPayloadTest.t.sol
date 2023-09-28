@@ -40,6 +40,7 @@ contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3Base.WETH_GATEWAY,
       address(0),
       address(0),
+      address(0),
       address(0)
     );
 
