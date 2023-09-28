@@ -121,7 +121,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     polygon,
     AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-    0x274a46efd4364ccba654dc74ddb793f9010b179c,
+    '0x274a46efd4364ccba654dc74ddb793f9010b179c',
     GovernanceV3Polygon,
     [TestV2PayloadPolygon, TestV3PayloadPolygon]
   );
@@ -129,7 +129,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     avalanche,
     AVAX_GUARDIAN,
-    0xb58e840e1356ed9b7f89d11a03d4cef24f56a1ea,
+    '0xb58e840e1356ed9b7f89d11a03d4cef24f56a1ea',
     GovernanceV3Avalanche,
     [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
   );
@@ -137,7 +137,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     arbitrum,
     AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-    0xfd858c8bc5ac5e10f01018bc78471bb0dc392247,
+    '0xfd858c8bc5ac5e10f01018bc78471bb0dc392247',
     GovernanceV3Arbitrum,
     [TestV3PayloadArbitrum]
   );
@@ -145,7 +145,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     optimism,
     AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-    0x7fc3fcb14ef04a48bb0c12f0c39cd74c249c37d8,
+    '0x7fc3fcb14ef04a48bb0c12f0c39cd74c249c37d8',
     GovernanceV3Optimism,
     [TestV3PayloadOptimism]
   );
@@ -153,7 +153,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    0xea58bff2a100d5a2ea40a61ceeb849f5484bfff5,
+    '0xea58bff2a100d5a2ea40a61ceeb849f5484bfff5',
     GovernanceV3Base,
     [TestV3PayloadBase]
   );
