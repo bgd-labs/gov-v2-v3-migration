@@ -35,6 +35,7 @@ The following diagram gives an overview of how this process will be.
   - Migrate permissions of Balancer v1 ABPT to the Governance v3 Level 1 Executor.
   - Transfer the ownership of the Aave Swapper contract to the Governance v3 Level 1 Executor.
   - Transfer the ownership of the Aave Collector Polygon→Ethereum bridge to the Governance v3 level 1 Executor.
+  - Transfer the ownership of the Aave Merkle Distributor contract to the Governance v3 Level 1 Executor.
   - Migrate the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
   - Change ownership of Governance v3 Level 1 Executor to the Governance v2 Payloads Controller.
 
@@ -45,6 +46,7 @@ The following diagram gives an overview of how this process will be.
   - Fund execution robot.
   - Migrate all permissions of Aave v2 Polygon to the Governance v3 Level 1 Executor.
   - Migrate all permissions of Aave v3 Polygon to the Governance v3 Level 1 Executor.
+  - Transfer the ownership of the Aave Merkle Distributor contract to the Governance v3 Level 1 Executor.
 
 - [Avalanche](./src/contracts/ArbMovePermissionsPayload.sol)
 
@@ -52,6 +54,7 @@ The following diagram gives an overview of how this process will be.
   - Fund execution robot.
   - Migrate all permissions of Aave v2 Avalanche to the Governance v3 Level 1 Executor.
   - Migrate all permissions of Aave v3 Avalanche to the Governance v3 Level 1 Executor.
+  - Transfer the ownership of the Aave Merkle Distributor contract to the Governance v3 Level 1 Executor.
   - Migrate permissions of Proof of Reserve to the Governance v3 Level 1 Executor.
 
 - [Arbitrum](./src/contracts/ArbMovePermissionsPayload.sol)
@@ -63,6 +66,7 @@ The following diagram gives an overview of how this process will be.
 
   - Fund execution robot.
   - Migrate all permissions of Aave v3 Optimism to the Governance v3 Level 1 Executor.
+  - Transfer the ownership of the Aave Merkle Distributor contract to the Governance v3 Level 1 Executor.
 
 - [Metis](./src/contracts/MetisMovePermissionsPayload.sol)
 
