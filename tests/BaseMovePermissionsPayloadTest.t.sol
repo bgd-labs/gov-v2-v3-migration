@@ -13,7 +13,7 @@ import {BaseMovePermissionsPayload} from '../src/contracts/BaseMovePermissionsPa
 
 contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('base'), 2996825);
+    vm.createSelectFork(vm.rpcUrl('base'), 4594609);
   }
 
   function testPermissionsTransfer() public {
@@ -41,7 +41,7 @@ contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
       address(0),
       address(0),
       address(0),
-      address(0)
+      AaveV3Base.DEBT_SWAP_ADAPTER
     );
 
     vm.stopPrank();
