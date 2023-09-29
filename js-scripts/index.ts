@@ -83,7 +83,7 @@ const deployPayloadsEthereum = async () => {
     AaveGovernanceV2.LONG_EXECUTOR
   );
 
-  const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15;
+  const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 16;
 
   await tenderly.warpTime(fork, BigInt(timeToWarpTo));
 
@@ -153,7 +153,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    '0xea58bff2a100d5a2ea40a61ceeb849f5484bfff5',
+    '0x4959bad86d851378c6bccf07cb8240d55a11c5ac',
     GovernanceV3Base,
     [TestV3PayloadBase]
   );
