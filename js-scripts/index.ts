@@ -163,4 +163,4 @@ async function upgradeL2s() {
   );
 }
 
-// upgradeL2s();
+upgradeL2s();
