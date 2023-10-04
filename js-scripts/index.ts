@@ -73,7 +73,7 @@ const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
   const shortMigrationPayload = '0xa59262276db8f997948fdc4a10cbc1448a375636';
-  const longMigrationPayload = '0x274a46efd4364ccba654dc74ddb793f9010b179c';
+  const longMigrationPayload = '0x6195a956dc026a949de552f04a5803d3aa1fc408';
 
   // create proposal on v2
   const longProposalId = await createV2Proposal(
