@@ -9,4 +9,8 @@ interface IStakedToken {
   function COOLDOWN_ADMIN_ROLE() external returns (uint256);
 
   function CLAIM_HELPER_ROLE() external returns (uint256);
+
+  function setGHODebtToken(address newGHODebtToken) external;
+
+  function ghoDebtToken() external returns (address);
 }
