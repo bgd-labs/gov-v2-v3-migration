@@ -114,7 +114,8 @@ export const getAaveGovernanceV2Slots = (proposalId: bigint, executor: Address) 
 export const simulateOnTenderly = async (
   publicClient: PublicClient,
   walletClient: WalletClient,
-  proposalId: bigint
+  proposalId: bigint,
+  latestBlock: {number: bigint; timestamp: bigint}
 ) => {
   const aaveGovernanceV2Contract = getContract({
     address: AaveGovernanceV2.GOV,
@@ -136,7 +137,6 @@ export const simulateOnTenderly = async (
    * For proposals that are still pending it might happen that the startBlock is not mined yet.
    * Therefor in this case we need to estimate the startTimestamp.
    */
-  const latestBlock = await publicClient.getBlock();
   const isStartBlockMinted = latestBlock.number! < proposal.startBlock;
   const startTimestamp = isStartBlockMinted
     ? latestBlock.timestamp + (proposal.startBlock - latestBlock.number!) * 12n

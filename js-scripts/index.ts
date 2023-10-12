@@ -72,9 +72,10 @@ const deployAndExecuteL2Payload = async (
 const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
-  const shortMigrationPayload = '0xa59262276db8f997948fdc4a10cbc1448a375636';
-  const longMigrationPayload = '0x274a46efd4364ccba654dc74ddb793f9010b179c';
+  const shortMigrationPayload = '0x7fC3ebdB376fF38De2cD597671A6270113c27364';
+  const longMigrationPayload = '0x6195a956dC026A949dE552F04a5803d3aa1fC408';
 
+  const block = await publicClient.getBlock();
   // create proposal on v2
   const longProposalId = await createV2Proposal(
     walletClient,
@@ -83,9 +84,9 @@ const deployPayloadsEthereum = async () => {
     AaveGovernanceV2.LONG_EXECUTOR
   );
 
-  const timeToWarpTo = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 15;
+  const timeToWarpTo = block.timestamp + 60n * 60n * 24n * 16n;
 
-  await tenderly.warpTime(fork, BigInt(timeToWarpTo));
+  await tenderly.warpTime(fork, timeToWarpTo);
 
   const shortProposalId = await createV2Proposal(
     walletClient,
@@ -95,7 +96,10 @@ const deployPayloadsEthereum = async () => {
   );
 
   // execute proposals
-  await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork);
+  await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork, {
+    number: block.number,
+    timestamp: timeToWarpTo,
+  });
 
   const payloadId = await deployAndRegisterTestPayloads(
     walletClient,
@@ -153,7 +157,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    '0xea58bff2a100d5a2ea40a61ceeb849f5484bfff5',
+    '0x4959bad86d851378c6bccf07cb8240d55a11c5ac',
     GovernanceV3Base,
     [TestV3PayloadBase]
   );

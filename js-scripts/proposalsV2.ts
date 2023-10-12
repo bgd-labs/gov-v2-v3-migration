@@ -57,12 +57,23 @@ export const executeV2Proposals = async (
   longProposalId: bigint,
   walletClient: WalletClient,
   publicClient: PublicClient,
-  fork: any
+  fork: any,
+  latestBlock: {number: bigint; timestamp: bigint}
 ) => {
-  const longProposalObject = await simulateOnTenderly(publicClient, walletClient, longProposalId);
-  const shortProposalObject = await simulateOnTenderly(publicClient, walletClient, shortProposalId);
-
+  const longProposalObject = await simulateOnTenderly(
+    publicClient,
+    walletClient,
+    longProposalId,
+    latestBlock
+  );
+  const shortProposalObject = await simulateOnTenderly(
+    publicClient,
+    walletClient,
+    shortProposalId,
+    {...latestBlock, number: latestBlock.number + 1n}
+  );
   const longHash = await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, longProposalObject);
+
   const shortHash = await tenderly.unwrapAndExecuteSimulationPayloadOnFork(
     fork,
     shortProposalObject

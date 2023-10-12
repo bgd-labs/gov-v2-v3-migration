@@ -517,10 +517,10 @@
   dependencies:
     "@types/node" "*"
 
-"aave-cli@npm:@bgd-labs/aave-cli@0.0.25":
-  version "0.0.25"
-  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-cli/-/aave-cli-0.0.25.tgz#531f0964474046e5a7276a52b03033be7cdd2de4"
-  integrity sha512-VqTTMjwUm5QmGlwpxh/cVlLoK+KbheIYjUyrSEBbp5GFFK171h8rS+gFimNOU8SdVMJsa4vAlck+36Pr+5gXrQ==
+"aave-cli@npm:@bgd-labs/aave-cli@0.0.27-e92a1e8f74c40ff44bae7e01f89cfe6ec4ed1310.0":
+  version "0.0.27-e92a1e8f74c40ff44bae7e01f89cfe6ec4ed1310.0"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-cli/-/aave-cli-0.0.27-e92a1e8f74c40ff44bae7e01f89cfe6ec4ed1310.0.tgz#5b3cf56ce9200007199df67217e317a6ef429253"
+  integrity sha512-Y/gIQytEhrzQFqu+vLgtnzqvRrl4u9v7R0JVS3fkDHNIJWEj7yn8yLXAvzYHGkm2FQKYHhB5pZkp4miclWz2qA==
   dependencies:
     "@bgd-labs/aave-address-book" "^1.33.0"
     bs58 "^5.0.0"
