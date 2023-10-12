@@ -68,8 +68,9 @@ contract PolygonMovePermissionsPayload {
       AaveV3Polygon.COLLECTOR,
       GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
       AaveV3PolygonAssets.WMATIC_A_TOKEN,
+      AaveV3PolygonAssets.WMATIC_UNDERLYING,
       MATIC_AMOUNT_CROSSCHAIN_CONTROLLER,
-      AaveV3Polygon.WETH_GATEWAY
+      address(AaveV3Polygon.POOL)
     );
 
     _fetchLinkTokens();

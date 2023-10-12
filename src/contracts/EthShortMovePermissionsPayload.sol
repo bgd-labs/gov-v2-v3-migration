@@ -16,7 +16,6 @@ import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {IStakedToken} from './dependencies/IStakedToken.sol';
 import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
-import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
 import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
@@ -96,8 +95,9 @@ contract EthShortMovePermissionsPayload {
       AaveV3Ethereum.COLLECTOR,
       GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       AaveV3EthereumAssets.WETH_A_TOKEN,
+      AaveV3EthereumAssets.WETH_UNDERLYING,
       ETH_AMOUNT_CROSSCHAIN_CONTROLLER,
-      AaveV3Ethereum.WETH_GATEWAY
+      address(AaveV3Ethereum.POOL)
     );
     IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).transfer(
       GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,

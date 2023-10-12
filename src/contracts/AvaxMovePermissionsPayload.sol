@@ -48,8 +48,9 @@ contract AvaxMovePermissionsPayload {
       AaveV3Avalanche.COLLECTOR,
       GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER,
       AaveV3AvalancheAssets.WAVAX_A_TOKEN,
+      AaveV3AvalancheAssets.WAVAX_UNDERLYING,
       AVAX_AMOUNT_CROSSCHAIN_CONTROLLER,
-      AaveV3Avalanche.WETH_GATEWAY
+      address(AaveV3Avalanche.POOL)
     );
 
     // GET LINK TOKENS FROM COLLECTOR

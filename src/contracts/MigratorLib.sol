@@ -6,7 +6,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {ILendingPoolAddressesProvider, IAaveOracle, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
 import {IACLManager, IPoolAddressesProvider, IPool} from 'aave-address-book/AaveV3.sol';
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
-import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
+import {IWETH} from './dependencies/IWETH.sol';
 
 /**
  * @title MigratorLib
@@ -114,20 +114,20 @@ library MigratorLib {
     ICollector collector,
     address crosschainController,
     address nativeAToken,
+    address underlyingToken,
     uint256 nativeAmount,
-    address wethGateway
+    address pool
   ) internal {
     // transfer native a token
     collector.transfer(nativeAToken, address(this), nativeAmount);
 
-    IERC20(nativeAToken).approve(wethGateway, nativeAmount);
+    IPool(pool).withdraw(underlyingToken, type(uint256).max, address(this));
 
-    // withdraw native
-    IWrappedTokenGateway(wethGateway).withdrawETH(
-      address(this),
-      nativeAmount,
-      crosschainController
-    );
+    uint256 underlyingBalance = IERC20(underlyingToken).balanceOf(address(this));
+
+    IWETH(underlyingToken).withdraw(underlyingBalance);
+
+    safeTransferETH(crosschainController, underlyingBalance);
   }
 
   function fetchLinkTokens(
@@ -147,5 +147,10 @@ library MigratorLib {
     } else {
       collector.transfer(linkToken, address(this), linkAmount);
     }
+  }
+
+  function safeTransferETH(address to, uint256 value) internal {
+    (bool success, ) = to.call{value: value}(new bytes(0));
+    require(success, 'ETH_TRANSFER_FAILED');
   }
 }
