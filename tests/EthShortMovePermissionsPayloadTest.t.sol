@@ -7,7 +7,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
-import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/AaveV2EthereumAMM.sol';
@@ -25,6 +25,8 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {Mediator} from '../src/contracts/Mediator.sol';
 import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
 import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
+import {ShortPayload} from './mocks/ShortPayload.sol';
+import {LongPayload} from './mocks/LongPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
@@ -41,7 +43,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18230033);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18333657);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -135,9 +137,9 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     vm.stopPrank();
 
-    _testLongPermissions();
     _testAaveTokenUpgrade();
     _testStkAaveTokenUpgrade();
+    _testLongPermissions(address(mediator));
   }
 
   function _testMisc(
@@ -164,6 +166,34 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
   function _testExecutor(address newExecutor, address payloadController) internal {
     assertEq(IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin(), newExecutor);
+
+    ShortPayload shortPayload = new ShortPayload();
+
+    uint256 executionTime = block.timestamp + 86400;
+
+    IExecutorWithTimelock(AaveGovernanceV2.SHORT_EXECUTOR).queueTransaction(
+      address(shortPayload),
+      0,
+      'execute()',
+      bytes(''),
+      executionTime,
+      true
+    );
+
+    skip(86400);
+
+    IExecutorWithTimelock(AaveGovernanceV2.SHORT_EXECUTOR).executeTransaction(
+      address(shortPayload),
+      0,
+      'execute()',
+      bytes(''),
+      executionTime,
+      true
+    );
+
+    assertEq(IStakedToken(STK_AAVE_IMPL).ghoDebtToken(), shortPayload.GHO_DEBT_TOKEN());
+
+    rewind(86400);
 
     assertEq(IOwnable(newExecutor).owner(), payloadController);
   }
@@ -227,7 +257,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     );
   }
 
-  function _testLongPermissions() internal {
+  function _testLongPermissions(address mediator) internal {
     assertEq(
       IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
       GovernanceV3Ethereum.EXECUTOR_LVL_2
@@ -242,6 +272,36 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(),
       address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
     );
+
+    LongPayload longPayload = new LongPayload();
+
+    uint256 executionTime = block.timestamp + 604800;
+
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_2);
+
+    IExecutorWithTimelock(AaveGovernanceV2.LONG_EXECUTOR).queueTransaction(
+      address(longPayload),
+      0,
+      'execute(address)',
+      abi.encode(mediator),
+      executionTime,
+      true
+    );
+
+    skip(604800);
+
+    IExecutorWithTimelock(AaveGovernanceV2.LONG_EXECUTOR).executeTransaction(
+      address(longPayload),
+      0,
+      'execute(address)',
+      abi.encode(mediator),
+      executionTime,
+      true
+    );
+
+    rewind(604800);
+
+    vm.stopPrank();
   }
 
   function _testAaveTokenUpgrade() internal {
