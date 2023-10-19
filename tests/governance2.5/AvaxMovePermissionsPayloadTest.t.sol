@@ -10,7 +10,7 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {AvaxMovePermissionsPayload} from '../../src/contracts/governance2.5/AvaxMovePermissionsPayload.sol';
-import {IKeeperRegistry} from '../../src/contracts/governance2.5/dependencies/IKeeperRegistry.sol';
+import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IProofOfReserveExecutor} from './helpers/IProofOfReserveExecutor.sol';

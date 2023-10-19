@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IStakedToken} from '../../src/contracts/governance2.5/dependencies/IStakedToken.sol';
+import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 
 contract ShortPayload {
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;

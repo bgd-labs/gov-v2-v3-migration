@@ -9,8 +9,8 @@ import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygo
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
-import {IPegSwap} from './dependencies/IPegSwap.sol';
+import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
+import {IPegSwap} from '../dependencies/IPegSwap.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 /**

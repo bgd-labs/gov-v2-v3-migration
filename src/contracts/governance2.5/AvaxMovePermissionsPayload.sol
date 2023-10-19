@@ -5,7 +5,7 @@ import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
+import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';

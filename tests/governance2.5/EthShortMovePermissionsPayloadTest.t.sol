@@ -6,7 +6,7 @@ import {ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {ITransparentUpgradeableProxy} from '../../src/contracts/governance2.5/dependencies/ITransparentUpgradeableProxy.sol';
+import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -14,13 +14,13 @@ import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/Aave
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import {IExecutor as IExecutorV2} from '../../src/contracts/governance2.5/dependencies/IExecutor.sol';
-import {ILendingPoolAddressProviderV1} from '../../src/contracts/governance2.5/dependencies/ILendingPoolAddressProviderV1.sol';
-import {IStakedToken} from '../../src/contracts/governance2.5/dependencies/IStakedToken.sol';
-import {IGhoAccessControl} from '../../src/contracts/governance2.5/dependencies/IGhoAccessControl.sol';
+import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies//IExecutor.sol';
+import {ILendingPoolAddressProviderV1} from '../../src/contracts/dependencies//ILendingPoolAddressProviderV1.sol';
+import {IStakedToken} from '../../src/contracts/dependencies//IStakedToken.sol';
+import {IGhoAccessControl} from '../../src/contracts/dependencies//IGhoAccessControl.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
-import {IKeeperRegistry} from '../../src/contracts/governance2.5/dependencies/IKeeperRegistry.sol';
+import {IKeeperRegistry} from '../../src/contracts/dependencies//IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/EthShortMovePermissionsPayload.sol';
 import {ShortPayload} from '../mocks/ShortPayload.sol';
@@ -134,7 +134,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testGovernance() internal {
     vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG);
 
-    // Lend to Aave migrator
     assertEq(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
       AaveMisc.PROXY_ADMIN_ETHEREUM_LONG

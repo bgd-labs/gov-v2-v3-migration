@@ -5,8 +5,8 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
-import {ITransparentUpgradeableProxy} from './dependencies/ITransparentUpgradeableProxy.sol';
-import {IProxyAdmin} from './dependencies/IProxyAdmin.sol';
+import {ITransparentUpgradeableProxy} from '../dependencies/ITransparentUpgradeableProxy.sol';
+import {IProxyAdmin} from '../dependencies/IProxyAdmin.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -14,14 +14,14 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import {IStakedToken} from './dependencies/IStakedToken.sol';
-import {IExecutor as IExecutorV2} from './dependencies/IExecutor.sol';
+import {IStakedToken} from '../dependencies/IStakedToken.sol';
+import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
-import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
-import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
-import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
-import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
-import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
+import {IWrappedTokenGateway} from '../dependencies/IWrappedTokenGateway.sol';
+import {IBalancerOwnable} from '../dependencies/IBalancerOwnable.sol';
+import {ILendingPoolAddressProviderV1} from '../dependencies/ILendingPoolAddressProviderV1.sol';
+import {IGhoAccessControl} from '../dependencies/IGhoAccessControl.sol';
+import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 /**

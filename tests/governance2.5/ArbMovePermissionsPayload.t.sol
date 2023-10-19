@@ -8,7 +8,7 @@ import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbi
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {IKeeperRegistry} from '../../src/contracts/governance2.5/dependencies/IKeeperRegistry.sol';
+import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {ArbMovePermissionsPayload} from '../../src/contracts/governance2.5/ArbMovePermissionsPayload.sol';
 
 contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {

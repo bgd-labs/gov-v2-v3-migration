@@ -8,7 +8,7 @@ import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygo
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
-import {IKeeperRegistry} from '../../src/contracts/governance2.5/dependencies/IKeeperRegistry.sol';
+import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {PolygonMovePermissionsPayload} from '../../src/contracts/governance2.5/PolygonMovePermissionsPayload.sol';

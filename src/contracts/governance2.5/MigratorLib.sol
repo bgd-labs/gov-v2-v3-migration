@@ -6,7 +6,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {ILendingPoolAddressesProvider, IAaveOracle, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
 import {IACLManager, IPoolAddressesProvider, IPool} from 'aave-address-book/AaveV3.sol';
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
-import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
+import {IWrappedTokenGateway} from '../dependencies/IWrappedTokenGateway.sol';
 
 /**
  * @title MigratorLib
