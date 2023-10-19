@@ -5,7 +5,6 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {ITransparentUpgradeableProxy} from './dependencies/ITransparentUpgradeableProxy.sol';
-import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -20,22 +19,17 @@ import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
 import {IBalancerOwnable} from './dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from './dependencies/ILendingPoolAddressProviderV1.sol';
 import {IGhoAccessControl} from './dependencies/IGhoAccessControl.sol';
-import {IMediator} from './interfaces/IMediator.sol';
 import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 /**
  * @title EthShortMovePermissionsPayload
  * @notice Migrate permissions for Aave V1, V2 and V3 pools on Ethereum from governance v2 to v3.
- * Migrate GHO permissions to the new governance, fund cross chain controller and execute long permissions move.
+ * Migrate GHO permissions to the new governance, fund cross chain controller.
  * @author BGD Labs
  **/
 contract EthShortMovePermissionsPayload {
   using SafeCast for uint256;
-
-  address public immutable MEDIATOR;
-
-  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
@@ -73,14 +67,7 @@ contract EthShortMovePermissionsPayload {
   address public constant EXECUTION_CHAIN_ROBOT = 0x365d47ceD3D7Eb6a9bdB3814aA23cc06B2D33Ef8;
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
-  constructor(address mediator) {
-    MEDIATOR = mediator;
-  }
-
   function execute() external {
-    // LONG ADMIN PERMISSIONS
-    IMediator(MEDIATOR).execute();
-
     // GET LINK TOKENS FROM COLLECTOR
     MigratorLib.fetchLinkTokens(
       AaveV3Ethereum.COLLECTOR,
@@ -112,9 +99,6 @@ contract EthShortMovePermissionsPayload {
 
     // GHO
     migrateGHOPermissions();
-
-    // aAave
-    upgradeAAave();
 
     // V1 POOL
     migrateV1Pool();
@@ -175,7 +159,6 @@ contract EthShortMovePermissionsPayload {
     IOwnable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // EXECUTOR PERMISSIONS
-
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_1));
 
     // new executor - call execute payload to accept new permissions
@@ -319,22 +302,5 @@ contract EthShortMovePermissionsPayload {
 
     // TRANSFER PERMISSION OF ROBOT OPERATOR
     IOwnable(ROBOT_OPERATOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-  }
-
-  function upgradeAAave() internal {
-    // update aAave implementation
-
-    ConfiguratorInputTypes.UpdateATokenInput memory input = ConfiguratorInputTypes
-      .UpdateATokenInput({
-        asset: AaveV3EthereumAssets.AAVE_UNDERLYING,
-        treasury: address(AaveV3Ethereum.COLLECTOR),
-        incentivesController: AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
-        name: 'Aave Ethereum AAVE',
-        symbol: 'aEthAAVE',
-        implementation: A_AAVE_IMPL,
-        params: bytes('') // this parameter is not actually used anywhere
-      });
-
-    AaveV3Ethereum.POOL_CONFIGURATOR.updateAToken(input);
   }
 }

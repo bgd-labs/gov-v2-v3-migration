@@ -6,7 +6,7 @@ import {ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {ITransparentUpgradeableProxy} from '../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
+import {ITransparentUpgradeableProxy} from '../../src/contracts/governance2.5/dependencies/ITransparentUpgradeableProxy.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -14,19 +14,16 @@ import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/Aave
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
-import {IExecutor as IExecutorV2} from '../src/contracts/dependencies/IExecutor.sol';
-import {ILendingPoolAddressProviderV1} from '../src/contracts/dependencies/ILendingPoolAddressProviderV1.sol';
-import {IStakedToken} from '../src/contracts/dependencies/IStakedToken.sol';
-import {IGhoAccessControl} from '../src/contracts/dependencies/IGhoAccessControl.sol';
+import {IExecutor as IExecutorV2} from '../../src/contracts/governance2.5/dependencies/IExecutor.sol';
+import {ILendingPoolAddressProviderV1} from '../../src/contracts/governance2.5/dependencies/ILendingPoolAddressProviderV1.sol';
+import {IStakedToken} from '../../src/contracts/governance2.5/dependencies/IStakedToken.sol';
+import {IGhoAccessControl} from '../../src/contracts/governance2.5/dependencies/IGhoAccessControl.sol';
 import {IPriceProviderV1} from './helpers/IPriceProviderV1.sol';
 import {ILendingPoolConfiguratorV1} from './helpers/ILendingPoolConfiguratorV1.sol';
-import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
+import {IKeeperRegistry} from '../../src/contracts/governance2.5/dependencies/IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {Mediator} from '../src/contracts/Mediator.sol';
-import {EthLongMovePermissionsPayload} from '../src/contracts/EthLongMovePermissionsPayload.sol';
-import {EthShortMovePermissionsPayload} from '../src/contracts/EthShortMovePermissionsPayload.sol';
-import {ShortPayload} from './mocks/ShortPayload.sol';
-import {LongPayload} from './mocks/LongPayload.sol';
+import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/EthShortMovePermissionsPayload.sol';
+import {ShortPayload} from '../mocks/ShortPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
@@ -48,15 +45,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function testPayload() public {
-    Mediator mediator = new Mediator();
-
-    EthLongMovePermissionsPayload longPayload = new EthLongMovePermissionsPayload(
-      address(mediator)
-    );
-
-    payload = new EthShortMovePermissionsPayload(address(mediator));
-
-    GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
+    payload = new EthShortMovePermissionsPayload();
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
 
@@ -136,10 +125,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     _testGhoPermissions();
 
     vm.stopPrank();
-
-    _testAaveTokenUpgrade();
-    _testStkAaveTokenUpgrade();
-    _testLongPermissions(address(mediator));
   }
 
   function _testMisc(
@@ -238,96 +223,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
       !ghoToken.hasRole(ghoToken.FACILITATOR_MANAGER_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR)
     );
     assertTrue(!ghoToken.hasRole(ghoToken.BUCKET_MANAGER_ROLE(), AaveGovernanceV2.SHORT_EXECUTOR));
-  }
-
-  function _testAAaveUpgrade() internal {
-    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-      vm,
-      AaveV3EthereumAssets.AAVE_A_TOKEN
-    );
-
-    assertEq(newImpl, A_AAVE_IMPL);
-
-    ReserveConfig[] memory allConfigs = _getReservesConfigs(AaveV3Ethereum.POOL);
-
-    e2eTestAsset(
-      AaveV3Ethereum.POOL,
-      _findReserveConfig(allConfigs, AaveV3EthereumAssets.USDC_UNDERLYING),
-      _findReserveConfig(allConfigs, AaveV3EthereumAssets.AAVE_UNDERLYING)
-    );
-  }
-
-  function _testLongPermissions(address mediator) internal {
-    assertEq(
-      IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
-      GovernanceV3Ethereum.EXECUTOR_LVL_2
-    );
-
-    assertEq(
-      IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getAdmin(),
-      GovernanceV3Ethereum.EXECUTOR_LVL_2
-    );
-
-    assertEq(
-      IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(),
-      address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)
-    );
-
-    LongPayload longPayload = new LongPayload();
-
-    uint256 executionTime = block.timestamp + 604800;
-
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_2);
-
-    IExecutorWithTimelock(AaveGovernanceV2.LONG_EXECUTOR).queueTransaction(
-      address(longPayload),
-      0,
-      'execute(address)',
-      abi.encode(mediator),
-      executionTime,
-      true
-    );
-
-    skip(604800);
-
-    IExecutorWithTimelock(AaveGovernanceV2.LONG_EXECUTOR).executeTransaction(
-      address(longPayload),
-      0,
-      'execute(address)',
-      abi.encode(mediator),
-      executionTime,
-      true
-    );
-
-    rewind(604800);
-
-    vm.stopPrank();
-  }
-
-  function _testAaveTokenUpgrade() internal {
-    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-      vm,
-      AaveV3EthereumAssets.AAVE_UNDERLYING
-    );
-
-    assertEq(newImpl, 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322);
-
-    ReserveConfig[] memory allConfigs = _getReservesConfigs(AaveV3Ethereum.POOL);
-
-    e2eTestAsset(
-      AaveV3Ethereum.POOL,
-      _findReserveConfig(allConfigs, AaveV3EthereumAssets.USDC_UNDERLYING),
-      _findReserveConfig(allConfigs, AaveV3EthereumAssets.AAVE_UNDERLYING)
-    );
-  }
-
-  function _testStkAaveTokenUpgrade() internal {
-    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-      vm,
-      AaveSafetyModule.STK_AAVE
-    );
-
-    assertEq(newImpl, STK_AAVE_IMPL);
   }
 
   function _testRobot() internal {

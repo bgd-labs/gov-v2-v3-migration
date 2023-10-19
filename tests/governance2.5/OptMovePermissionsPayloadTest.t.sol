@@ -8,8 +8,8 @@ import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Opti
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
-import {OptMovePermissionsPayload} from '../src/contracts/OptMovePermissionsPayload.sol';
+import {IKeeperRegistry} from '../../src/contracts/governance2.5/dependencies/IKeeperRegistry.sol';
+import {OptMovePermissionsPayload} from '../../src/contracts/governance2.5/OptMovePermissionsPayload.sol';
 
 contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public KEEPER_REGISTRY = 0x75c0530885F385721fddA23C539AF3701d6183D4;

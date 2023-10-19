@@ -9,7 +9,7 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
-import {BaseMovePermissionsPayload} from '../src/contracts/BaseMovePermissionsPayload.sol';
+import {BaseMovePermissionsPayload} from '../../src/contracts/governance2.5/BaseMovePermissionsPayload.sol';
 
 contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
