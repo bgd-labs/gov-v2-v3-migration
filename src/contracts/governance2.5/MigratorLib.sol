@@ -142,8 +142,8 @@ library MigratorLib {
       // transfer aLINK token from the treasury to the current address
       collector.transfer(linkAToken, address(this), linkAmount);
 
-      // withdraw aLINK from the aave pool and receive LINK
-      IPool(pool).withdraw(linkToken, linkAmount, address(this));
+      // withdraw all aLINK on the executor from the aave pool and receive LINK
+      IPool(pool).withdraw(linkToken, type(uint256).max, address(this));
     } else {
       collector.transfer(linkToken, address(this), linkAmount);
     }

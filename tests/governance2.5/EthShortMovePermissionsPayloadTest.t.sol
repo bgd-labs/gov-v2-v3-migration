@@ -221,48 +221,22 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function _testRobot() internal {
-    uint256 govChainKeeperId = uint256(
-      keccak256(
-        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
-      )
-    );
-    uint256 votingChainKeeperId = uint256(
-      keccak256(
-        abi.encodePacked(
-          blockhash(block.number - 1),
-          KEEPER_REGISTRY,
-          uint32(registryState.nonce + 1)
-        )
-      )
-    );
     uint256 executionChainKeeperId = uint256(
       keccak256(
         abi.encodePacked(
           blockhash(block.number - 1),
           KEEPER_REGISTRY,
-          uint32(registryState.nonce + 2)
+          uint32(registryState.nonce)
         )
       )
     );
 
-    (address govChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      govChainKeeperId
-    );
-    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      votingChainKeeperId
-    );
-    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
       executionChainKeeperId
     );
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    assertEq(govChainKeeperTarget, payload.GOV_CHAIN_ROBOT());
-    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-
-    assertEq(
-      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-      IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER())
-    );
+    assertGe(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN());
   }
 }

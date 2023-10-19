@@ -27,9 +27,7 @@ contract PolygonMovePermissionsPayload {
 
   address public constant ERC677_LINK = 0xb0897686c545045aFc77CF20eC7A532E3120E0F1;
 
-  uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 50 ether;
   uint256 public constant LINK_AMOUNT_ROBOT_EXECUTION_CHAIN = 50 ether;
-  uint256 public constant LINK_AMOUNT_ROOTS_CONSUMER = 100 ether;
 
   uint256 public constant GOV_V2_ROBOT_ID =
     5270433258472149004463739312507691937285233476849983113005055156517680660709;
@@ -41,19 +39,14 @@ contract PolygonMovePermissionsPayload {
   uint256 public constant LINK_AMOUNT_CROSSCHAIN_CONTROLLER = 250 ether;
 
   uint256 public constant TOTAL_LINK_AMOUNT =
-    LINK_AMOUNT_CROSSCHAIN_CONTROLLER +
-      LINK_AMOUNT_ROBOT_VOTING_CHAIN +
-      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN +
-      LINK_AMOUNT_ROOTS_CONSUMER;
+    LINK_AMOUNT_CROSSCHAIN_CONTROLLER + LINK_AMOUNT_ROBOT_EXECUTION_CHAIN;
 
   address public constant GELATO_ADDRESS = 0x73495115E38A307DA3419Bf062bb050b96f68Cf3;
   uint256 public constant GELATO_AMOUNT = 10_000e6;
 
   IPegSwap public constant PEGSWAP = IPegSwap(0xAA1DC356dc4B18f30C347798FD5379F3D77ABC5b);
 
-  address public constant VOTING_CHAIN_ROBOT = 0xbe7998712402B6A63975515A532Ce503437998b7;
   address public constant EXECUTION_CHAIN_ROBOT = 0x249396a890F89D47F89326d7EE116b1d374Fb3A9;
-  address public constant ROOTS_CONSUMER = 0xE77aF99210AC55939e1ba0bFC6A9a20E1Da73b25;
 
   function execute() external {
     // GELATO FUNDING
@@ -125,42 +118,35 @@ contract PolygonMovePermissionsPayload {
     );
 
     // withdraw aLINK from the aave pool and receive LINK
-    AaveV3Polygon.POOL.withdraw(
+    uint256 linkBalance = AaveV3Polygon.POOL.withdraw(
       AaveV3PolygonAssets.LINK_UNDERLYING,
-      TOTAL_LINK_AMOUNT,
+      type(uint256).max,
       address(this)
     );
 
     // Swap ERC-20 link to ERC-677 link
-    IERC20(AaveV3PolygonAssets.LINK_UNDERLYING).forceApprove(address(PEGSWAP), TOTAL_LINK_AMOUNT);
-    PEGSWAP.swap(TOTAL_LINK_AMOUNT, AaveV3PolygonAssets.LINK_UNDERLYING, ERC677_LINK);
+    IERC20(AaveV3PolygonAssets.LINK_UNDERLYING).forceApprove(address(PEGSWAP), linkBalance);
+    PEGSWAP.swap(linkBalance, AaveV3PolygonAssets.LINK_UNDERLYING, ERC677_LINK);
   }
 
   function migrateKeepers() internal {
+    uint256 linkBalance = IERC20(ERC677_LINK).balanceOf(address(this));
+
     // CANCEL PREVIOUS KEEPER
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
-    // REGISTER NEW KEEPER (VOTING CHAIN, EXECUTION CHAIN)
-    IERC20(ERC677_LINK).approve(
+    // REGISTER NEW EXECUTION CHAIN KEEPER
+    IERC20(ERC677_LINK).forceApprove(
       ROBOT_OPERATOR,
-      LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
+      linkBalance
     );
 
-    IAaveCLRobotOperator(ROBOT_OPERATOR).register(
-      'Voting Chain Keeper',
-      VOTING_CHAIN_ROBOT,
-      5000000,
-      LINK_AMOUNT_ROBOT_VOTING_CHAIN.toUint96()
-    );
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',
       EXECUTION_CHAIN_ROBOT,
       5000000,
-      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN.toUint96()
+      linkBalance.toUint96()
     );
-
-    // FUND ROOTS CONSUMER
-    IERC20(ERC677_LINK).transfer(ROOTS_CONSUMER, LINK_AMOUNT_ROOTS_CONSUMER);
 
     // TRANSFER PERMISSION OF ROBOT OPERATOR
     IOwnable(ROBOT_OPERATOR).transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);

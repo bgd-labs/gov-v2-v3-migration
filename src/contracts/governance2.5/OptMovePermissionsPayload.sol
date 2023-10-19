@@ -5,6 +5,7 @@ import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Opti
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
@@ -16,6 +17,7 @@ import {MigratorLib} from './MigratorLib.sol';
  * @author BGD Labs
  **/
 contract OptMovePermissionsPayload {
+  using SafeERC20 for IERC20;
   using SafeCast for uint256;
 
   address public constant AAVE_MERKLE_DISTRIBUTOR = 0x1685D81212580DD4cDA287616C2f6F4794927e18;
@@ -64,20 +66,22 @@ contract OptMovePermissionsPayload {
   }
 
   function migrateKeepers() internal {
+    uint256 linkBalance = IERC20(AaveV3OptimismAssets.LINK_UNDERLYING).balanceOf(address(this));
+
     // CANCEL PREVIOUS KEEPER
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
     // REGISTER NEW EXECUTION CHAIN KEEPER
-    IERC20(AaveV3OptimismAssets.LINK_UNDERLYING).approve(
+    IERC20(AaveV3OptimismAssets.LINK_UNDERLYING).forceApprove(
       ROBOT_OPERATOR,
-      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
+      linkBalance
     );
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',
       EXECUTION_CHAIN_ROBOT,
       5000000,
-      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN.toUint96()
+      linkBalance.toUint96()
     );
 
     // TRANSFER PERMISSION OF ROBOT OPERATOR

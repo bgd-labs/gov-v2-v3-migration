@@ -89,35 +89,22 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function _testRobot() internal {
-    uint256 votingChainKeeperId = uint256(
-      keccak256(
-        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
-      )
-    );
     uint256 executionChainKeeperId = uint256(
       keccak256(
         abi.encodePacked(
           blockhash(block.number - 1),
           KEEPER_REGISTRY,
-          uint32(registryState.nonce + 1)
+          uint32(registryState.nonce)
         )
       )
     );
 
-    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      votingChainKeeperId
-    );
-    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
       executionChainKeeperId
     );
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Polygon.EXECUTOR_LVL_1);
-    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-
-    assertEq(
-      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-      IERC20(payload.ERC677_LINK()).balanceOf(payload.ROOTS_CONSUMER())
-    );
+    assertGe(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN());
   }
 }
