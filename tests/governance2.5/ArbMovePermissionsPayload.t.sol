@@ -65,9 +65,9 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
       )
     );
 
-    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      executionChainKeeperId
-    );
+    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(
+      KEEPER_REGISTRY
+    ).getUpkeep(executionChainKeeperId);
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Arbitrum.EXECUTOR_LVL_1);
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());

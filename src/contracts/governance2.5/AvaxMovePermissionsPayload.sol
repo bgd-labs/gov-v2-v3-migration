@@ -115,10 +115,7 @@ contract AvaxMovePermissionsPayload {
     uint256 linkBalance = IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).balanceOf(address(this));
 
     // REGISTER NEW EXECUTION CHAIN KEEPER
-    IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).forceApprove(
-      ROBOT_OPERATOR,
-      linkBalance
-    );
+    IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).forceApprove(ROBOT_OPERATOR, linkBalance);
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',

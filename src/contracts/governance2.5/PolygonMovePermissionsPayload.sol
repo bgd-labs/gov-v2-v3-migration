@@ -136,10 +136,7 @@ contract PolygonMovePermissionsPayload {
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
     // REGISTER NEW EXECUTION CHAIN KEEPER
-    IERC20(ERC677_LINK).forceApprove(
-      ROBOT_OPERATOR,
-      linkBalance
-    );
+    IERC20(ERC677_LINK).forceApprove(ROBOT_OPERATOR, linkBalance);
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',

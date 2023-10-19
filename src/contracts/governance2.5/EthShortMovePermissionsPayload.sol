@@ -267,10 +267,7 @@ contract EthShortMovePermissionsPayload {
     uint256 linkBalance = IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(address(this));
 
     // REGISTER NEW EXECUTION CHAIN KEEPER
-    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).forceApprove(
-      ROBOT_OPERATOR,
-      linkBalance
-    );
+    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).forceApprove(ROBOT_OPERATOR, linkBalance);
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',

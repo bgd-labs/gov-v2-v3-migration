@@ -223,17 +223,13 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testRobot() internal {
     uint256 executionChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(
-          blockhash(block.number - 1),
-          KEEPER_REGISTRY,
-          uint32(registryState.nonce)
-        )
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
       )
     );
 
-    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      executionChainKeeperId
-    );
+    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(
+      KEEPER_REGISTRY
+    ).getUpkeep(executionChainKeeperId);
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());

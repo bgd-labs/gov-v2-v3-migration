@@ -72,10 +72,7 @@ contract OptMovePermissionsPayload {
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
     // REGISTER NEW EXECUTION CHAIN KEEPER
-    IERC20(AaveV3OptimismAssets.LINK_UNDERLYING).forceApprove(
-      ROBOT_OPERATOR,
-      linkBalance
-    );
+    IERC20(AaveV3OptimismAssets.LINK_UNDERLYING).forceApprove(ROBOT_OPERATOR, linkBalance);
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',
