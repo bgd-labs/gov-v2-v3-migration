@@ -5,6 +5,7 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {ITransparentUpgradeableProxy} from './dependencies/ITransparentUpgradeableProxy.sol';
+import {IProxyAdmin} from './dependencies/IProxyAdmin.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -30,6 +31,9 @@ import {MigratorLib} from './MigratorLib.sol';
  **/
 contract EthShortMovePermissionsPayload {
   using SafeCast for uint256;
+
+  address payable public constant GOVERNANCE_25_IMPL =
+    payable(0x323F2c8E227b3F0d88B047Ed16581fc0b6B9B1d7);
 
   address payable public constant LEND_TO_AAVE_MIGRATOR =
     payable(0x317625234562B1526Ea2FaC4030Ea499C5291de4);
@@ -68,6 +72,18 @@ contract EthShortMovePermissionsPayload {
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
   function execute() external {
+    // GOVERNANCE V3
+    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).upgradeAndCall(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+      GOVERNANCE_25_IMPL,
+      abi.encodeWithSignature('initialize()')
+    );
+
+    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+    );
+
     // GET LINK TOKENS FROM COLLECTOR
     MigratorLib.fetchLinkTokens(
       AaveV3Ethereum.COLLECTOR,
@@ -159,16 +175,8 @@ contract EthShortMovePermissionsPayload {
     IOwnable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // EXECUTOR PERMISSIONS
+    // admin will be accepted on the v3 activation
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_1));
-
-    // new executor - call execute payload to accept new permissions
-    IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-      address(this),
-      0,
-      'acceptAdmin()',
-      bytes(''),
-      false
-    );
 
     // new executor - change owner to payload controller
     IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_1).transferOwnership(

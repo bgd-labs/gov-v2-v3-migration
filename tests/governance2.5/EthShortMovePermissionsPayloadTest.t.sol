@@ -26,6 +26,8 @@ import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/
 import {ShortPayload} from '../mocks/ShortPayload.sol';
 
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
+  address public constant GOVERNANCE_25_IMPL = 0x323F2c8E227b3F0d88B047Ed16581fc0b6B9B1d7;
+
   address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
@@ -40,7 +42,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18333657);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18383684);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -48,6 +50,8 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     payload = new EthShortMovePermissionsPayload();
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
+
+    _testGovernance();
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
@@ -127,6 +131,25 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
     vm.stopPrank();
   }
 
+  function _testGovernance() internal {
+    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG);
+
+    // Lend to Aave migrator
+    assertEq(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
+      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+    );
+
+    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+      vm,
+      address(GovernanceV3Ethereum.GOVERNANCE)
+    );
+
+    assertEq(newImpl, GOVERNANCE_25_IMPL);
+
+    vm.stopPrank();
+  }
+
   function _testMisc(
     address newExecutor,
     address lendToAaveMigrator,
@@ -150,35 +173,7 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function _testExecutor(address newExecutor, address payloadController) internal {
-    assertEq(IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getAdmin(), newExecutor);
-
-    ShortPayload shortPayload = new ShortPayload();
-
-    uint256 executionTime = block.timestamp + 86400;
-
-    IExecutorWithTimelock(AaveGovernanceV2.SHORT_EXECUTOR).queueTransaction(
-      address(shortPayload),
-      0,
-      'execute()',
-      bytes(''),
-      executionTime,
-      true
-    );
-
-    skip(86400);
-
-    IExecutorWithTimelock(AaveGovernanceV2.SHORT_EXECUTOR).executeTransaction(
-      address(shortPayload),
-      0,
-      'execute()',
-      bytes(''),
-      executionTime,
-      true
-    );
-
-    assertEq(IStakedToken(STK_AAVE_IMPL).ghoDebtToken(), shortPayload.GHO_DEBT_TOKEN());
-
-    rewind(86400);
+    assertEq(IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).getPendingAdmin(), newExecutor);
 
     assertEq(IOwnable(newExecutor).owner(), payloadController);
   }
