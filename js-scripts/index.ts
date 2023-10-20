@@ -3,7 +3,7 @@ import {tenderly} from '@bgd-labs/aave-cli';
 import {Address, createPublicClient, createWalletClient, http} from 'viem';
 import {arbitrum, avalanche, base, mainnet, optimism, polygon} from 'viem/chains';
 import {executeL2Payload, executeL2PayloadViaGuardian} from './payloadsV2';
-import {createV2Proposal, executeV2Proposals} from './proposalsV2';
+import {createV2Proposal, executeV2Proposal, executeV2Proposals} from './proposalsV2';
 import {
   AaveGovernanceV2,
   GovernanceV3Ethereum,
@@ -73,20 +73,20 @@ const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
   const shortMigrationPayload = '0x7fC3ebdB376fF38De2cD597671A6270113c27364';
-  const longMigrationPayload = '0x6195a956dC026A949dE552F04a5803d3aa1fC408';
+  // const longMigrationPayload = '0x6195a956dC026A949dE552F04a5803d3aa1fC408';
 
   const block = await publicClient.getBlock();
   // create proposal on v2
-  const longProposalId = await createV2Proposal(
-    walletClient,
-    publicClient,
-    [longMigrationPayload],
-    AaveGovernanceV2.LONG_EXECUTOR
-  );
-
-  const timeToWarpTo = block.timestamp + 60n * 60n * 24n * 16n;
-
-  await tenderly.warpTime(fork, timeToWarpTo);
+  // const longProposalId = await createV2Proposal(
+  //   walletClient,
+  //   publicClient,
+  //   [longMigrationPayload],
+  //   AaveGovernanceV2.LONG_EXECUTOR
+  // );
+  //
+  const timeToWarpTo = block.timestamp; // + 60n * 60n * 24n * 16n;
+  //
+  // await tenderly.warpTime(fork, timeToWarpTo);
 
   const shortProposalId = await createV2Proposal(
     walletClient,
@@ -96,36 +96,41 @@ const deployPayloadsEthereum = async () => {
   );
 
   // execute proposals
-  await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork, {
+  // await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork, {
+  //   number: block.number,
+  //   timestamp: timeToWarpTo,
+  // });
+
+  await executeV2Proposal(shortProposalId, walletClient, publicClient, fork, {
     number: block.number,
     timestamp: timeToWarpTo,
   });
 
-  const payloadId = await deployAndRegisterTestPayloads(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-    [TestV2PayloadEthereum, TestV3PayloadEthereum]
-  );
-  const proposalId = await generateProposalAndExecutePayload(
-    walletClient,
-    publicClient,
-    fork,
-    AaveMisc.ECOSYSTEM_RESERVE,
-    payloadId,
-    mainnet
-  );
-  console.log('proposalId: ', proposalId);
+  // const payloadId = await deployAndRegisterTestPayloads(
+  //   walletClient,
+  //   publicClient,
+  //   DEPLOYER,
+  //   GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+  //   [TestV2PayloadEthereum, TestV3PayloadEthereum]
+  // );
+  // const proposalId = await generateProposalAndExecutePayload(
+  //   walletClient,
+  //   publicClient,
+  //   fork,
+  //   AaveMisc.ECOSYSTEM_RESERVE,
+  //   payloadId,
+  //   mainnet
+  // );
+  // console.log('proposalId: ', proposalId);
 };
 
-deployPayloadsEthereum().then().catch(console.log);
+// deployPayloadsEthereum().then().catch(console.log);
 
 async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     polygon,
     AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-    '0x274a46efd4364ccba654dc74ddb793f9010b179c',
+    '0xe40e84457f4b5075f1eb32352d81ecf1de77fee6',
     GovernanceV3Polygon,
     [TestV2PayloadPolygon, TestV3PayloadPolygon]
   );
@@ -133,7 +138,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     avalanche,
     AVAX_GUARDIAN,
-    '0xb58e840e1356ed9b7f89d11a03d4cef24f56a1ea',
+    '0x67f7306ea3b6909936940a7a5c06a68fd0dcbd08',
     GovernanceV3Avalanche,
     [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
   );
@@ -141,7 +146,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     arbitrum,
     AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-    '0xfd858c8bc5ac5e10f01018bc78471bb0dc392247',
+    '0xab22988d93d5f942fc6b6c6ea285744809d1d9cc',
     GovernanceV3Arbitrum,
     [TestV3PayloadArbitrum]
   );
@@ -149,7 +154,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     optimism,
     AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-    '0x7fc3fcb14ef04a48bb0c12f0c39cd74c249c37d8',
+    '0xfd858c8bc5ac5e10f01018bc78471bb0dc392247',
     GovernanceV3Optimism,
     [TestV3PayloadOptimism]
   );
@@ -157,7 +162,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    '0x4959bad86d851378c6bccf07cb8240d55a11c5ac',
+    '0x1f39bad65cf9e367ff986eef0ef4f3b6cb63a534',
     GovernanceV3Base,
     [TestV3PayloadBase]
   );
