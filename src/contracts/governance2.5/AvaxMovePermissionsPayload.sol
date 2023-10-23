@@ -10,7 +10,7 @@ import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title AvaxMovePermissionsPayload

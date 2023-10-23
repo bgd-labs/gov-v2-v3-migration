@@ -17,7 +17,6 @@ This is an intermediate step to activate a.DI and move all the permissions to th
 
 - [Level 1 (Short executor) proposal, Ethereum](./src/contracts/EthShortMovePermissionsPayload.sol)
 
-  - **Trigger the execution of the Mediator.**
   - Change implementation of the Governance V3 contract to V2.5.
   - Fund CCC contract on a.DI from Aave Collector.
   - Fund execution robot.
@@ -91,6 +90,7 @@ Final step to migrate to Governance V3.
 - [Level 1 (Short executor) proposal, Ethereum](./src/contracts/EthShortMovePermissionsPayload.sol)
 
   - **Trigger the execution of the Mediator.**
+  - Transfer Governance v3 proxy admin from Executor level 1 to Executor level 2.
   - Accept the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
   - Upgrade aAave implementation.
 

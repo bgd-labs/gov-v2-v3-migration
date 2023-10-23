@@ -134,11 +134,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   function _testGovernance() internal {
     vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
 
-    assertEq(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
-      MiscEthereum.PROXY_ADMIN_LONG
-    );
-
     address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
       vm,
       address(GovernanceV3Ethereum.GOVERNANCE)

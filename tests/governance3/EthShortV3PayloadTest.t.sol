@@ -12,6 +12,7 @@ import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/Aave
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
+import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
 import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
@@ -29,15 +30,15 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
-  //   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
+  address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
 
   EthShortV3Payload public payload;
 
-  //   IKeeperRegistry.State public registryState;
+  IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18383684);
-    // ß(registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18412862);
+    (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
@@ -53,11 +54,20 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
+    vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
+
+    assertEq(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
+      MiscEthereum.PROXY_ADMIN_LONG
+    );
+
+    vm.stopPrank();
+
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     _testExecutor();
 
-    // _testRobot();
+    _testRobot();
 
     vm.stopPrank();
 
@@ -188,49 +198,41 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     assertEq(newImpl, STK_AAVE_IMPL);
   }
 
-  //   function _testRobot() internal {
-  //     uint256 govChainKeeperId = uint256(
-  //       keccak256(
-  //         abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
-  //       )
-  //     );
-  //     uint256 votingChainKeeperId = uint256(
-  //       keccak256(
-  //         abi.encodePacked(
-  //           blockhash(block.number - 1),
-  //           KEEPER_REGISTRY,
-  //           uint32(registryState.nonce + 1)
-  //         )
-  //       )
-  //     );
-  //     uint256 executionChainKeeperId = uint256(
-  //       keccak256(
-  //         abi.encodePacked(
-  //           blockhash(block.number - 1),
-  //           KEEPER_REGISTRY,
-  //           uint32(registryState.nonce + 2)
-  //         )
-  //       )
-  //     );
+  function _testRobot() internal {
+    uint256 govChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
+      )
+    );
+    uint256 votingChainKeeperId = uint256(
+      keccak256(
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 2)
+        )
+      )
+    );
 
-  //     (address govChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-  //       govChainKeeperId
-  //     );
-  //     (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-  //       votingChainKeeperId
-  //     );
-  //     (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-  //       executionChainKeeperId
-  //     );
+    (address govChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      govChainKeeperId
+    );
+    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
+      votingChainKeeperId
+    );
 
-  //     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
-  //     assertEq(govChainKeeperTarget, payload.GOV_CHAIN_ROBOT());
-  //     assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
-  //     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
+    assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    assertEq(govChainKeeperTarget, payload.GOV_CHAIN_ROBOT());
+    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
 
-  //     assertEq(
-  //       payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-  //       IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER())
-  //     );
-  //   }
+    assertApproxEqAbs(
+      IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER()),
+      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
+      10
+    );
+  }
 }

@@ -22,12 +22,12 @@ import {IBalancerOwnable} from '../dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from '../dependencies/ILendingPoolAddressProviderV1.sol';
 import {IGhoAccessControl} from '../dependencies/IGhoAccessControl.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title EthShortMovePermissionsPayload
- * @notice Migrate permissions for Aave V1, V2 and V3 pools on Ethereum from governance v2 to v3.
- * Migrate GHO permissions to the new governance, fund cross chain controller.
+ * @notice Migrate permissions for Aave V1, V2, V2 AMM and V3 pools on Ethereum from governance v2 to v2.5.
+ * Migrate GHO permissions to the new executors, fund cross chain controller and fund execution robot.
  * @author BGD Labs
  **/
 contract EthShortMovePermissionsPayload {
@@ -69,11 +69,6 @@ contract EthShortMovePermissionsPayload {
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
       GOVERNANCE_25_IMPL,
       abi.encodeWithSignature('initialize()')
-    );
-
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     // GET LINK TOKENS FROM COLLECTOR
@@ -163,7 +158,10 @@ contract EthShortMovePermissionsPayload {
     ITransparentUpgradeableProxy(ABPT).changeAdmin(MiscEthereum.PROXY_ADMIN);
     IBalancerOwnable(ABPT).setController(MiscEthereum.PROXY_ADMIN);
 
+    // Swapper
     IOwnable(MiscEthereum.AAVE_SWAPPER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    // Polygon eth bridge
     IOwnable(MiscEthereum.AAVE_POL_ETH_BRIDGE).transferOwnership(
       GovernanceV3Ethereum.EXECUTOR_LVL_1
     );

@@ -113,14 +113,21 @@ const deployPayloadsEthereum = async () => {
     GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
     [TestV2PayloadEthereum, TestV3PayloadEthereum]
   );
-  const proposalId = await generateProposalAndExecutePayload(
-    walletClient,
-    publicClient,
-    fork,
-    AaveMisc.ECOSYSTEM_RESERVE,
-    payloadId,
-    mainnet
-  );
+
+  // deploy payload 2.5
+
+  // create proposal 2.5
+
+  // execute proposal 2.5
+
+  // const proposalId = await generateProposalAndExecutePayload(
+  //   walletClient,
+  //   publicClient,
+  //   fork,
+  //   AaveMisc.ECOSYSTEM_RESERVE,
+  //   payloadId,
+  //   mainnet
+  // );
   // console.log('proposalId: ', proposalId);
 };
 
