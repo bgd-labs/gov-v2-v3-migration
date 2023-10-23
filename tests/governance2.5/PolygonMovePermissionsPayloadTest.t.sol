@@ -6,12 +6,12 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
-import {IKeeperRegistry} from '../src/contracts/dependencies/IKeeperRegistry.sol';
+import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
+import {PolygonMovePermissionsPayload} from '../../src/contracts/governance2.5/PolygonMovePermissionsPayload.sol';
 
 contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant ERC677_LINK = 0xb0897686c545045aFc77CF20eC7A532E3120E0F1;
@@ -25,7 +25,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 48047688);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 49056415);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -57,7 +57,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3PolygonAssets.DAI_ORACLE,
       AaveV3Polygon.EMISSION_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_POLYGON
+      MiscPolygon.PROXY_ADMIN
     );
 
     _testV3Optional(
@@ -89,35 +89,18 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   }
 
   function _testRobot() internal {
-    uint256 votingChainKeeperId = uint256(
+    uint256 executionChainKeeperId = uint256(
       keccak256(
         abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
       )
     );
-    uint256 executionChainKeeperId = uint256(
-      keccak256(
-        abi.encodePacked(
-          blockhash(block.number - 1),
-          KEEPER_REGISTRY,
-          uint32(registryState.nonce + 1)
-        )
-      )
-    );
 
-    (address votingChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      votingChainKeeperId
-    );
-    (address executionChainKeeperTarget, , , , , , , ) = IKeeperRegistry(KEEPER_REGISTRY).getUpkeep(
-      executionChainKeeperId
-    );
+    (address executionChainKeeperTarget, , , uint96 keeperBalance, , , , ) = IKeeperRegistry(
+      KEEPER_REGISTRY
+    ).getUpkeep(executionChainKeeperId);
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Polygon.EXECUTOR_LVL_1);
-    assertEq(votingChainKeeperTarget, payload.VOTING_CHAIN_ROBOT());
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-
-    assertEq(
-      payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-      IERC20(payload.ERC677_LINK()).balanceOf(payload.ROOTS_CONSUMER())
-    );
+    assertApproxEqAbs(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(), 0.2 ether);
   }
 }

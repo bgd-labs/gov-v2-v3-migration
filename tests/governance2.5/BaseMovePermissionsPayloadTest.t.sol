@@ -5,15 +5,15 @@ import {MovePermissionsTestBase} from './MovePermissionsTestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Base, AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscBase} from 'aave-address-book/MiscBase.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
-import {BaseMovePermissionsPayload} from '../src/contracts/BaseMovePermissionsPayload.sol';
+import {BaseMovePermissionsPayload} from '../../src/contracts/governance2.5/BaseMovePermissionsPayload.sol';
 
 contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('base'), 4594609);
+    vm.createSelectFork(vm.rpcUrl('base'), 5638286);
   }
 
   function testPermissionsTransfer() public {
@@ -32,7 +32,7 @@ contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3BaseAssets.USDbC_ORACLE,
       AaveV3Base.EMISSION_MANAGER,
       AaveV3Base.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_BASE
+      MiscBase.PROXY_ADMIN
     );
 
     _testV3Optional(

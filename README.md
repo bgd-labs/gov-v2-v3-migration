@@ -1,27 +1,23 @@
-## Migration Governance v2→v3
+## Migration Governance v2→v2.5→v3
 
-This repository contains payloads which are necessary for migration of all the Aave deployments from governance v2 to v3.
+This repository contains payloads which are necessary for migration of all the Aave deployments from governance v2 to v2.5 and then to v3.
+
+To migrate to Governance v2.5 the short proposal will move all the permissions to the new lvl1 executors across all the networks.
 
 Activating Aave Governance v3 requires passing both Level 1 (Short) and Level 2 (Long) proposals on Aave Governance v2, but as the execution of both should be atomic, the global procedure needs to be more sophisticated than usual.
 
 The following diagram gives an overview of how this process will be.
 ![Execution timeline](./proposal_timeline.png)
 
-## List of contracts and actions:
+## Governance V2.5
 
-- [Mediator contract](./src/contracts/Mediator.sol). In order to execute sync/atomically both Level 1 and Level 2 proposals, we have created the so-called mediator smart contract, which will receive permissions from the Level 2 executor (long), allowing for the Level 1 executor to do its own execution in sync.
-  This is mandatory, because in any situation of Level 1 passing and Level 2 not (or vice versa), the whole Aave Governance v2 & v3 systems will not be operative.
+This is an intermediate step to activate a.DI and move all the permissions to the new short executors across all the networks.
 
-- [Level 2 (Long executor) proposal, Ethereum](./src/contracts/EthLongMovePermissionsPayload.sol).
-
-  - Transfer the proxy admin permissions from the AAVE token to the ProxyAdmin Level 2 contract.
-  - Transfer the ownership of the ProxyAdmin Level 2 contract to the Mediator.
-  - Transfer the pendingAdmin role of Governance v2 Level 2 Executor to the Governance v3 Level 2 Executor.
-  - Change ownership of Governance v3 Level 2 Executor to the Mediator contract.
+### List of contracts and actions:
 
 - [Level 1 (Short executor) proposal, Ethereum](./src/contracts/EthShortMovePermissionsPayload.sol)
 
-  - **Trigger the execution of the Mediator.**
+  - Change implementation of the Governance V3 contract to V2.5.
   - Fund CCC contract on a.DI from Aave Collector.
   - Fund execution robot.
   - Migrate all “minor” permissions of stkAAVE to the Governance v3 Level 1 Executor.
@@ -35,7 +31,7 @@ The following diagram gives an overview of how this process will be.
   - Migrate permissions of Balancer v1 ABPT to the Governance v3 Level 1 Executor.
   - Transfer the ownership of the Aave Swapper contract to the Governance v3 Level 1 Executor.
   - Transfer the ownership of the Aave Collector Polygon→Ethereum bridge to the Governance v3 level 1 Executor.
-  - Migrate the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
+  - Start migrating the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
   - Change ownership of Governance v3 Level 1 Executor to the Governance v2 Payloads Controller.
 
 - [Polygon PoS](./src/contracts/PolygonMovePermissionsPayload.sol)
@@ -74,7 +70,31 @@ The following diagram gives an overview of how this process will be.
 - [Base](./src/contracts/BaseMovePermissionsPayload.sol)
   - Migrate all permissions of Aave v3 Base to the Governance v3 Level 1 Executor.
 
-### Setup
+## Governance V3
+
+Final step to migrate to Governance V3.
+
+### List of contracts and actions:
+
+- [Mediator contract](./src/contracts/Mediator.sol). In order to execute sync/atomically both Level 1 and Level 2 proposals, we have created the so-called mediator smart contract, which will receive permissions from the Level 2 executor (long), allowing for the Level 1 executor to do its own execution in sync.
+  This is mandatory, because in any situation of Level 1 passing and Level 2 not (or vice versa), the whole Aave Governance v2 & v3 systems will not be operative.
+
+- [Level 2 (Long executor) proposal, Ethereum](./src/contracts/EthLongMovePermissionsPayload.sol).
+
+  - Upgrade the implementation of the Governance V3 to the final version.
+  - Transfer the proxy admin permissions from the AAVE token to the ProxyAdmin Level 2 contract.
+  - Transfer the ownership of the ProxyAdmin Level 2 contract to the Mediator.
+  - Transfer the pendingAdmin role of Governance v2 Level 2 Executor to the Governance v3 Level 2 Executor.
+  - Change ownership of Governance v3 Level 2 Executor to the Mediator contract.
+
+- [Level 1 (Short executor) proposal, Ethereum](./src/contracts/EthShortMovePermissionsPayload.sol)
+
+  - **Trigger the execution of the Mediator.**
+  - Transfer Governance v3 proxy admin from Executor level 1 to Executor level 2.
+  - Accept the admin role of Governance v2 Level 1 Executor to the Governance v3 Level 1 Executor.
+  - Upgrade aAave implementation.
+
+## Setup
 
 ```sh
 cp .env.example .env

@@ -6,7 +6,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {ILendingPoolAddressesProvider, IAaveOracle, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
 import {IACLManager, IPoolAddressesProvider, IPool} from 'aave-address-book/AaveV3.sol';
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
-import {IWrappedTokenGateway} from './dependencies/IWrappedTokenGateway.sol';
+import {IWrappedTokenGateway} from '../dependencies/IWrappedTokenGateway.sol';
 
 /**
  * @title MigratorLib
@@ -120,12 +120,14 @@ library MigratorLib {
     // transfer native a token
     collector.transfer(nativeAToken, address(this), nativeAmount);
 
-    IERC20(nativeAToken).approve(wethGateway, nativeAmount);
+    uint256 nativeATokenBalance = IERC20(nativeAToken).balanceOf(address(this));
+
+    IERC20(nativeAToken).approve(wethGateway, nativeATokenBalance);
 
     // withdraw native
     IWrappedTokenGateway(wethGateway).withdrawETH(
-      address(this),
-      nativeAmount,
+      address(this), // unused param
+      type(uint256).max,
       crosschainController
     );
   }
@@ -142,8 +144,8 @@ library MigratorLib {
       // transfer aLINK token from the treasury to the current address
       collector.transfer(linkAToken, address(this), linkAmount);
 
-      // withdraw aLINK from the aave pool and receive LINK
-      IPool(pool).withdraw(linkToken, linkAmount, address(this));
+      // withdraw all aLINK on the executor from the aave pool and receive LINK
+      IPool(pool).withdraw(linkToken, type(uint256).max, address(this));
     } else {
       collector.transfer(linkToken, address(this), linkAmount);
     }

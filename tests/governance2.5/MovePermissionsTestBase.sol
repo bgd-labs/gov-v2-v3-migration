@@ -7,12 +7,12 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveOracle as IAaveOracleV2, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
 import {IPoolAddressesProvider, IPoolConfigurator, IACLManager, IAaveOracle as IAaveOracleV3} from 'aave-address-book/AaveV3.sol';
 import {ICollector} from 'aave-address-book/common/ICollector.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscBase} from 'aave-address-book/MiscBase.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
-import {PolygonMovePermissionsPayload} from '../src/contracts/PolygonMovePermissionsPayload.sol';
+import {PolygonMovePermissionsPayload} from '../../src/contracts/governance2.5/PolygonMovePermissionsPayload.sol';
 import {IPoolAddressProviderRegistry} from './helpers/IPoolAddressProviderRegistry.sol';
 import {IEmissionManager} from './helpers/IEmissionManager.sol';
 

@@ -4,11 +4,12 @@ pragma solidity ^0.8.0;
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {IAaveCLRobotOperator} from './dependencies/IAaveCLRobotOperator.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {MigratorLib} from './MigratorLib.sol';
+import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title ArbMovePermissionsPayload
@@ -16,6 +17,7 @@ import {MigratorLib} from './MigratorLib.sol';
  * @author BGD Labs
  **/
 contract ArbMovePermissionsPayload {
+  using SafeERC20 for IERC20;
   using SafeCast for uint256;
 
   uint256 public constant GOV_V2_ROBOT_ID =
@@ -49,7 +51,7 @@ contract ArbMovePermissionsPayload {
       AaveV3Arbitrum.EMISSION_MANAGER,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Arbitrum.COLLECTOR,
-      AaveMisc.PROXY_ADMIN_ARBITRUM,
+      MiscArbitrum.PROXY_ADMIN,
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,
@@ -59,20 +61,19 @@ contract ArbMovePermissionsPayload {
   }
 
   function migrateKeepers() internal {
+    uint256 linkBalance = IERC20(AaveV3ArbitrumAssets.LINK_UNDERLYING).balanceOf(address(this));
+
     // CANCEL PREVIOUS KEEPER
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
     // REGISTER NEW EXECUTION CHAIN KEEPER
-    IERC20(AaveV3ArbitrumAssets.LINK_UNDERLYING).approve(
-      ROBOT_OPERATOR,
-      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN
-    );
+    IERC20(AaveV3ArbitrumAssets.LINK_UNDERLYING).forceApprove(ROBOT_OPERATOR, linkBalance);
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Execution Chain Keeper',
       EXECUTION_CHAIN_ROBOT,
       5000000,
-      LINK_AMOUNT_ROBOT_EXECUTION_CHAIN.toUint96()
+      linkBalance.toUint96()
     );
 
     // TRANSFER PERMISSION OF ROBOT OPERATOR
