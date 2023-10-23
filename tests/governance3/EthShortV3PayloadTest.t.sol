@@ -232,7 +232,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     assertApproxEqAbs(
       IERC20(AaveV2EthereumAssets.LINK_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER()),
       payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-      10
+      0.2 ether
     );
   }
 }

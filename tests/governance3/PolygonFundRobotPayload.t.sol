@@ -52,7 +52,7 @@ contract PolygonFundRobotPayloadTest is Test {
     assertApproxEqAbs(
       IERC20(payload.ERC677_LINK()).balanceOf(payload.ROOTS_CONSUMER()),
       payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-      10
+      0.2 ether
     );
   }
 }

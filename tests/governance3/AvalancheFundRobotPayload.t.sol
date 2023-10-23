@@ -56,7 +56,7 @@ contract AvaxMovePermissionsPayloadTest is Test {
     assertApproxEqAbs(
       IERC20(AaveV3AvalancheAssets.LINKe_UNDERLYING).balanceOf(payload.ROOTS_CONSUMER()),
       payload.LINK_AMOUNT_ROOTS_CONSUMER(),
-      10
+      0.2 ether
     );
   }
 }

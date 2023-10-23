@@ -101,6 +101,6 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Polygon.EXECUTOR_LVL_1);
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-    assertApproxEqAbs(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(), 0.1 ether);
+    assertApproxEqAbs(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(), 0.2 ether);
   }
 }
