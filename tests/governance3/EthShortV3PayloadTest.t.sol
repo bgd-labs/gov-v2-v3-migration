@@ -12,6 +12,7 @@ import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/Aave
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
+import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
 import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
@@ -52,6 +53,15 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     GovHelpers.executePayload(vm, address(shortPayload), AaveGovernanceV2.SHORT_EXECUTOR);
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG);
+
+    assertEq(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
+      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+    );
+
+    vm.stopPrank();
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 

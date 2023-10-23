@@ -26,8 +26,8 @@ import {MigratorLib} from './MigratorLib.sol';
 
 /**
  * @title EthShortMovePermissionsPayload
- * @notice Migrate permissions for Aave V1, V2 and V3 pools on Ethereum from governance v2 to v3.
- * Migrate GHO permissions to the new governance, fund cross chain controller.
+ * @notice Migrate permissions for Aave V1, V2, V2 AMM and V3 pools on Ethereum from governance v2 to v2.5.
+ * Migrate GHO permissions to the new executors, fund cross chain controller and fund execution robot.
  * @author BGD Labs
  **/
 contract EthShortMovePermissionsPayload {
@@ -69,11 +69,6 @@ contract EthShortMovePermissionsPayload {
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
       GOVERNANCE_25_IMPL,
       abi.encodeWithSignature('initialize()')
-    );
-
-    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
     );
 
     // GET LINK TOKENS FROM COLLECTOR
