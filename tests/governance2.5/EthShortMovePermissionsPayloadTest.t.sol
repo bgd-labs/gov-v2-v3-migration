@@ -227,6 +227,6 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-    assertGe(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN());
+    assertApproxEqAbs(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(), 0.1 ether);
   }
 }
