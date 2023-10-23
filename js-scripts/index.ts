@@ -24,7 +24,9 @@ import TestV3PayloadAvalanche from '../out/PoolPayload.sol/TestV3PayloadAvalanch
 import TestV3PayloadArbitrum from '../out/PoolPayload.sol/TestV3PayloadArbitrum.json';
 import TestV3PayloadOptimism from '../out/PoolPayload.sol/TestV3PayloadOptimism.json';
 import TestV3PayloadBase from '../out/PoolPayload.sol/TestV3PayloadBase.json';
+import TestV2_5PayloadEthereum from '../out/PoolPayload.sol/TestV2_5PayloadEthereum.json';
 import {createAndExecuteGovernanceV3Payload} from './payloadsV3';
+import {deployContract} from './helpers';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
@@ -115,10 +117,27 @@ const deployPayloadsEthereum = async () => {
   );
 
   // deploy payload 2.5
+  const payload_2_5 = await deployContract(
+    walletClient,
+    publicClient,
+    DEPLOYER,
+    TestV2_5PayloadEthereum
+  );
 
   // create proposal 2.5
+  const shortProposal2_5Id = await createV2Proposal(
+    walletClient,
+    publicClient,
+    [payload_2_5],
+    AaveGovernanceV2.SHORT_EXECUTOR
+  );
 
   // execute proposal 2.5
+  const block2_5 = await publicClient.getBlock();
+  await executeV2Proposal(shortProposal2_5Id, walletClient, publicClient, fork, {
+    number: block2_5.number,
+    timestamp: block2_5.timestamp,
+  });
 
   // const proposalId = await generateProposalAndExecutePayload(
   //   walletClient,
