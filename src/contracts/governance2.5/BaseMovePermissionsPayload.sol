@@ -5,7 +5,7 @@ import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title BaseMovePermissionsPayload

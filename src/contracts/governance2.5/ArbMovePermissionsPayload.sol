@@ -9,7 +9,7 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title ArbMovePermissionsPayload

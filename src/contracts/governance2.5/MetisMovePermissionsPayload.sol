@@ -5,7 +5,7 @@ import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title MetisMovePermissionsPayload

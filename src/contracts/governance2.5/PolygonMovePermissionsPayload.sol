@@ -11,7 +11,7 @@ import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {IPegSwap} from '../dependencies/IPegSwap.sol';
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title AvaxMovePermissionsPayload

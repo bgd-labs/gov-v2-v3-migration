@@ -22,7 +22,7 @@ import {IBalancerOwnable} from '../dependencies/IBalancerOwnable.sol';
 import {ILendingPoolAddressProviderV1} from '../dependencies/ILendingPoolAddressProviderV1.sol';
 import {IGhoAccessControl} from '../dependencies/IGhoAccessControl.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
-import {MigratorLib} from './MigratorLib.sol';
+import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 /**
  * @title EthShortMovePermissionsPayload
