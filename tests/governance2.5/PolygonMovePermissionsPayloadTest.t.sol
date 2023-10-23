@@ -25,7 +25,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 48047688);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 49056415);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 

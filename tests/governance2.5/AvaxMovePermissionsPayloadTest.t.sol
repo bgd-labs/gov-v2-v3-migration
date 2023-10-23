@@ -27,7 +27,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 35767232);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 36818286);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 

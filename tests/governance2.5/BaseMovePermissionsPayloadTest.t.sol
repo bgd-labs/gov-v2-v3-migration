@@ -13,7 +13,7 @@ import {BaseMovePermissionsPayload} from '../../src/contracts/governance2.5/Base
 
 contract BaseMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('base'), 4594609);
+    vm.createSelectFork(vm.rpcUrl('base'), 5638286);
   }
 
   function testPermissionsTransfer() public {

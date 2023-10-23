@@ -13,7 +13,7 @@ import {MetisMovePermissionsPayload} from '../../src/contracts/governance2.5/Met
 
 contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('metis'), 8140311);
+    vm.createSelectFork(vm.rpcUrl('metis'), 9043148);
   }
 
   function testPermissionsTransfer() public {
