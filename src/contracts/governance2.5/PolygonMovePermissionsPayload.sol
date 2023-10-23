@@ -97,7 +97,7 @@ contract PolygonMovePermissionsPayload {
       AaveV3Polygon.EMISSION_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Polygon.COLLECTOR,
-      MiscPolygon.PROXY_ADMIN_POLYGON,
+      MiscPolygon.PROXY_ADMIN,
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,

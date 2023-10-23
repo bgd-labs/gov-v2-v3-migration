@@ -22,7 +22,7 @@ contract BaseMovePermissionsPayload {
       AaveV3Base.EMISSION_MANAGER,
       AaveV3Base.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Base.COLLECTOR,
-      MiscBase.PROXY_ADMIN_BASE,
+      MiscBase.PROXY_ADMIN,
       AaveV3Base.WETH_GATEWAY,
       address(0), // swap collateral adapter not deployed yet
       address(0), // repay with collateral adapter not deployed yet

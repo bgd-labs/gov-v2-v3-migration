@@ -71,21 +71,21 @@ contract Mediator is IMediator {
     // UPDATE TOKENS
 
     // update Aave token impl
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN_LONG).upgradeAndCall(
       ITransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)),
       address(AAVE_IMPL),
       abi.encodeWithSignature('initialize()')
     );
 
     // upgrade stk aave
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN_LONG).upgradeAndCall(
       ITransparentUpgradeableProxy(payable(AaveSafetyModule.STK_AAVE)),
       address(STK_AAVE_IMPL),
       abi.encodeWithSignature('initialize()')
     );
 
     // PROXY ADMIN
-    IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+    IOwnable(MiscEthereum.PROXY_ADMIN_LONG).transferOwnership(
       address(GovernanceV3Ethereum.EXECUTOR_LVL_2)
     );
 
@@ -119,7 +119,7 @@ contract Mediator is IMediator {
     }
 
     // proxy admin
-    IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(
+    IOwnable(MiscEthereum.PROXY_ADMIN_LONG).transferOwnership(
       address(AaveGovernanceV2.LONG_EXECUTOR)
     );
 

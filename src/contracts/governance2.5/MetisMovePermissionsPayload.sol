@@ -22,7 +22,7 @@ contract MetisMovePermissionsPayload {
       AaveV3Metis.EMISSION_MANAGER,
       AaveV3Metis.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Metis.COLLECTOR,
-      MiscMetis.PROXY_ADMIN_METIS,
+      MiscMetis.PROXY_ADMIN,
       address(0), // no need of wEthGateway because Metis token is ERC20 as well
       address(0), // swap collateral adapter not deployed yet
       address(0), // repay with collateral adapter not deployed yet

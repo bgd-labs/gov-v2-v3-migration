@@ -39,7 +39,7 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3ArbitrumAssets.DAI_ORACLE,
       AaveV3Arbitrum.EMISSION_MANAGER,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      MiscArbitrum.PROXY_ADMIN_ARBITRUM
+      MiscArbitrum.PROXY_ADMIN
     );
 
     _testV3Optional(

@@ -65,15 +65,15 @@ contract EthShortMovePermissionsPayload {
 
   function execute() external {
     // GOVERNANCE V3
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM).upgradeAndCall(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgradeAndCall(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
       GOVERNANCE_25_IMPL,
       abi.encodeWithSignature('initialize()')
     );
 
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     // GET LINK TOKENS FROM COLLECTOR
@@ -143,7 +143,7 @@ contract EthShortMovePermissionsPayload {
       AaveV3Ethereum.EMISSION_MANAGER,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Ethereum.COLLECTOR,
-      MiscEthereum.PROXY_ADMIN_ETHEREUM,
+      MiscEthereum.PROXY_ADMIN,
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
@@ -157,17 +157,13 @@ contract EthShortMovePermissionsPayload {
     IOwnable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // LendToAave Migrator
-    ITransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(
-      MiscEthereum.PROXY_ADMIN_ETHEREUM
-    );
+    ITransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(MiscEthereum.PROXY_ADMIN);
 
     // Safety module
-    ITransparentUpgradeableProxy(ABPT).changeAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM);
-    IBalancerOwnable(ABPT).setController(MiscEthereum.PROXY_ADMIN_ETHEREUM);
+    ITransparentUpgradeableProxy(ABPT).changeAdmin(MiscEthereum.PROXY_ADMIN);
+    IBalancerOwnable(ABPT).setController(MiscEthereum.PROXY_ADMIN);
 
-    IOwnable(MiscEthereum.AAVE_SWAPPER_ETHEREUM).transferOwnership(
-      GovernanceV3Ethereum.EXECUTOR_LVL_1
-    );
+    IOwnable(MiscEthereum.AAVE_SWAPPER).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
     IOwnable(MiscEthereum.AAVE_POL_ETH_BRIDGE).transferOwnership(
       GovernanceV3Ethereum.EXECUTOR_LVL_1
     );

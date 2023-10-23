@@ -86,7 +86,7 @@ contract AvaxMovePermissionsPayload {
       AaveV3Avalanche.EMISSION_MANAGER,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Avalanche.COLLECTOR,
-      MiscAvalanche.PROXY_ADMIN_AVALANCHE,
+      MiscAvalanche.PROXY_ADMIN,
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,

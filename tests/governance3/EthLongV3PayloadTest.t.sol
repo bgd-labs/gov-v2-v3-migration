@@ -31,7 +31,7 @@ contract EthLongV3PayloadTest is ProtocolV3TestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.LONG_EXECUTOR);
 
-    assertEq(IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).owner(), address(mediator));
+    assertEq(IOwnable(MiscEthereum.PROXY_ADMIN_LONG).owner(), address(mediator));
 
     assertEq(
       IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getPendingAdmin(),

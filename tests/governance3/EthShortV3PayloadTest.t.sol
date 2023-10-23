@@ -119,10 +119,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   }
 
   function _testLongPermissions(address mediator) internal {
-    assertEq(
-      IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).owner(),
-      GovernanceV3Ethereum.EXECUTOR_LVL_2
-    );
+    assertEq(IOwnable(MiscEthereum.PROXY_ADMIN_LONG).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_2);
 
     assertEq(
       IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getAdmin(),

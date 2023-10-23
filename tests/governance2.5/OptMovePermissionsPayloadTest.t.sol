@@ -39,7 +39,7 @@ contract OptMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3OptimismAssets.DAI_ORACLE,
       AaveV3Optimism.EMISSION_MANAGER,
       AaveV3Optimism.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      MiscOptimism.PROXY_ADMIN_OPTIMISM
+      MiscOptimism.PROXY_ADMIN
     );
 
     _testV3Optional(

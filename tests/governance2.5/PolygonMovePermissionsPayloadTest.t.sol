@@ -57,7 +57,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3PolygonAssets.DAI_ORACLE,
       AaveV3Polygon.EMISSION_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      MiscPolygon.PROXY_ADMIN_POLYGON
+      MiscPolygon.PROXY_ADMIN
     );
 
     _testV3Optional(

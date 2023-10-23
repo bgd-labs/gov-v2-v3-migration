@@ -59,7 +59,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3AvalancheAssets.DAIe_ORACLE,
       AaveV3Avalanche.EMISSION_MANAGER,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      MiscAvalanche.PROXY_ADMIN_AVALANCHE
+      MiscAvalanche.PROXY_ADMIN
     );
 
     _testV3Optional(

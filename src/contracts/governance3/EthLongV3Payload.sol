@@ -29,7 +29,7 @@ contract EthLongV3Payload {
 
   function execute() external {
     // GOVERNANCE V3
-    // IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+    // IProxyAdmin(MiscEthereum.PROXY_ADMIN_LONG).upgradeAndCall(
     //   ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
     //   GOVERNANCE_3_IMPL,
     //   abi.encodeWithSignature('initialize()')
@@ -37,11 +37,11 @@ contract EthLongV3Payload {
 
     // move aave token proxy admin owner from Long Executor to ProxyAdminLong
     ITransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)).changeAdmin(
-      MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     // proxy admin
-    IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(address(MEDIATOR));
+    IOwnable(MiscEthereum.PROXY_ADMIN_LONG).transferOwnership(address(MEDIATOR));
 
     // set the new executor as the pending admin
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_2));

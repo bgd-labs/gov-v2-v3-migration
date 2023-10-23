@@ -53,7 +53,7 @@ contract OptMovePermissionsPayload {
       AaveV3Optimism.EMISSION_MANAGER,
       AaveV3Optimism.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Optimism.COLLECTOR,
-      MiscOptimism.PROXY_ADMIN_OPTIMISM,
+      MiscOptimism.PROXY_ADMIN,
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
       AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,

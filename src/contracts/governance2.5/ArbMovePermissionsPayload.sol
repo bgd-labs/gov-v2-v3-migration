@@ -51,7 +51,7 @@ contract ArbMovePermissionsPayload {
       AaveV3Arbitrum.EMISSION_MANAGER,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Arbitrum.COLLECTOR,
-      MiscArbitrum.PROXY_ADMIN_ARBITRUM,
+      MiscArbitrum.PROXY_ADMIN,
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,

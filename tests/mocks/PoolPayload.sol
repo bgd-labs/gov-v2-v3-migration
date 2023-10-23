@@ -13,8 +13,10 @@ import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbi
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Base, AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
 import {AaveV3Metis, AaveV3MetisAssets} from 'aave-address-book/AaveV3Metis.sol';
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {IGovernance_V2_5, PayloadsControllerUtils} from 'aave-governance-v3/contracts/governance_2_5/Governance_V2_5.sol';
-import {AaveV3PayloadEthereum, IEngine, EngineFlags, AaveV3EthereumAssets} from 'aave-helpers/v3-config-engine/AaveV3PayloadEthereum.sol';
+import {AaveV3PayloadEthereum, IEngine, EngineFlags} from 'aave-helpers/v3-config-engine/AaveV3PayloadEthereum.sol';
 import {AaveV3PayloadPolygon} from 'aave-helpers/v3-config-engine/AaveV3PayloadPolygon.sol';
 import {AaveV3PayloadAvalanche} from 'aave-helpers/v3-config-engine/AaveV3PayloadAvalanche.sol';
 import {AaveV3PayloadArbitrum} from 'aave-helpers/v3-config-engine/AaveV3PayloadArbitrum.sol';
@@ -56,10 +58,10 @@ contract TestV2_5PayloadEthereum is AaveV3PayloadEthereum {
     PayloadsControllerUtils.Payload memory payload = PayloadsControllerUtils.Payload({
       chain: 1,
       accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
-      payloadsController: GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+      payloadsController: address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
       payloadId: 0
     });
-    IGovernance_V2_5(GovernanceV3Ethereum.GOVERNANCE).forwardPayloadForExecution(payload);
+    IGovernance_V2_5(address(GovernanceV3Ethereum.GOVERNANCE)).forwardPayloadForExecution(payload);
   }
 }
 
