@@ -1,6 +1,7 @@
 aave-address-book/=lib/aave-address-book/src/
 aave-collector-unification/=lib/aave-v3-factory/lib/aave-collector-unification/
 aave-governance-v3/=lib/aave-governance-v3/src/
+aave-delivery-infrastructure/=lib/aave-governance-v3/lib/aave-delivery-infrastructure/src/
 aave-helpers/=lib/aave-helpers/src/
 aave-v3-core/=lib/aave-address-book/lib/aave-v3-core/
 aave-v3-factory/=lib/aave-v3-factory/

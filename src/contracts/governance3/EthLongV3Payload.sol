@@ -5,7 +5,7 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {ITransparentUpgradeableProxy} from '../dependencies/ITransparentUpgradeableProxy.sol';
 import {IProxyAdmin} from '../dependencies/IProxyAdmin.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
@@ -29,7 +29,7 @@ contract EthLongV3Payload {
 
   function execute() external {
     // GOVERNANCE V3
-    // IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).upgradeAndCall(
+    // IProxyAdmin(MiscEthereum.PROXY_ADMIN_LONG).upgradeAndCall(
     //   ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
     //   GOVERNANCE_3_IMPL,
     //   abi.encodeWithSignature('initialize()')
@@ -37,11 +37,11 @@ contract EthLongV3Payload {
 
     // move aave token proxy admin owner from Long Executor to ProxyAdminLong
     ITransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)).changeAdmin(
-      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     // proxy admin
-    IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).transferOwnership(address(MEDIATOR));
+    IOwnable(MiscEthereum.PROXY_ADMIN_LONG).transferOwnership(address(MEDIATOR));
 
     // set the new executor as the pending admin
     IExecutorV2(address(this)).setPendingAdmin(address(GovernanceV3Ethereum.EXECUTOR_LVL_2));

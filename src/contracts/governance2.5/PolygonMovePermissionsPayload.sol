@@ -6,7 +6,7 @@ import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
@@ -97,7 +97,7 @@ contract PolygonMovePermissionsPayload {
       AaveV3Polygon.EMISSION_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Polygon.COLLECTOR,
-      AaveMisc.PROXY_ADMIN_POLYGON,
+      MiscPolygon.PROXY_ADMIN,
       AaveV3Polygon.WETH_GATEWAY,
       AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
       AaveV3Polygon.REPAY_WITH_COLLATERAL_ADAPTER,

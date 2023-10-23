@@ -79,3 +79,18 @@ export const executeV2Proposals = async (
     shortProposalObject
   );
 };
+
+export const executeV2Proposal = async (
+  proposalId: bigint,
+  walletClient: WalletClient,
+  publicClient: PublicClient,
+  fork: any,
+  latestBlock: {number: bigint; timestamp: bigint}
+) => {
+  const proposalObject = await simulateOnTenderly(publicClient, walletClient, proposalId, {
+    ...latestBlock,
+    number: latestBlock.number + 1n,
+  });
+
+  const proposalHash = await tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, proposalObject);
+};

@@ -10,7 +10,7 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
@@ -54,11 +54,11 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
-    vm.startPrank(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG);
+    vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
 
     assertEq(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
-      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     vm.stopPrank();
@@ -129,10 +129,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   }
 
   function _testLongPermissions(address mediator) internal {
-    assertEq(
-      IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
-      GovernanceV3Ethereum.EXECUTOR_LVL_2
-    );
+    assertEq(IOwnable(MiscEthereum.PROXY_ADMIN_LONG).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_2);
 
     assertEq(
       IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getAdmin(),
@@ -204,7 +201,11 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   function _testRobot() internal {
     uint256 govChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce + 1))
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
       )
     );
     uint256 votingChainKeeperId = uint256(

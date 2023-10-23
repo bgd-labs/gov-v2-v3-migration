@@ -9,7 +9,7 @@ import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethe
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {ITransparentUpgradeableProxy} from '../dependencies/ITransparentUpgradeableProxy.sol';
 import {IProxyAdmin} from '../dependencies/IProxyAdmin.sol';
 import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
@@ -57,9 +57,9 @@ contract EthShortV3Payload {
     // LONG ADMIN PERMISSIONS
     IMediator(MEDIATOR).execute();
 
-    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     upgradeAAave();

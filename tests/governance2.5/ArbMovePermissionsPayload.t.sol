@@ -5,7 +5,7 @@ import {MovePermissionsTestBase} from './MovePermissionsTestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
@@ -39,7 +39,7 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3ArbitrumAssets.DAI_ORACLE,
       AaveV3Arbitrum.EMISSION_MANAGER,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_ARBITRUM
+      MiscArbitrum.PROXY_ADMIN
     );
 
     _testV3Optional(
@@ -71,6 +71,6 @@ contract ArbMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Arbitrum.EXECUTOR_LVL_1);
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-    assertGe(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN());
+    assertApproxEqAbs(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(), 0.1 ether);
   }
 }

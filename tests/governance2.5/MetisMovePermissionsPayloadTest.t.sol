@@ -5,7 +5,7 @@ import {MovePermissionsTestBase} from './MovePermissionsTestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Metis, AaveV3MetisAssets} from 'aave-address-book/AaveV3Metis.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
@@ -32,7 +32,7 @@ contract MetisMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3MetisAssets.mDAI_ORACLE,
       AaveV3Metis.EMISSION_MANAGER,
       AaveV3Metis.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_METIS
+      MiscMetis.PROXY_ADMIN
     );
 
     vm.stopPrank();
