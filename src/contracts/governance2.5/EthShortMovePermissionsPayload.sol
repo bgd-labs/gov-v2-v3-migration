@@ -10,7 +10,7 @@ import {IProxyAdmin} from '../dependencies/IProxyAdmin.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
@@ -65,15 +65,15 @@ contract EthShortMovePermissionsPayload {
 
   function execute() external {
     // GOVERNANCE V3
-    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).upgradeAndCall(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM).upgradeAndCall(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
       GOVERNANCE_25_IMPL,
       abi.encodeWithSignature('initialize()')
     );
 
-    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG
     );
 
     // GET LINK TOKENS FROM COLLECTOR
@@ -143,7 +143,7 @@ contract EthShortMovePermissionsPayload {
       AaveV3Ethereum.EMISSION_MANAGER,
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Ethereum.COLLECTOR,
-      AaveMisc.PROXY_ADMIN_ETHEREUM,
+      MiscEthereum.PROXY_ADMIN_ETHEREUM,
       AaveV3Ethereum.WETH_GATEWAY,
       AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Ethereum.REPAY_WITH_COLLATERAL_ADAPTER,
@@ -157,14 +157,20 @@ contract EthShortMovePermissionsPayload {
     IOwnable(AAVE_MERKLE_DISTRIBUTOR).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     // LendToAave Migrator
-    ITransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
+    ITransparentUpgradeableProxy(LEND_TO_AAVE_MIGRATOR).changeAdmin(
+      MiscEthereum.PROXY_ADMIN_ETHEREUM
+    );
 
     // Safety module
-    ITransparentUpgradeableProxy(ABPT).changeAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM);
-    IBalancerOwnable(ABPT).setController(AaveMisc.PROXY_ADMIN_ETHEREUM);
+    ITransparentUpgradeableProxy(ABPT).changeAdmin(MiscEthereum.PROXY_ADMIN_ETHEREUM);
+    IBalancerOwnable(ABPT).setController(MiscEthereum.PROXY_ADMIN_ETHEREUM);
 
-    IOwnable(AaveMisc.AAVE_SWAPPER_ETHEREUM).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    IOwnable(AaveMisc.AAVE_POL_ETH_BRIDGE).transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    IOwnable(MiscEthereum.AAVE_SWAPPER_ETHEREUM).transferOwnership(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
+    IOwnable(MiscEthereum.AAVE_POL_ETH_BRIDGE).transferOwnership(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
 
     // EXECUTOR PERMISSIONS
     // admin will be accepted on the v3 activation

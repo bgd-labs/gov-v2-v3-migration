@@ -8,7 +8,7 @@ import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IO
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
 import {Mediator} from '../../src/contracts/governance3/Mediator.sol';
 import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/EthShortMovePermissionsPayload.sol';
@@ -31,7 +31,7 @@ contract EthLongV3PayloadTest is ProtocolV3TestBase {
 
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.LONG_EXECUTOR);
 
-    assertEq(IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(), address(mediator));
+    assertEq(IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).owner(), address(mediator));
 
     assertEq(
       IExecutorV2(AaveGovernanceV2.LONG_EXECUTOR).getPendingAdmin(),

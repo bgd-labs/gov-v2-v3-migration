@@ -9,7 +9,7 @@ import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 /**
@@ -86,7 +86,7 @@ contract AvaxMovePermissionsPayload {
       AaveV3Avalanche.EMISSION_MANAGER,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Avalanche.COLLECTOR,
-      AaveMisc.PROXY_ADMIN_AVALANCHE,
+      MiscAvalanche.PROXY_ADMIN_AVALANCHE,
       AaveV3Avalanche.WETH_GATEWAY,
       AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
       AaveV3Avalanche.REPAY_WITH_COLLATERAL_ADAPTER,

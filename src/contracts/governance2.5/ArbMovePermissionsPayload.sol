@@ -8,7 +8,7 @@ import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
 import {MigratorLib} from './MigratorLib.sol';
 
 /**
@@ -51,7 +51,7 @@ contract ArbMovePermissionsPayload {
       AaveV3Arbitrum.EMISSION_MANAGER,
       AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Arbitrum.COLLECTOR,
-      AaveMisc.PROXY_ADMIN_ARBITRUM,
+      MiscArbitrum.PROXY_ADMIN_ARBITRUM,
       AaveV3Arbitrum.WETH_GATEWAY,
       AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER,
       AaveV3Arbitrum.REPAY_WITH_COLLATERAL_ADAPTER,

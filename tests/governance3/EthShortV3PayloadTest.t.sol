@@ -10,7 +10,7 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM, AaveV2EthereumAMMAssets} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
 import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
@@ -120,7 +120,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
 
   function _testLongPermissions(address mediator) internal {
     assertEq(
-      IOwnable(AaveMisc.PROXY_ADMIN_ETHEREUM_LONG).owner(),
+      IOwnable(MiscEthereum.PROXY_ADMIN_ETHEREUM_LONG).owner(),
       GovernanceV3Ethereum.EXECUTOR_LVL_2
     );
 

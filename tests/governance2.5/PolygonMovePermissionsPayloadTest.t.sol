@@ -6,7 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
@@ -57,7 +57,7 @@ contract PolygonMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3PolygonAssets.DAI_ORACLE,
       AaveV3Polygon.EMISSION_MANAGER,
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_POLYGON
+      MiscPolygon.PROXY_ADMIN_POLYGON
     );
 
     _testV3Optional(

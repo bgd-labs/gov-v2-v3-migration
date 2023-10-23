@@ -106,21 +106,21 @@ const deployPayloadsEthereum = async () => {
     timestamp: timeToWarpTo,
   });
 
-  // const payloadId = await deployAndRegisterTestPayloads(
-  //   walletClient,
-  //   publicClient,
-  //   DEPLOYER,
-  //   GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-  //   [TestV2PayloadEthereum, TestV3PayloadEthereum]
-  // );
-  // const proposalId = await generateProposalAndExecutePayload(
-  //   walletClient,
-  //   publicClient,
-  //   fork,
-  //   AaveMisc.ECOSYSTEM_RESERVE,
-  //   payloadId,
-  //   mainnet
-  // );
+  const payloadId = await deployAndRegisterTestPayloads(
+    walletClient,
+    publicClient,
+    DEPLOYER,
+    GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
+    [TestV2PayloadEthereum, TestV3PayloadEthereum]
+  );
+  const proposalId = await generateProposalAndExecutePayload(
+    walletClient,
+    publicClient,
+    fork,
+    AaveMisc.ECOSYSTEM_RESERVE,
+    payloadId,
+    mainnet
+  );
   // console.log('proposalId: ', proposalId);
 };
 
