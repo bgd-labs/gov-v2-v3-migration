@@ -120,12 +120,14 @@ library MigratorLib {
     // transfer native a token
     collector.transfer(nativeAToken, address(this), nativeAmount);
 
-    IERC20(nativeAToken).approve(wethGateway, nativeAmount);
+    uint256 nativeATokenBalance = IERC20(nativeAToken).balanceOf(address(this));
+
+    IERC20(nativeAToken).approve(wethGateway, nativeATokenBalance);
 
     // withdraw native
     IWrappedTokenGateway(wethGateway).withdrawETH(
-      address(this),
-      nativeAmount,
+      address(this), // unused param
+      type(uint256).max,
       crosschainController
     );
   }
