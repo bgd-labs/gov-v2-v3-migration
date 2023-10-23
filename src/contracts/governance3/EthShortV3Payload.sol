@@ -9,7 +9,7 @@ import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethe
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {ITransparentUpgradeableProxy} from '../dependencies/ITransparentUpgradeableProxy.sol';
 import {IProxyAdmin} from '../dependencies/IProxyAdmin.sol';
 import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
@@ -38,9 +38,7 @@ contract EthShortV3Payload {
   uint256 public constant LINK_AMOUNT_ROOTS_CONSUMER = 100 ether;
 
   uint256 public constant TOTAL_LINK_AMOUNT =
-      LINK_AMOUNT_ROBOT_GOV_CHAIN +
-      LINK_AMOUNT_ROBOT_VOTING_CHAIN +
-      LINK_AMOUNT_ROOTS_CONSUMER;
+    LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROOTS_CONSUMER;
 
   uint256 public constant GOV_V2_ROBOT_ID =
     38708010855340815800266444206792387479170521527111639306025178205742164078384;
@@ -59,9 +57,9 @@ contract EthShortV3Payload {
     // LONG ADMIN PERMISSIONS
     IMediator(MEDIATOR).execute();
 
-    IProxyAdmin(AaveMisc.PROXY_ADMIN_ETHEREUM).changeProxyAdmin(
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      AaveMisc.PROXY_ADMIN_ETHEREUM_LONG
+      MiscEthereum.PROXY_ADMIN_LONG
     );
 
     upgradeAAave();
@@ -98,8 +96,7 @@ contract EthShortV3Payload {
     // REGISTER NEW KEEPER (GOV CHAIN, VOTING CHAIN)
     IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).approve(
       ROBOT_OPERATOR,
-      LINK_AMOUNT_ROBOT_GOV_CHAIN +
-        LINK_AMOUNT_ROBOT_VOTING_CHAIN
+      LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN
     );
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(

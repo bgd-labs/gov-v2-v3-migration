@@ -6,7 +6,7 @@ import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Avalanche, AaveV2AvalancheAssets} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {AvaxMovePermissionsPayload} from '../../src/contracts/governance2.5/AvaxMovePermissionsPayload.sol';
@@ -59,7 +59,7 @@ contract AvaxMovePermissionsPayloadTest is MovePermissionsTestBase {
       AaveV3AvalancheAssets.DAIe_ORACLE,
       AaveV3Avalanche.EMISSION_MANAGER,
       AaveV3Avalanche.POOL_ADDRESSES_PROVIDER_REGISTRY,
-      AaveMisc.PROXY_ADMIN_AVALANCHE
+      MiscAvalanche.PROXY_ADMIN
     );
 
     _testV3Optional(

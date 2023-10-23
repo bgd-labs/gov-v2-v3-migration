@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
@@ -53,7 +53,7 @@ contract OptMovePermissionsPayload {
       AaveV3Optimism.EMISSION_MANAGER,
       AaveV3Optimism.POOL_ADDRESSES_PROVIDER_REGISTRY,
       AaveV3Optimism.COLLECTOR,
-      AaveMisc.PROXY_ADMIN_OPTIMISM,
+      MiscOptimism.PROXY_ADMIN,
       AaveV3Optimism.WETH_GATEWAY,
       AaveV3Optimism.SWAP_COLLATERAL_ADAPTER,
       AaveV3Optimism.REPAY_WITH_COLLATERAL_ADAPTER,

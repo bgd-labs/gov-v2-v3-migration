@@ -13,15 +13,16 @@ import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbi
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Base, AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
 import {AaveV3Metis, AaveV3MetisAssets} from 'aave-address-book/AaveV3Metis.sol';
-
-import {AaveV3PayloadEthereum, IEngine, EngineFlags, AaveV3EthereumAssets} from 'aave-helpers/v3-config-engine/AaveV3PayloadEthereum.sol';
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {IGovernance_V2_5, PayloadsControllerUtils} from 'aave-governance-v3/contracts/governance_2_5/Governance_V2_5.sol';
+import {AaveV3PayloadEthereum, IEngine, EngineFlags} from 'aave-helpers/v3-config-engine/AaveV3PayloadEthereum.sol';
 import {AaveV3PayloadPolygon} from 'aave-helpers/v3-config-engine/AaveV3PayloadPolygon.sol';
 import {AaveV3PayloadAvalanche} from 'aave-helpers/v3-config-engine/AaveV3PayloadAvalanche.sol';
 import {AaveV3PayloadArbitrum} from 'aave-helpers/v3-config-engine/AaveV3PayloadArbitrum.sol';
 import {AaveV3PayloadOptimism} from 'aave-helpers/v3-config-engine/AaveV3PayloadOptimism.sol';
 import {AaveV3PayloadBase} from 'aave-helpers/v3-config-engine/AaveV3PayloadBase.sol';
 import {AaveV3PayloadMetis} from 'aave-helpers/v3-config-engine/AaveV3PayloadMetis.sol';
-import {AaveV3PayloadBasenet} from 'aave-helpers/v3-config-engine/AaveV3PayloadBasenet.sol';
 
 contract TestV3PayloadEthereum is AaveV3PayloadEthereum {
   function capsUpdates() public pure override returns (IEngine.CapsUpdate[] memory) {
@@ -49,6 +50,18 @@ contract TestV2PayloadEthereum is AaveV2PayloadEthereum {
       CRV_LIQUIDATION_THRESHOLD,
       CRV_LIQUIDATION_BONUS
     );
+  }
+}
+
+contract TestV2_5PayloadEthereum is AaveV3PayloadEthereum {
+  function _postExecute() internal override {
+    PayloadsControllerUtils.Payload memory payload = PayloadsControllerUtils.Payload({
+      chain: 1,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
+      payloadId: 0
+    });
+    IGovernance_V2_5(address(GovernanceV3Ethereum.GOVERNANCE)).forwardPayloadForExecution(payload);
   }
 }
 
@@ -130,7 +143,7 @@ contract TestV3PayloadOptimism is AaveV3PayloadOptimism {
   }
 }
 
-contract TestV3PayloadBase is AaveV3PayloadBasenet {
+contract TestV3PayloadBase is AaveV3PayloadBase {
   function capsUpdates() public pure override returns (IEngine.CapsUpdate[] memory) {
     IEngine.CapsUpdate[] memory capsUpdate = new IEngine.CapsUpdate[](1);
 
