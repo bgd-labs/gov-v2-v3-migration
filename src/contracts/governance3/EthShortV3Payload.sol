@@ -38,9 +38,7 @@ contract EthShortV3Payload {
   uint256 public constant LINK_AMOUNT_ROOTS_CONSUMER = 100 ether;
 
   uint256 public constant TOTAL_LINK_AMOUNT =
-      LINK_AMOUNT_ROBOT_GOV_CHAIN +
-      LINK_AMOUNT_ROBOT_VOTING_CHAIN +
-      LINK_AMOUNT_ROOTS_CONSUMER;
+    LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROOTS_CONSUMER;
 
   uint256 public constant GOV_V2_ROBOT_ID =
     38708010855340815800266444206792387479170521527111639306025178205742164078384;
@@ -82,13 +80,6 @@ contract EthShortV3Payload {
     // EXECUTOR PERMISSIONS
     // new executor - call execute payload to accept new permissions
     IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
-    // IExecutorV3(GovernanceV3Ethereum.EXECUTOR_LVL_1).executeTransaction(
-    //   address(this),
-    //   0,
-    //   'acceptAdmin()',
-    //   bytes(''),
-    //   false
-    // );
   }
 
   function migrateKeepers() internal {
@@ -98,8 +89,7 @@ contract EthShortV3Payload {
     // REGISTER NEW KEEPER (GOV CHAIN, VOTING CHAIN)
     IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).approve(
       ROBOT_OPERATOR,
-      LINK_AMOUNT_ROBOT_GOV_CHAIN +
-        LINK_AMOUNT_ROBOT_VOTING_CHAIN
+      LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN
     );
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
