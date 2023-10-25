@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
-import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
+import {OwnableWithGuardian, IWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
@@ -16,7 +16,8 @@ import {MiscBase} from 'aave-address-book/MiscBase.sol';
 import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
 import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
-import {GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, GovernanceV3Arbitrum, GovernanceV3Optimism, GovernanceV3Base, GovernanceV3Metis, GovernanceV3Gnosis, GovernanceV3BNB, AaveGovernanceV2} from 'aave-address-book/AaveAddressBook.sol';
+import {AaveV2Ethereum, GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, GovernanceV3Arbitrum, GovernanceV3Optimism, GovernanceV3Base, GovernanceV3Metis, GovernanceV3Gnosis, GovernanceV3BNB, AaveGovernanceV2} from 'aave-address-book/AaveAddressBook.sol';
+import {UpdateV3ContractsPermissionsEthereum, UpdateV3ContractsPermissionsBNB, UpdateV3ContractsPermissionsMetis, UpdateV3ContractsPermissionsBase, UpdateV3ContractsPermissionsOptimism, UpdateV3ContractsPermissionsArbitrum, UpdateV3ContractsPermissionsAvalanche, UpdateV3ContractsPermissionsPolygon} from '../scripts/OwnershipUpdate.s.sol';
 
 contract MockImplementation is OwnableWithGuardian, Initializable {
   uint256 public constant TEST = 1;
@@ -46,7 +47,9 @@ abstract contract BaseTest is Test {
   function _setUp() internal {
     pcImpl = new MockImplementation();
 
-    GovHelpers.executePayload(vm, address(payload()), shortExecutor());
+    if (block.chainid != 100 && block.chainid != 56) {
+      GovHelpers.executePayload(vm, address(payload()), shortExecutor());
+    }
 
     vm.startPrank(executorLvl1());
     ProxyAdmin(proxyAdmin()).upgradeAndCall(
@@ -82,7 +85,7 @@ abstract contract BaseTest is Test {
   }
 }
 
-contract ProxyAdminTestEthereum is BaseTest {
+contract ProxyAdminTestEthereum is BaseTest, UpdateV3ContractsPermissionsEthereum {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
   }
@@ -110,11 +113,15 @@ contract ProxyAdminTestEthereum is BaseTest {
   function setUp() public {
     vm.createSelectFork('mainnet', 18427147);
 
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
 
-contract ProxyAdminTestPolygon is BaseTest {
+contract ProxyAdminTestPolygon is BaseTest, UpdateV3ContractsPermissionsPolygon {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Polygon.PAYLOADS_CONTROLLER);
   }
@@ -141,11 +148,16 @@ contract ProxyAdminTestPolygon is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('polygon', 49131391);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
 
-contract ProxyAdminTestAvalanche is BaseTest {
+contract ProxyAdminTestAvalanche is BaseTest, UpdateV3ContractsPermissionsAvalanche {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER);
   }
@@ -172,11 +184,16 @@ contract ProxyAdminTestAvalanche is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('avalanche', 36905462);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
 
-contract ProxyAdminTestArbitrum is BaseTest {
+contract ProxyAdminTestArbitrum is BaseTest, UpdateV3ContractsPermissionsArbitrum {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER);
   }
@@ -203,11 +220,16 @@ contract ProxyAdminTestArbitrum is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('arbitrum', 143889657);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
 
-contract ProxyAdminTestOptimism is BaseTest {
+contract ProxyAdminTestOptimism is BaseTest, UpdateV3ContractsPermissionsOptimism {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Optimism.PAYLOADS_CONTROLLER);
   }
@@ -234,11 +256,16 @@ contract ProxyAdminTestOptimism is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('optimism', 111322500);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
 
-contract ProxyAdminTestMetis is BaseTest {
+contract ProxyAdminTestMetis is BaseTest, UpdateV3ContractsPermissionsMetis {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Metis.PAYLOADS_CONTROLLER);
   }
@@ -265,11 +292,16 @@ contract ProxyAdminTestMetis is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('metis', 9077368);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
 
-contract ProxyAdminTestBase is BaseTest {
+contract ProxyAdminTestBase is BaseTest, UpdateV3ContractsPermissionsBase {
   function payloadsController() public pure override returns (address) {
     return address(GovernanceV3Base.PAYLOADS_CONTROLLER);
   }
@@ -296,6 +328,47 @@ contract ProxyAdminTestBase is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('base', 5727316);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
     _setUp();
   }
 }
+
+//contract ProxyAdminTestBNB is BaseTest, UpdateV3ContractsPermissionsBNB {
+//  function payloadsController() public pure override returns (address) {
+//    return address(GovernanceV3BNB.PAYLOADS_CONTROLLER);
+//  }
+//
+//  function proxyAdmin() public pure override returns (address) {
+//    return MiscBNB.PROXY_ADMIN;
+//  }
+//
+//  function executorLvl1() public pure override returns (address) {
+//    return GovernanceV3BNB.EXECUTOR_LVL_1;
+//  }
+//
+//  function shortExecutor() public pure override returns (address) {
+//    return address(0);
+//  }
+//
+//  function payload() public pure override returns (address) {
+//    return address(0);
+//  }
+//
+//  function crossChainController() public pure override returns (address) {
+//    return GovernanceV3BNB.CROSS_CHAIN_CONTROLLER;
+//  }
+//
+//  function setUp() public {
+//    vm.createSelectFork('base', 5727316);
+//
+//    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+//    _changeOwnerAndGuardian();
+//    vm.stopPrank();
+//
+//    _setUp();
+//  }
+//}

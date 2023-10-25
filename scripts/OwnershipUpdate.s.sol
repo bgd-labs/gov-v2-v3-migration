@@ -7,8 +7,8 @@ import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/
 import {GovernanceV3Ethereum, GovernanceV3Arbitrum, GovernanceV3Avalanche, GovernanceV3Optimism, GovernanceV3Polygon, GovernanceV3Metis, GovernanceV3Base, GovernanceV3BNB, GovernanceV3Gnosis} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV2Ethereum, AaveV2Polygon, AaveV2Avalanche} from 'aave-address-book/AaveAddressBook.sol';
 
-contract UpdateV3ContractsPermissionsEthereum is EthereumScript {
-  function run() external broadcast {
+contract UpdateV3ContractsPermissionsEthereum {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Ethereum.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -38,8 +38,14 @@ contract UpdateV3ContractsPermissionsEthereum is EthereumScript {
   }
 }
 
-contract UpdateV3ContractsPolygon is PolygonScript {
+contract Ethereum is EthereumScript, UpdateV3ContractsPermissionsEthereum {
   function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsPolygon {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Polygon.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -63,8 +69,14 @@ contract UpdateV3ContractsPolygon is PolygonScript {
   }
 }
 
-contract UpdateV3ContractsPermissionsAvalanche is AvalancheScript {
+contract Polygon is PolygonScript, UpdateV3ContractsPermissionsPolygon {
   function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsAvalanche {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Avalanche.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -88,8 +100,14 @@ contract UpdateV3ContractsPermissionsAvalanche is AvalancheScript {
   }
 }
 
-contract UpdateV3ContractsPermissionsArbitrum is ArbitrumScript {
+contract Avalanche is AvalancheScript, UpdateV3ContractsPermissionsAvalanche {
   function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsArbitrum {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Arbitrum.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -111,8 +129,14 @@ contract UpdateV3ContractsPermissionsArbitrum is ArbitrumScript {
   }
 }
 
-contract UpdateV3ContractsPermissionsOptimism is OptimismScript {
+contract Arbitrum is ArbitrumScript, UpdateV3ContractsPermissionsArbitrum {
   function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsOptimism {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Optimism.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -134,8 +158,14 @@ contract UpdateV3ContractsPermissionsOptimism is OptimismScript {
   }
 }
 
-contract UpdateV3ContractsPermissionsBase is BaseScript {
+contract Optimism is OptimismScript, UpdateV3ContractsPermissionsOptimism {
   function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsBase {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Base.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -157,8 +187,14 @@ contract UpdateV3ContractsPermissionsBase is BaseScript {
   }
 }
 
-contract UpdateV3ContractsPermissionsMetis is MetisScript {
+contract Base is BaseScript, UpdateV3ContractsPermissionsBase {
   function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsMetis {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Metis.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -180,8 +216,14 @@ contract UpdateV3ContractsPermissionsMetis is MetisScript {
   }
 }
 
+contract Metis is MetisScript, UpdateV3ContractsPermissionsMetis {
+  function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
 //contract UpdateV3ContractsPermissionsGnosis is GnosisScript {
-//  function run() external broadcast {
+//  function _changeOwnerAndGuardian() internal {
 //    address newOwner = GovernanceV3Gnosis.EXECUTOR_LVL_1;
 //    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 //
@@ -202,9 +244,14 @@ contract UpdateV3ContractsPermissionsMetis is MetisScript {
 //    IWithGuardian(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
 //  }
 //}
+//contract Gnosis is GnosisScript, UpdateV3ContractsPermissionsGnosis {
+//  function run() external broadcast {
+//    _changeOwnerAndGuardian();
+//  }
+//}
 
-contract UpdateV3ContractsPermissionsBNB is BNBScript {
-  function run() external broadcast {
+contract UpdateV3ContractsPermissionsBNB {
+  function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3BNB.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
@@ -227,5 +274,11 @@ contract UpdateV3ContractsPermissionsBNB is BNBScript {
 
     // change guardian
     IWithGuardian(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+  }
+}
+
+contract Binance is BNBScript, UpdateV3ContractsPermissionsBNB {
+  function run() external broadcast {
+    _changeOwnerAndGuardian();
   }
 }
