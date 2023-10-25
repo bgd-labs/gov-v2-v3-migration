@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {EthereumScript, ArbitrumScript, AvalancheScript, MetisScript, OptimismScript, PolygonScript, BaseScript, BNBScript} from 'aave-helpers/ScriptUtils.sol';
+import {EthereumScript, ArbitrumScript, AvalancheScript, MetisScript, OptimismScript, PolygonScript, BaseScript, BNBScript, GnosisScript} from 'aave-helpers/ScriptUtils.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/IWithGuardian.sol';
 import {GovernanceV3Ethereum, GovernanceV3Arbitrum, GovernanceV3Avalanche, GovernanceV3Optimism, GovernanceV3Polygon, GovernanceV3Metis, GovernanceV3Base, GovernanceV3BNB, GovernanceV3Gnosis} from 'aave-address-book/AaveAddressBook.sol';
@@ -222,63 +222,62 @@ contract Metis is MetisScript, UpdateV3ContractsPermissionsMetis {
   }
 }
 
-//contract UpdateV3ContractsPermissionsGnosis is GnosisScript {
-//  function _changeOwnerAndGuardian() internal {
-//    address newOwner = GovernanceV3Gnosis.EXECUTOR_LVL_1;
-//    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
-//
-//    address newGuardian = 0xF163b8698821cefbD33Cf449764d69Ea445cE23D;
-//
-//    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-//    // change ownership
-//    Ownable(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-//
-//    // change guardian
-//    IWithGuardian(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
-//
-//    // ------------- GOVERNANCE CONTRACTS -----------------
-//    // change ownership
-//    Ownable(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
-//
-//    // change guardian
-//    IWithGuardian(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
-//  }
-//}
-//contract Gnosis is GnosisScript, UpdateV3ContractsPermissionsGnosis {
-//  function run() external broadcast {
-//    _changeOwnerAndGuardian();
-//  }
-//}
-
-contract UpdateV3ContractsPermissionsBNB {
+contract UpdateV3ContractsPermissionsGnosis {
   function _changeOwnerAndGuardian() internal {
-    address newOwner = GovernanceV3BNB.EXECUTOR_LVL_1;
+    address newOwner = GovernanceV3Gnosis.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
-    address newGuardian = address(0);
-    require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
-
-    //change ownership of proxy admin TODO: get from address book when updated
-    Ownable(0x39EBFfc7679c62Dfcc4A3E2c09Bcb0be255Ae63c).transferOwnership(newOwner);
+    address newGuardian = 0xF163b8698821cefbD33Cf449764d69Ea445cE23D;
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
     // change ownership
-    Ownable(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+    Ownable(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
     // change guardian
-    IWithGuardian(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+    IWithGuardian(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
     // ------------- GOVERNANCE CONTRACTS -----------------
-    // change ownership
-    Ownable(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
 
     // change guardian
-    IWithGuardian(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+    IWithGuardian(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
   }
 }
 
-contract Binance is BNBScript, UpdateV3ContractsPermissionsBNB {
+contract Gnosis is GnosisScript, UpdateV3ContractsPermissionsGnosis {
   function run() external broadcast {
     _changeOwnerAndGuardian();
   }
 }
+
+//contract UpdateV3ContractsPermissionsBNB {
+//  function _changeOwnerAndGuardian() internal {
+//    address newOwner = GovernanceV3BNB.EXECUTOR_LVL_1;
+//    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
+//
+//    address newGuardian = address(0);
+//    require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
+//
+//    //change ownership of proxy admin TODO: get from address book when updated
+//    Ownable(0x39EBFfc7679c62Dfcc4A3E2c09Bcb0be255Ae63c).transferOwnership(newOwner);
+//
+//    // ------------- INFRASTRUCTURE CONTRACTS -----------------
+//    // change ownership
+//    Ownable(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+//
+//    // change guardian
+//    IWithGuardian(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+//
+//    // ------------- GOVERNANCE CONTRACTS -----------------
+//    // change ownership
+//    Ownable(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+//
+//    // change guardian
+//    IWithGuardian(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+//  }
+//}
+//
+//contract Binance is BNBScript, UpdateV3ContractsPermissionsBNB {
+//  function run() external broadcast {
+//    _changeOwnerAndGuardian();
+//  }
+//}

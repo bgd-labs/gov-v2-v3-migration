@@ -16,8 +16,8 @@ import {MiscBase} from 'aave-address-book/MiscBase.sol';
 import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
 import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
-import {AaveV2Ethereum, GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, GovernanceV3Arbitrum, GovernanceV3Optimism, GovernanceV3Base, GovernanceV3Metis, GovernanceV3Gnosis, GovernanceV3BNB, AaveGovernanceV2} from 'aave-address-book/AaveAddressBook.sol';
-import {UpdateV3ContractsPermissionsEthereum, UpdateV3ContractsPermissionsBNB, UpdateV3ContractsPermissionsMetis, UpdateV3ContractsPermissionsBase, UpdateV3ContractsPermissionsOptimism, UpdateV3ContractsPermissionsArbitrum, UpdateV3ContractsPermissionsAvalanche, UpdateV3ContractsPermissionsPolygon} from '../scripts/OwnershipUpdate.s.sol';
+import {GovernanceV3Gnosis, AaveV2Ethereum, GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, GovernanceV3Arbitrum, GovernanceV3Optimism, GovernanceV3Base, GovernanceV3Metis, GovernanceV3Gnosis, GovernanceV3BNB, AaveGovernanceV2} from 'aave-address-book/AaveAddressBook.sol';
+import {UpdateV3ContractsPermissionsGnosis, UpdateV3ContractsPermissionsEthereum, UpdateV3ContractsPermissionsBNB, UpdateV3ContractsPermissionsMetis, UpdateV3ContractsPermissionsBase, UpdateV3ContractsPermissionsOptimism, UpdateV3ContractsPermissionsArbitrum, UpdateV3ContractsPermissionsAvalanche, UpdateV3ContractsPermissionsPolygon} from '../scripts/OwnershipUpdate.s.sol';
 
 contract MockImplementation is OwnableWithGuardian, Initializable {
   uint256 public constant TEST = 1;
@@ -47,7 +47,7 @@ abstract contract BaseTest is Test {
   function _setUp() internal {
     pcImpl = new MockImplementation();
 
-    if (block.chainid != 100 && block.chainid != 56) {
+    if (payload() != address(0) && shortExecutor() != address(0)) {
       GovHelpers.executePayload(vm, address(payload()), shortExecutor());
     }
 
@@ -328,6 +328,42 @@ contract ProxyAdminTestBase is BaseTest, UpdateV3ContractsPermissionsBase {
 
   function setUp() public {
     vm.createSelectFork('base', 5727316);
+
+    vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
+    _changeOwnerAndGuardian();
+    vm.stopPrank();
+
+    _setUp();
+  }
+}
+
+contract ProxyAdminTestGnosis is BaseTest, UpdateV3ContractsPermissionsGnosis {
+  function payloadsController() public pure override returns (address) {
+    return address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER);
+  }
+
+  function proxyAdmin() public pure override returns (address) {
+    return MiscGnosis.PROXY_ADMIN;
+  }
+
+  function executorLvl1() public pure override returns (address) {
+    return GovernanceV3Gnosis.EXECUTOR_LVL_1;
+  }
+
+  function shortExecutor() public pure override returns (address) {
+    return address(0);
+  }
+
+  function payload() public pure override returns (address) {
+    return address(0);
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER;
+  }
+
+  function setUp() public {
+    vm.createSelectFork('gnosis', 30633383);
 
     vm.startPrank(0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6);
     _changeOwnerAndGuardian();
