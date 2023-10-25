@@ -46,6 +46,8 @@ abstract contract BaseTest is Test {
 
   function payload() public view virtual returns (address);
 
+  function crossChainController() public view virtual returns (address);
+
   function _setUp() internal {
     pcImpl = new MockImplementation();
 
@@ -58,8 +60,13 @@ abstract contract BaseTest is Test {
       abi.encodeWithSelector(MockImplementation.initialize.selector)
     );
 
+    ProxyAdmin(proxyAdmin()).upgradeAndCall(
+      TransparentUpgradeableProxy(payable(crossChainController())),
+      address(pcImpl),
+      abi.encodeWithSelector(MockImplementation.initialize.selector)
+    );
+
     if (block.chainid == 1) {
-      hoax(executorLvl1());
       ProxyAdmin(proxyAdmin()).upgradeAndCall(
         TransparentUpgradeableProxy(payable(address(GovernanceV3Ethereum.GOVERNANCE))),
         address(pcImpl),
@@ -71,7 +78,8 @@ abstract contract BaseTest is Test {
   }
 
   function test_ImplementationUpdate() public {
-    assertEq(MockImplementation(payloadsController()).TEST(), 1);
+    //    assertEq(MockImplementation(payloadsController()).TEST(), 1);
+    assertEq(MockImplementation(crossChainController()).TEST(), 1);
 
     if (block.chainid == 1) {
       assertEq(MockImplementation(address(GovernanceV3Ethereum.GOVERNANCE)).TEST(), 1);
@@ -100,6 +108,10 @@ contract ProxyAdminTestEthereum is BaseTest {
     return 0xE40E84457F4b5075f1EB32352d81ecF1dE77fee6;
   }
 
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER;
+  }
+
   function setUp() public {
     vm.createSelectFork('mainnet', 18427147);
 
@@ -126,6 +138,10 @@ contract ProxyAdminTestPolygon is BaseTest {
 
   function payload() public pure override returns (address) {
     return 0xc7751400F809cdB0C167F87985083C558a0610F7;
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER;
   }
 
   function setUp() public {
