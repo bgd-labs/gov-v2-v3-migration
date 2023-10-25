@@ -26,7 +26,7 @@ import {GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, Govern
 contract MockImplementation is Initializable {
   uint256 public constant TEST = 1;
 
-  function initialize() external reinitializer(2) {}
+  function initialize() external reinitializer(3) {}
 }
 
 interface IPayload {
@@ -51,16 +51,31 @@ abstract contract BaseTest is Test {
 
     GovHelpers.executePayload(vm, address(payload()), shortExecutor());
 
-    hoax(executorLvl1());
+    vm.startPrank(executorLvl1());
     ProxyAdmin(proxyAdmin()).upgradeAndCall(
       TransparentUpgradeableProxy(payable(payloadsController())),
       address(pcImpl),
       abi.encodeWithSelector(MockImplementation.initialize.selector)
     );
+
+    if (block.chainid == 1) {
+      hoax(executorLvl1());
+      ProxyAdmin(proxyAdmin()).upgradeAndCall(
+        TransparentUpgradeableProxy(payable(address(GovernanceV3Ethereum.GOVERNANCE))),
+        address(pcImpl),
+        abi.encodeWithSelector(MockImplementation.initialize.selector)
+      );
+    }
+
+    vm.stopPrank();
   }
 
   function test_ImplementationUpdate() public {
     assertEq(MockImplementation(payloadsController()).TEST(), 1);
+
+    if (block.chainid == 1) {
+      assertEq(MockImplementation(address(GovernanceV3Ethereum.GOVERNANCE)).TEST(), 1);
+    }
   }
 }
 
