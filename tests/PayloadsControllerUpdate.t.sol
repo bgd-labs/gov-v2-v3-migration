@@ -23,7 +23,7 @@ import {GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, Govern
 //https://andromeda-explorer.metis.io/address/0xA9F30e6ED4098e9439B2ac8aEA2d3fc26BcEbb45/
 //https://basescan.org/address/0x80a2f9a653d3990878cff8206588fd66699e7f2a
 
-contract MockImplementation is Initializable {
+contract MockImplementation is OwnableWithGuardian, Initializable {
   uint256 public constant TEST = 1;
 
   function initialize() external reinitializer(3) {}
