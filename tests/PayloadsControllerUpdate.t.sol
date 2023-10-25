@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
@@ -16,12 +17,6 @@ import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
 import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, GovernanceV3Arbitrum, GovernanceV3Optimism, GovernanceV3Base, GovernanceV3Metis, GovernanceV3Gnosis, GovernanceV3BNB, AaveGovernanceV2} from 'aave-address-book/AaveAddressBook.sol';
-
-//https://snowtrace.io/address/0x0a5a19f1c4a527773f8b6e7428255dd83b7a687b
-//https://arbiscan.io/address/0xd0f0bc55ac46f63a68f7c27fbfd60792c9571fea
-//https://optimistic.etherscan.io/address/0xab22988d93d5f942fc6b6c6ea285744809d1d9cc
-//https://andromeda-explorer.metis.io/address/0xA9F30e6ED4098e9439B2ac8aEA2d3fc26BcEbb45/
-//https://basescan.org/address/0x80a2f9a653d3990878cff8206588fd66699e7f2a
 
 contract MockImplementation is OwnableWithGuardian, Initializable {
   uint256 public constant TEST = 1;
@@ -78,7 +73,7 @@ abstract contract BaseTest is Test {
   }
 
   function test_ImplementationUpdate() public {
-    //    assertEq(MockImplementation(payloadsController()).TEST(), 1);
+    assertEq(MockImplementation(payloadsController()).TEST(), 1);
     assertEq(MockImplementation(crossChainController()).TEST(), 1);
 
     if (block.chainid == 1) {
@@ -146,6 +141,161 @@ contract ProxyAdminTestPolygon is BaseTest {
 
   function setUp() public {
     vm.createSelectFork('polygon', 49131391);
+    _setUp();
+  }
+}
+
+contract ProxyAdminTestAvalanche is BaseTest {
+  function payloadsController() public pure override returns (address) {
+    return address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER);
+  }
+
+  function proxyAdmin() public pure override returns (address) {
+    return MiscAvalanche.PROXY_ADMIN;
+  }
+
+  function executorLvl1() public pure override returns (address) {
+    return GovernanceV3Avalanche.EXECUTOR_LVL_1;
+  }
+
+  function shortExecutor() public pure override returns (address) {
+    return 0xa35b76E4935449E33C56aB24b23fcd3246f13470;
+  }
+
+  function payload() public pure override returns (address) {
+    return 0x0A5a19f1c4a527773F8B6e7428255DD83b7A687b;
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER;
+  }
+
+  function setUp() public {
+    vm.createSelectFork('avalanche', 36905462);
+    _setUp();
+  }
+}
+
+contract ProxyAdminTestArbitrum is BaseTest {
+  function payloadsController() public pure override returns (address) {
+    return address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER);
+  }
+
+  function proxyAdmin() public pure override returns (address) {
+    return MiscArbitrum.PROXY_ADMIN;
+  }
+
+  function executorLvl1() public pure override returns (address) {
+    return GovernanceV3Arbitrum.EXECUTOR_LVL_1;
+  }
+
+  function shortExecutor() public pure override returns (address) {
+    return AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR;
+  }
+
+  function payload() public pure override returns (address) {
+    return 0xd0F0BC55Ac46f63A68F7c27fbFD60792C9571feA;
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER;
+  }
+
+  function setUp() public {
+    vm.createSelectFork('arbitrum', 143889657);
+    _setUp();
+  }
+}
+
+contract ProxyAdminTestOptimism is BaseTest {
+  function payloadsController() public pure override returns (address) {
+    return address(GovernanceV3Optimism.PAYLOADS_CONTROLLER);
+  }
+
+  function proxyAdmin() public pure override returns (address) {
+    return MiscOptimism.PROXY_ADMIN;
+  }
+
+  function executorLvl1() public pure override returns (address) {
+    return GovernanceV3Optimism.EXECUTOR_LVL_1;
+  }
+
+  function shortExecutor() public pure override returns (address) {
+    return AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR;
+  }
+
+  function payload() public pure override returns (address) {
+    return 0xab22988D93d5F942fC6B6c6Ea285744809D1d9Cc;
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER;
+  }
+
+  function setUp() public {
+    vm.createSelectFork('optimism', 111322500);
+    _setUp();
+  }
+}
+
+contract ProxyAdminTestMetis is BaseTest {
+  function payloadsController() public pure override returns (address) {
+    return address(GovernanceV3Metis.PAYLOADS_CONTROLLER);
+  }
+
+  function proxyAdmin() public pure override returns (address) {
+    return MiscMetis.PROXY_ADMIN;
+  }
+
+  function executorLvl1() public pure override returns (address) {
+    return GovernanceV3Metis.EXECUTOR_LVL_1;
+  }
+
+  function shortExecutor() public pure override returns (address) {
+    return AaveGovernanceV2.METIS_BRIDGE_EXECUTOR;
+  }
+
+  function payload() public pure override returns (address) {
+    return 0xA9F30e6ED4098e9439B2ac8aEA2d3fc26BcEbb45;
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Metis.CROSS_CHAIN_CONTROLLER;
+  }
+
+  function setUp() public {
+    vm.createSelectFork('metis', 9077368);
+    _setUp();
+  }
+}
+
+contract ProxyAdminTestBase is BaseTest {
+  function payloadsController() public pure override returns (address) {
+    return address(GovernanceV3Base.PAYLOADS_CONTROLLER);
+  }
+
+  function proxyAdmin() public pure override returns (address) {
+    return MiscBase.PROXY_ADMIN;
+  }
+
+  function executorLvl1() public pure override returns (address) {
+    return GovernanceV3Base.EXECUTOR_LVL_1;
+  }
+
+  function shortExecutor() public pure override returns (address) {
+    return AaveGovernanceV2.BASE_BRIDGE_EXECUTOR;
+  }
+
+  function payload() public pure override returns (address) {
+    return 0x80a2F9a653d3990878cFf8206588fd66699E7f2a;
+  }
+
+  function crossChainController() public pure override returns (address) {
+    return GovernanceV3Base.CROSS_CHAIN_CONTROLLER;
+  }
+
+  function setUp() public {
+    vm.createSelectFork('base', 5727316);
     _setUp();
   }
 }
