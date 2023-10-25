@@ -74,7 +74,7 @@ const deployAndExecuteL2Payload = async (
 const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
-  const shortMigrationPayload = '0x7fC3ebdB376fF38De2cD597671A6270113c27364';
+  const shortMigrationPayload = '0xe40e84457f4b5075f1eb32352d81ecf1de77fee6';
   // const longMigrationPayload = '0x6195a956dC026A949dE552F04a5803d3aa1fC408';
 
   const block = await publicClient.getBlock();
@@ -150,13 +150,13 @@ const deployPayloadsEthereum = async () => {
   // console.log('proposalId: ', proposalId);
 };
 
-// deployPayloadsEthereum().then().catch(console.log);
+deployPayloadsEthereum().then().catch(console.log);
 
 async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     polygon,
     AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-    '0xe40e84457f4b5075f1eb32352d81ecf1de77fee6',
+    '0xc7751400f809cdb0c167f87985083c558a0610f7',
     GovernanceV3Polygon,
     [TestV2PayloadPolygon, TestV3PayloadPolygon]
   );
@@ -164,7 +164,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     avalanche,
     AVAX_GUARDIAN,
-    '0x67f7306ea3b6909936940a7a5c06a68fd0dcbd08',
+    '0x0a5a19f1c4a527773f8b6e7428255dd83b7a687b',
     GovernanceV3Avalanche,
     [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
   );
@@ -172,7 +172,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     arbitrum,
     AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-    '0xab22988d93d5f942fc6b6c6ea285744809d1d9cc',
+    '0xd0f0bc55ac46f63a68f7c27fbfd60792c9571fea',
     GovernanceV3Arbitrum,
     [TestV3PayloadArbitrum]
   );
@@ -180,7 +180,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     optimism,
     AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-    '0xfd858c8bc5ac5e10f01018bc78471bb0dc392247',
+    '0xab22988d93d5f942fc6b6c6ea285744809d1d9cc',
     GovernanceV3Optimism,
     [TestV3PayloadOptimism]
   );
@@ -188,7 +188,7 @@ async function upgradeL2s() {
   await deployAndExecuteL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    '0x1f39bad65cf9e367ff986eef0ef4f3b6cb63a534',
+    '0x80a2f9a653d3990878cff8206588fd66699e7f2a',
     GovernanceV3Base,
     [TestV3PayloadBase]
   );
