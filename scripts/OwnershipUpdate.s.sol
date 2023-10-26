@@ -6,6 +6,7 @@ import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/IWithGuardian.sol';
 import {GovernanceV3Ethereum, GovernanceV3Arbitrum, GovernanceV3Avalanche, GovernanceV3Optimism, GovernanceV3Polygon, GovernanceV3Metis, GovernanceV3Base, GovernanceV3BNB, GovernanceV3Gnosis} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV2Ethereum, AaveV2Polygon, AaveV2Avalanche} from 'aave-address-book/AaveAddressBook.sol';
+import {ICrossChainForwarder} from 'aave-delivery-infrastructure/contracts/interfaces/ICrossChainForwarder.sol';
 
 contract UpdateV3ContractsPermissionsEthereum {
   function _changeOwnerAndGuardian() internal {
@@ -16,6 +17,13 @@ contract UpdateV3ContractsPermissionsEthereum {
     require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
+    // remove deployer from allowed senders
+    address[] memory sendersToRemove = new address[](1);
+    sendersToRemove[0] = msg.sender;
+    ICrossChainForwarder(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER).removeSenders(
+      sendersToRemove
+    );
+
     // change ownership
     Ownable(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
     Ownable(GovernanceV3Ethereum.EMERGENCY_REGISTRY).transferOwnership(newOwner);
@@ -53,6 +61,11 @@ contract UpdateV3ContractsPermissionsPolygon {
     require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
+    // remove deployer from allowed senders
+    address[] memory sendersToRemove = new address[](1);
+    sendersToRemove[0] = msg.sender;
+    ICrossChainForwarder(GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER).removeSenders(sendersToRemove);
+
     // change ownership
     Ownable(GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
@@ -84,6 +97,13 @@ contract UpdateV3ContractsPermissionsAvalanche {
     require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
+    // remove deployer from allowed senders
+    address[] memory sendersToRemove = new address[](1);
+    sendersToRemove[0] = msg.sender;
+    ICrossChainForwarder(GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER).removeSenders(
+      sendersToRemove
+    );
+
     // change ownership
     Ownable(GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 

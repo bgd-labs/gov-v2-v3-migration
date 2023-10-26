@@ -13,3 +13,6 @@
 [submodule "lib/aave-governance-v3"]
 	path = lib/aave-governance-v3
 	url = https://github.com/bgd-labs/aave-governance-v3
+[submodule "lib/aave-delivery-infrastructure"]
+	path = lib/aave-delivery-infrastructure
+	url = https://github.com/bgd-labs/aave-delivery-infrastructure

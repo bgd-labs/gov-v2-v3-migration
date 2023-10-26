@@ -17,7 +17,7 @@ import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
 import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
 import {GovernanceV3Gnosis, AaveV2Ethereum, GovernanceV3Ethereum, GovernanceV3Polygon, GovernanceV3Avalanche, GovernanceV3Arbitrum, GovernanceV3Optimism, GovernanceV3Base, GovernanceV3Metis, GovernanceV3Gnosis, GovernanceV3BNB, AaveGovernanceV2} from 'aave-address-book/AaveAddressBook.sol';
-import {UpdateV3ContractsPermissionsGnosis, UpdateV3ContractsPermissionsEthereum, UpdateV3ContractsPermissionsBNB, UpdateV3ContractsPermissionsMetis, UpdateV3ContractsPermissionsBase, UpdateV3ContractsPermissionsOptimism, UpdateV3ContractsPermissionsArbitrum, UpdateV3ContractsPermissionsAvalanche, UpdateV3ContractsPermissionsPolygon} from '../scripts/OwnershipUpdate.s.sol';
+import {UpdateV3ContractsPermissionsGnosis, UpdateV3ContractsPermissionsEthereum, UpdateV3ContractsPermissionsMetis, UpdateV3ContractsPermissionsBase, UpdateV3ContractsPermissionsOptimism, UpdateV3ContractsPermissionsArbitrum, UpdateV3ContractsPermissionsAvalanche, UpdateV3ContractsPermissionsPolygon} from '../scripts/OwnershipUpdate.s.sol';
 
 contract MockImplementation is OwnableWithGuardian, Initializable {
   uint256 public constant TEST = 1;
