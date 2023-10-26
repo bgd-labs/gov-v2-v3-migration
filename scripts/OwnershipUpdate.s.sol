@@ -14,6 +14,7 @@ contract UpdateV3ContractsPermissionsEthereum {
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
     address newGuardian = AaveV2Ethereum.EMERGENCY_ADMIN;
+    address aDIGuardian = 0xb812d0944f8F581DfAA3a93Dda0d22EcEf51A9CF;
     require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
@@ -24,14 +25,18 @@ contract UpdateV3ContractsPermissionsEthereum {
       sendersToRemove
     );
 
+    // change guardian
+    IWithGuardian(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER).updateGuardian(aDIGuardian);
+
     // change ownership
     Ownable(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
     Ownable(GovernanceV3Ethereum.EMERGENCY_REGISTRY).transferOwnership(newOwner);
 
-    // change guardian
-    IWithGuardian(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
-
     // ------------- GOVERNANCE CONTRACTS -----------------
+    // change guardian
+    IWithGuardian(address(GovernanceV3Ethereum.GOVERNANCE)).updateGuardian(newGuardian);
+    IWithGuardian(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
     // change ownership
     Ownable(address(GovernanceV3Ethereum.GOVERNANCE)).transferOwnership(newOwner); // TODO: should it be long or short?
     Ownable(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
@@ -39,10 +44,6 @@ contract UpdateV3ContractsPermissionsEthereum {
     Ownable(GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH).transferOwnership(newOwner);
     Ownable(GovernanceV3Ethereum.VOTING_PORTAL_ETH_AVAX).transferOwnership(newOwner);
     Ownable(GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL).transferOwnership(newOwner);
-
-    // change guardian
-    IWithGuardian(address(GovernanceV3Ethereum.GOVERNANCE)).updateGuardian(newGuardian);
-    IWithGuardian(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
   }
 }
 
@@ -66,19 +67,19 @@ contract UpdateV3ContractsPermissionsPolygon {
     sendersToRemove[0] = msg.sender;
     ICrossChainForwarder(GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER).removeSenders(sendersToRemove);
 
-    // change ownership
-    Ownable(GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
+    // change ownership
+    Ownable(GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+
     // ------------- GOVERNANCE CONTRACTS -----------------
+    // change guardian
+    IWithGuardian(address(GovernanceV3Polygon.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
     // change ownership
     Ownable(address(GovernanceV3Polygon.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
     Ownable(GovernanceV3Polygon.VOTING_MACHINE).transferOwnership(newOwner);
-
-    // change guardian
-    IWithGuardian(address(GovernanceV3Polygon.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
   }
 }
 
@@ -104,19 +105,19 @@ contract UpdateV3ContractsPermissionsAvalanche {
       sendersToRemove
     );
 
-    // change ownership
-    Ownable(GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
+    // change ownership
+    Ownable(GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+
     // ------------- GOVERNANCE CONTRACTS -----------------
+    // change guardian
+    IWithGuardian(address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
     // change ownership
     Ownable(address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
     Ownable(GovernanceV3Avalanche.VOTING_MACHINE).transferOwnership(newOwner);
-
-    // change guardian
-    IWithGuardian(address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
   }
 }
 
@@ -134,18 +135,18 @@ contract UpdateV3ContractsPermissionsArbitrum {
     address newGuardian = 0xbbd9f90699c1FA0D7A65870D241DD1f1217c96Eb;
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change ownership
-    Ownable(GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
     // change ownership
-    Ownable(address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+    Ownable(GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
+    // ------------- GOVERNANCE CONTRACTS -----------------
     // change guardian
     IWithGuardian(address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
+    // change ownership
+    Ownable(address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
   }
 }
 
@@ -163,18 +164,18 @@ contract UpdateV3ContractsPermissionsOptimism {
     address newGuardian = 0xE50c8C619d05ff98b22Adf991F17602C774F785c;
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change ownership
-    Ownable(GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
     // change ownership
-    Ownable(address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+    Ownable(GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
+    // ------------- GOVERNANCE CONTRACTS -----------------
     // change guardian
     IWithGuardian(address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
+    // change ownership
+    Ownable(address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
   }
 }
 
@@ -192,18 +193,18 @@ contract UpdateV3ContractsPermissionsBase {
     address newGuardian = 0x9e10C0A1Eb8FF6a0AaA53a62C7a338f35D7D9a2A;
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change ownership
-    Ownable(GovernanceV3Base.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Base.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
     // change ownership
-    Ownable(address(GovernanceV3Base.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+    Ownable(GovernanceV3Base.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
+    // ------------- GOVERNANCE CONTRACTS -----------------
     // change guardian
     IWithGuardian(address(GovernanceV3Base.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
+    // change ownership
+    Ownable(address(GovernanceV3Base.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
   }
 }
 
@@ -221,18 +222,18 @@ contract UpdateV3ContractsPermissionsMetis {
     address newGuardian = 0xF6Db48C5968A9eBCB935786435530f28e32Cc501;
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change ownership
-    Ownable(GovernanceV3Metis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Metis.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
     // change ownership
-    Ownable(address(GovernanceV3Metis.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+    Ownable(GovernanceV3Metis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
+    // ------------- GOVERNANCE CONTRACTS -----------------
     // change guardian
     IWithGuardian(address(GovernanceV3Metis.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+
+    // change ownership
+    Ownable(address(GovernanceV3Metis.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
   }
 }
 
@@ -250,11 +251,11 @@ contract UpdateV3ContractsPermissionsGnosis {
     address newGuardian = 0xF163b8698821cefbD33Cf449764d69Ea445cE23D;
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change ownership
-    Ownable(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
     // change guardian
     IWithGuardian(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+
+    // change ownership
+    Ownable(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 
     // ------------- GOVERNANCE CONTRACTS -----------------
 
@@ -281,18 +282,18 @@ contract Gnosis is GnosisScript, UpdateV3ContractsPermissionsGnosis {
 //    Ownable(0x39EBFfc7679c62Dfcc4A3E2c09Bcb0be255Ae63c).transferOwnership(newOwner);
 //
 //    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-//    // change ownership
-//    Ownable(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 //
 //    // change guardian
 //    IWithGuardian(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+//    // change ownership
+//    Ownable(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
 //
 //    // ------------- GOVERNANCE CONTRACTS -----------------
-//    // change ownership
-//    Ownable(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
 //
 //    // change guardian
 //    IWithGuardian(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+//    // change ownership
+//    Ownable(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
 //  }
 //}
 //
