@@ -38,7 +38,7 @@ contract UpdateV3ContractsPermissionsEthereum {
     IWithGuardian(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
 
     // change ownership
-    Ownable(address(GovernanceV3Ethereum.GOVERNANCE)).transferOwnership(newOwner); // TODO: should it be long or short?
+    Ownable(address(GovernanceV3Ethereum.GOVERNANCE)).transferOwnership(newOwner);
     Ownable(address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
     Ownable(GovernanceV3Ethereum.VOTING_MACHINE).transferOwnership(newOwner);
     Ownable(GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH).transferOwnership(newOwner);
