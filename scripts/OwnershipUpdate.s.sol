@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Script} from 'forge-std/Script.sol';
+// This Scripts change the ownership of the V3 contracts from Deployer to the correct addresses. For most of the cases
+// ownership will be changed to executor lvl1, and guardian to the aave safes. BGD will mantain for now the guardian of aDI
+// Effects of executing this changes on tenderly fork can be found here: https://github.com/bgd-labs/aave-permissions-list/pull/42
 
 import {EthereumScript, ArbitrumScript, AvalancheScript, MetisScript, OptimismScript, PolygonScript, BaseScript, BNBScript, GnosisScript} from 'aave-helpers/ScriptUtils.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
@@ -13,13 +15,7 @@ import {ICrossChainForwarder} from 'aave-delivery-infrastructure/contracts/inter
 
 // Effects of executing this changes on tenderly fork can be found here: https://github.com/bgd-labs/aave-permissions-list/pull/42
 
-abstract contract UpdateV3Permissions is Script {
-  modifier broadcastV2() {
-    vm.startBroadcast();
-    _;
-    vm.stopBroadcast();
-  }
-
+abstract contract UpdateV3Permissions {
   function targetOwner() public pure virtual returns (address);
 
   function targetGovernanceGuardian() public pure virtual returns (address);
@@ -64,14 +60,14 @@ abstract contract UpdateV3Permissions is Script {
     }
   }
 
-  function run() external broadcastV2 {
+  function _changeOwnerAndGuardian() internal {
     _removeFromAllowedSenders();
     _changeOwnerAndGuardian(targetOwner(), targetGovernanceGuardian(), govContractsToUpdate());
     _changeOwnerAndGuardian(targetOwner(), targetADIGuardian(), aDIContractsToUpdate());
   }
 }
 
-contract UpdateV3ContractsPermissionsEthereum is UpdateV3Permissions, EthereumScript {
+contract UpdateV3ContractsPermissionsEthereum is UpdateV3Permissions {
   function targetOwner() public pure override returns (address) {
     return GovernanceV3Ethereum.EXECUTOR_LVL_1;
   }
@@ -89,35 +85,40 @@ contract UpdateV3ContractsPermissionsEthereum is UpdateV3Permissions, EthereumSc
   }
 
   function govContractsToUpdate() public pure override returns (address[] memory) {
-    address[] memory contracts = new address[](2);
+    address[] memory contracts = new address[](6);
     contracts[0] = address(GovernanceV3Ethereum.GOVERNANCE);
     contracts[1] = address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER);
-    return contracts;
-  }
-}
-
-  function aDIContractsToUpdate() public pure override returns (address[] memory) {
-    address[] memory contracts = new address[](6);
-    contracts[0] = GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER;
-    contracts[1] = GovernanceV3Ethereum.EMERGENCY_REGISTRY;
     contracts[2] = GovernanceV3Ethereum.VOTING_MACHINE;
     contracts[3] = GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH;
     contracts[4] = GovernanceV3Ethereum.VOTING_PORTAL_ETH_AVAX;
     contracts[5] = GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL;
     return contracts;
   }
+
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](2);
+    contracts[0] = GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER;
+    contracts[1] = GovernanceV3Ethereum.EMERGENCY_REGISTRY;
+    return contracts;
+  }
 }
 
-contract UpdateV3ContractsPermissionsPolygon is UpdateV3Permissions, PolygonScript {
+contract Ethereum is EthereumScript, UpdateV3ContractsPermissionsEthereum {
+  function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsPolygon is UpdateV3Permissions {
   function targetOwner() public pure override returns (address) {
     return GovernanceV3Polygon.EXECUTOR_LVL_1;
   }
 
-  function targetGovernanceGuardian() public pure virtual returns (address) {
+  function targetGovernanceGuardian() public pure override returns (address) {
     return AaveV2Polygon.EMERGENCY_ADMIN;
   }
 
-  function targetADIGuardian() public pure virtual returns (address) {
+  function targetADIGuardian() public pure override returns (address) {
     return 0xbCEB4f363f2666E2E8E430806F37e97C405c130b;
   }
 
@@ -131,6 +132,7 @@ contract UpdateV3ContractsPermissionsPolygon is UpdateV3Permissions, PolygonScri
     contracts[1] = GovernanceV3Polygon.VOTING_MACHINE;
     return contracts;
   }
+
   function aDIContractsToUpdate() public pure override returns (address[] memory) {
     address[] memory contracts = new address[](1);
     contracts[0] = GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER;
@@ -138,12 +140,22 @@ contract UpdateV3ContractsPermissionsPolygon is UpdateV3Permissions, PolygonScri
   }
 }
 
-contract UpdateV3ContractsPermissionsAvalanche is UpdateV3Permissions, AvalancheScript {
+contract Polygon is PolygonScript, UpdateV3ContractsPermissionsPolygon {
+  function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsAvalanche is UpdateV3Permissions {
   function targetOwner() public pure override returns (address) {
     return GovernanceV3Avalanche.EXECUTOR_LVL_1;
   }
 
-  function targetGovernanceGuardian() public pure virtual returns (address) {
+  function targetADIGuardian() public pure override returns (address) {
+    return 0x3DBA1c4094BC0eE4772A05180B7E0c2F1cFD9c36; // BGD Safe
+  }
+
+  function targetGovernanceGuardian() public pure override returns (address) {
     return AaveV2Avalanche.EMERGENCY_ADMIN;
   }
 
@@ -151,56 +163,53 @@ contract UpdateV3ContractsPermissionsAvalanche is UpdateV3Permissions, Avalanche
     return GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER;
   }
 
-  function contractsToUpdate() public pure override returns (address[] memory) {
-    address[] memory contracts = new address[](3);
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](2);
+    contracts[0] = address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER);
+    contracts[1] = GovernanceV3Avalanche.VOTING_MACHINE;
+    return contracts;
+  }
+
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
     contracts[0] = GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER;
-    contracts[1] = address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER);
-    contracts[2] = GovernanceV3Avalanche.VOTING_MACHINE;
     return contracts;
   }
 }
 
-contract UpdateV3ContractsPermissionsArbitrum is UpdateV3Permissions, ArbitrumScript {
+contract Avalanche is AvalancheScript, UpdateV3ContractsPermissionsAvalanche {
+  function run() external broadcast {
+    _changeOwnerAndGuardian();
+  }
+}
+
+contract UpdateV3ContractsPermissionsArbitrum is UpdateV3Permissions {
   function targetOwner() public pure override returns (address) {
     return GovernanceV3Arbitrum.EXECUTOR_LVL_1;
   }
 
-  function targetGovernanceGuardian() public pure virtual returns (address) {
-    return 0xbbd9f90699c1FA0D7A65870D241DD1f1217c96Eb; // normal arb guardian
+  function targetADIGuardian() public pure override returns (address) {
+    return 0x1Fcd437D8a9a6ea68da858b78b6cf10E8E0bF959; // BGD Safe
+  }
+
+  function targetGovernanceGuardian() public pure override returns (address) {
+    return 0xbbd9f90699c1FA0D7A65870D241DD1f1217c96Eb;
   }
 
   function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
-    return GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER;
+    return address(0);
   }
 
-  function contractsToUpdate() public pure override returns (address[] memory) {
-    address[] memory contracts = new address[](2);
-    contracts[0] = GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER;
-    contracts[1] = address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER);
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER);
     return contracts;
   }
-}
 
-contract UpdateV3ContractsPermissionsArbitrum {
-  function _changeOwnerAndGuardian() internal {
-    address newOwner = GovernanceV3Arbitrum.EXECUTOR_LVL_1;
-    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
-
-    address newGuardian = 0xbbd9f90699c1FA0D7A65870D241DD1f1217c96Eb;
-
-    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
-
-    // change ownership
-    Ownable(GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-
-    // ------------- GOVERNANCE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
-
-    // change ownership
-    Ownable(address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = GovernanceV3Arbitrum.CROSS_CHAIN_CONTROLLER;
+    return contracts;
   }
 }
 
@@ -210,26 +219,33 @@ contract Arbitrum is ArbitrumScript, UpdateV3ContractsPermissionsArbitrum {
   }
 }
 
-contract UpdateV3ContractsPermissionsOptimism {
-  function _changeOwnerAndGuardian() internal {
-    address newOwner = GovernanceV3Optimism.EXECUTOR_LVL_1;
-    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
+contract UpdateV3ContractsPermissionsOptimism is UpdateV3Permissions {
+  function targetOwner() public pure override returns (address) {
+    return GovernanceV3Optimism.EXECUTOR_LVL_1;
+  }
 
-    address newGuardian = 0xE50c8C619d05ff98b22Adf991F17602C774F785c;
+  function targetADIGuardian() public pure override returns (address) {
+    return 0x3A800fbDeAC82a4d9c68A9FA0a315e095129CDBF; // BGD Safe
+  }
 
-    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+  function targetGovernanceGuardian() public pure override returns (address) {
+    return 0xE50c8C619d05ff98b22Adf991F17602C774F785c;
+  }
 
-    // change ownership
-    Ownable(GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
+    return address(0);
+  }
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = address(GovernanceV3Optimism.PAYLOADS_CONTROLLER);
+    return contracts;
+  }
 
-    // change ownership
-    Ownable(address(GovernanceV3Optimism.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = GovernanceV3Optimism.CROSS_CHAIN_CONTROLLER;
+    return contracts;
   }
 }
 
@@ -239,26 +255,33 @@ contract Optimism is OptimismScript, UpdateV3ContractsPermissionsOptimism {
   }
 }
 
-contract UpdateV3ContractsPermissionsBase {
-  function _changeOwnerAndGuardian() internal {
-    address newOwner = GovernanceV3Base.EXECUTOR_LVL_1;
-    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
+contract UpdateV3ContractsPermissionsBase is UpdateV3Permissions {
+  function targetOwner() public pure override returns (address) {
+    return GovernanceV3Base.EXECUTOR_LVL_1;
+  }
 
-    address newGuardian = 0x9e10C0A1Eb8FF6a0AaA53a62C7a338f35D7D9a2A;
+  function targetADIGuardian() public pure override returns (address) {
+    return 0x7FDA7C3528ad8f05e62148a700D456898b55f8d2; // BGD Safe
+  }
 
-    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(GovernanceV3Base.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+  function targetGovernanceGuardian() public pure override returns (address) {
+    return 0x9e10C0A1Eb8FF6a0AaA53a62C7a338f35D7D9a2A;
+  }
 
-    // change ownership
-    Ownable(GovernanceV3Base.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
+    return address(0);
+  }
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(address(GovernanceV3Base.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = address(GovernanceV3Base.PAYLOADS_CONTROLLER);
+    return contracts;
+  }
 
-    // change ownership
-    Ownable(address(GovernanceV3Base.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = GovernanceV3Base.CROSS_CHAIN_CONTROLLER;
+    return contracts;
   }
 }
 
@@ -268,26 +291,33 @@ contract Base is BaseScript, UpdateV3ContractsPermissionsBase {
   }
 }
 
-contract UpdateV3ContractsPermissionsMetis {
-  function _changeOwnerAndGuardian() internal {
-    address newOwner = GovernanceV3Metis.EXECUTOR_LVL_1;
-    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
+contract UpdateV3ContractsPermissionsMetis is UpdateV3Permissions {
+  function targetOwner() public pure override returns (address) {
+    return GovernanceV3Metis.EXECUTOR_LVL_1;
+  }
 
-    address newGuardian = 0xF6Db48C5968A9eBCB935786435530f28e32Cc501;
+  function targetADIGuardian() public pure override returns (address) {
+    return 0x9853589F951D724D9f7c6724E0fD63F9d888C429; // BGD Safe
+  }
 
-    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(GovernanceV3Metis.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+  function targetGovernanceGuardian() public pure override returns (address) {
+    return 0xF6Db48C5968A9eBCB935786435530f28e32Cc501;
+  }
 
-    // change ownership
-    Ownable(GovernanceV3Metis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
+    return address(0);
+  }
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(address(GovernanceV3Metis.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = address(GovernanceV3Metis.PAYLOADS_CONTROLLER);
+    return contracts;
+  }
 
-    // change ownership
-    Ownable(address(GovernanceV3Metis.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = GovernanceV3Metis.CROSS_CHAIN_CONTROLLER;
+    return contracts;
   }
 }
 
@@ -297,24 +327,33 @@ contract Metis is MetisScript, UpdateV3ContractsPermissionsMetis {
   }
 }
 
-contract UpdateV3ContractsPermissionsGnosis {
-  function _changeOwnerAndGuardian() internal {
-    address newOwner = GovernanceV3Gnosis.EXECUTOR_LVL_1;
-    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
+contract UpdateV3ContractsPermissionsGnosis is UpdateV3Permissions {
+  function targetOwner() public pure override returns (address) {
+    return GovernanceV3Gnosis.EXECUTOR_LVL_1;
+  }
 
-    address newGuardian = 0xF163b8698821cefbD33Cf449764d69Ea445cE23D;
+  function targetADIGuardian() public pure override returns (address) {
+    return 0xcb8a3E864D12190eD2b03cbA0833b15f2c314Ed8; // BGD Safe
+  }
 
-    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-    // change guardian
-    IWithGuardian(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
+  function targetGovernanceGuardian() public pure override returns (address) {
+    return 0xF163b8698821cefbD33Cf449764d69Ea445cE23D;
+  }
 
-    // change ownership
-    Ownable(GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
+  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
+    return address(0);
+  }
 
-    // ------------- GOVERNANCE CONTRACTS -----------------
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER);
+    return contracts;
+  }
 
-    // change guardian
-    IWithGuardian(address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER;
+    return contracts;
   }
 }
 
