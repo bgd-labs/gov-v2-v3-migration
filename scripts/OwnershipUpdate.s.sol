@@ -8,13 +8,15 @@ import {GovernanceV3Ethereum, GovernanceV3Arbitrum, GovernanceV3Avalanche, Gover
 import {AaveV2Ethereum, AaveV2Polygon, AaveV2Avalanche} from 'aave-address-book/AaveAddressBook.sol';
 import {ICrossChainForwarder} from 'aave-delivery-infrastructure/contracts/interfaces/ICrossChainForwarder.sol';
 
+// Effects of executing this changes on tenderly fork can be found here: https://github.com/bgd-labs/aave-permissions-list/pull/42
+
 contract UpdateV3ContractsPermissionsEthereum {
   function _changeOwnerAndGuardian() internal {
     address newOwner = GovernanceV3Ethereum.EXECUTOR_LVL_1;
     require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
 
     address newGuardian = AaveV2Ethereum.EMERGENCY_ADMIN;
-    address aDIGuardian = 0xb812d0944f8F581DfAA3a93Dda0d22EcEf51A9CF;
+    address aDIGuardian = 0xb812d0944f8F581DfAA3a93Dda0d22EcEf51A9CF; // BGD Safe
     require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
 
     // ------------- INFRASTRUCTURE CONTRACTS -----------------
