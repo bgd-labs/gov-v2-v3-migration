@@ -8,6 +8,7 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {IABPT} from './IABPT.sol';
 import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
 import {IProxyAdmin} from '../../src/contracts/dependencies/IProxyAdmin.sol';
 import {IBalancerOwnable} from '../../src/contracts/dependencies/IBalancerOwnable.sol';
@@ -36,13 +37,13 @@ contract ABPTUpgradeTest is ProtocolV3TestBase {
       abi.encodeWithSignature('initialize(address)', GovernanceV3Ethereum.EXECUTOR_LVL_1)
     );
 
-    vm.stopPrank();
-
     assertEq(
       IBalancerOwnable(ABPT_PROXY).getController(),
       address(GovernanceV3Ethereum.EXECUTOR_LVL_1)
     );
 
-    // update impl
+    IABPT(ABPT_PROXY).setSwapFee(1e16);
+
+    vm.stopPrank();
   }
 }
