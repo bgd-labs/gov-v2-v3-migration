@@ -28,9 +28,9 @@ deploy-base :; forge script scripts/DeployPayloads.s.sol:DeployBase  --rpc-url b
 
 
 
-deploy-owner-mainnet :; forge script scripts/OwnershipUpdate.s.sol:Ethereum --fork-url https://rpc.tenderly.co/fork/7f892cc9-0097-4095-8100-0c8f58716e79 $(common-flags)
-deploy-owner-polygon :; forge script scripts/OwnershipUpdate.s.sol:Polygon --fork-url https://rpc.tenderly.co/fork/9b23a671-b47b-4d71-8c30-07fb1c8cfb91 $(common-flags)
-deploy-owner-avalanche :; forge script scripts/OwnershipUpdate.s.sol:Avalanche --fork-url https://rpc.tenderly.co/fork/54c6fc27-b83d-44fa-bd37-2599008d8ae2 $(common-flags)
-deploy-owner-arbitrum :; forge script scripts/OwnershipUpdate.s.sol:Arbitrum --fork-url https://rpc.tenderly.co/fork/35f1ee13-e56e-4db0-b099-18d2c0122353 $(common-flags)
-deploy-owner-optimism :; forge script scripts/OwnershipUpdate.s.sol:Optimism --fork-url https://rpc.tenderly.co/fork/27eaa83b-257d-422c-a3db-dcdd10994f26 $(common-flags)
-deploy-owner-base :; forge script scripts/OwnershipUpdate.s.sol:Base --fork-url https://rpc.tenderly.co/fork/7954043d-42e1-48a3-acad-cb9641c6da20 $(common-flags)
+deploy-owner-mainnet :; forge script scripts/OwnershipUpdate.s.sol:Ethereum --fork-url https://rpc.tenderly.co/fork/578c5cc5-fb44-4f88-84b9-8ed7e1216a75 $(common-flags)
+deploy-owner-polygon :; forge script scripts/OwnershipUpdate.s.sol:Polygon --fork-url https://rpc.tenderly.co/fork/524a6cfa-fce6-457d-ba78-793d07e269ac $(common-flags)
+deploy-owner-avalanche :; forge script scripts/OwnershipUpdate.s.sol:Avalanche --fork-url https://rpc.tenderly.co/fork/40da20b7-d9d9-47a1-8346-4d02bcdd43aa $(common-flags)
+deploy-owner-arbitrum :; forge script scripts/OwnershipUpdate.s.sol:Arbitrum --fork-url https://rpc.tenderly.co/fork/df2da112-679c-41b5-933d-d34b9e864d34 $(common-flags)
+deploy-owner-optimism :; forge script scripts/OwnershipUpdate.s.sol:Optimism --fork-url https://rpc.tenderly.co/fork/91065bd8-4d24-4539-a87b-589f9ce45154 $(common-flags)
+deploy-owner-base :; forge script scripts/OwnershipUpdate.s.sol:Base --fork-url https://rpc.tenderly.co/fork/5de70ecb-f606-409f-83d5-bea7764e43a5 $(common-flags)
