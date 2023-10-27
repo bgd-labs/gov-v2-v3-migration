@@ -196,10 +196,6 @@ contract UpdateV3ContractsPermissionsArbitrum is UpdateV3Permissions {
     return 0xbbd9f90699c1FA0D7A65870D241DD1f1217c96Eb;
   }
 
-  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
-    return address(0);
-  }
-
   function govContractsToUpdate() public pure override returns (address[] memory) {
     address[] memory contracts = new address[](1);
     contracts[0] = address(GovernanceV3Arbitrum.PAYLOADS_CONTROLLER);
@@ -230,10 +226,6 @@ contract UpdateV3ContractsPermissionsOptimism is UpdateV3Permissions {
 
   function targetGovernanceGuardian() public pure override returns (address) {
     return 0xE50c8C619d05ff98b22Adf991F17602C774F785c;
-  }
-
-  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
-    return address(0);
   }
 
   function govContractsToUpdate() public pure override returns (address[] memory) {
@@ -268,10 +260,6 @@ contract UpdateV3ContractsPermissionsBase is UpdateV3Permissions {
     return 0x9e10C0A1Eb8FF6a0AaA53a62C7a338f35D7D9a2A;
   }
 
-  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
-    return address(0);
-  }
-
   function govContractsToUpdate() public pure override returns (address[] memory) {
     address[] memory contracts = new address[](1);
     contracts[0] = address(GovernanceV3Base.PAYLOADS_CONTROLLER);
@@ -302,10 +290,6 @@ contract UpdateV3ContractsPermissionsMetis is UpdateV3Permissions {
 
   function targetGovernanceGuardian() public pure override returns (address) {
     return 0xF6Db48C5968A9eBCB935786435530f28e32Cc501;
-  }
-
-  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
-    return address(0);
   }
 
   function govContractsToUpdate() public pure override returns (address[] memory) {
