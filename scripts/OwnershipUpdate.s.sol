@@ -324,10 +324,6 @@ contract UpdateV3ContractsPermissionsGnosis is UpdateV3Permissions {
     return 0xF163b8698821cefbD33Cf449764d69Ea445cE23D;
   }
 
-  function CROSS_CHAIN_CONTROLLER() public pure override returns (address) {
-    return address(0);
-  }
-
   function govContractsToUpdate() public pure override returns (address[] memory) {
     address[] memory contracts = new address[](1);
     contracts[0] = address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER);
