@@ -28,9 +28,11 @@ deploy-base :; forge script scripts/DeployPayloads.s.sol:DeployBase  --rpc-url b
 
 
 
-deploy-owner-mainnet :; forge script scripts/OwnershipUpdate.s.sol:Ethereum --fork-url https://rpc.tenderly.co/fork/7f892cc9-0097-4095-8100-0c8f58716e79 $(common-flags)
-deploy-owner-polygon :; forge script scripts/OwnershipUpdate.s.sol:Polygon --fork-url https://rpc.tenderly.co/fork/9b23a671-b47b-4d71-8c30-07fb1c8cfb91 $(common-flags)
-deploy-owner-avalanche :; forge script scripts/OwnershipUpdate.s.sol:Avalanche --fork-url https://rpc.tenderly.co/fork/54c6fc27-b83d-44fa-bd37-2599008d8ae2 $(common-flags)
-deploy-owner-arbitrum :; forge script scripts/OwnershipUpdate.s.sol:Arbitrum --fork-url https://rpc.tenderly.co/fork/35f1ee13-e56e-4db0-b099-18d2c0122353 $(common-flags)
-deploy-owner-optimism :; forge script scripts/OwnershipUpdate.s.sol:Optimism --fork-url https://rpc.tenderly.co/fork/27eaa83b-257d-422c-a3db-dcdd10994f26 $(common-flags)
-deploy-owner-base :; forge script scripts/OwnershipUpdate.s.sol:Base --fork-url https://rpc.tenderly.co/fork/7954043d-42e1-48a3-acad-cb9641c6da20 $(common-flags)
+deploy-owner-mainnet :; forge script scripts/OwnershipUpdate.s.sol:Ethereum --fork-url mainnet $(common-flags)
+deploy-owner-polygon :; forge script scripts/OwnershipUpdate.s.sol:Polygon --fork-url polygon $(common-flags)
+deploy-owner-avalanche :; forge script scripts/OwnershipUpdate.s.sol:Avalanche --fork-url avalanche $(common-flags)
+deploy-owner-arbitrum :; forge script scripts/OwnershipUpdate.s.sol:Arbitrum --fork-url arbitrum $(common-flags)
+deploy-owner-optimism :; forge script scripts/OwnershipUpdate.s.sol:Optimism --fork-url optimism $(common-flags)
+deploy-owner-base :; forge script scripts/OwnershipUpdate.s.sol:Base --fork-url base $(common-flags)
+deploy-owner-metis :; forge script scripts/OwnershipUpdate.s.sol:Metis --fork-url metis $(common-flags)
+deploy-owner-gnosis :; forge script scripts/OwnershipUpdate.s.sol:Gnosis --fork-url gnosis $(common-flags)
