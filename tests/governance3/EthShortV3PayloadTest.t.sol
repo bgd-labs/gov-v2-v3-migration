@@ -21,6 +21,7 @@ import {Mediator} from '../../src/contracts/governance3/Mediator.sol';
 import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/EthShortMovePermissionsPayload.sol';
 import {EthLongV3Payload} from '../../src/contracts/governance3/EthLongV3Payload.sol';
 import {EthShortV3Payload} from '../../src/contracts/governance3/EthShortV3Payload.sol';
+import {IABPT} from '../abpt/IABPT.sol';
 import {ShortPayload} from '../mocks/ShortPayload.sol';
 import {LongPayload} from '../mocks/LongPayload.sol';
 
@@ -30,6 +31,8 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
+  address public constant ABPT_PROXY = 0x41A08648C3766F9F9d85598fF102a08f4ef84F84;
+
   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
 
   EthShortV3Payload public payload;
@@ -37,7 +40,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18412862);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18455132);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -64,6 +67,8 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     vm.stopPrank();
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    // IABPT(ABPT_PROXY).setSwapFee(1e16);
 
     _testExecutor();
 

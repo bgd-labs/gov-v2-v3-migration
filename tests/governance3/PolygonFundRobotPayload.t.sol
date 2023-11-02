@@ -19,7 +19,7 @@ contract PolygonFundRobotPayloadTest is Test {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 49056415);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 49290337);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -28,7 +28,11 @@ contract PolygonFundRobotPayloadTest is Test {
 
     payload = new PolygonFundRobotPayload();
 
-    GovHelpers.executePayload(vm, address(permissionsPayload), AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
+    GovHelpers.executePayload(
+      vm,
+      address(permissionsPayload),
+      AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR
+    );
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Polygon.EXECUTOR_LVL_1);
 
     _testRobot();
@@ -37,7 +41,11 @@ contract PolygonFundRobotPayloadTest is Test {
   function _testRobot() internal {
     uint256 votingChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce + 1))
+        abi.encodePacked(
+          blockhash(block.number - 1),
+          KEEPER_REGISTRY,
+          uint32(registryState.nonce + 1)
+        )
       )
     );
 

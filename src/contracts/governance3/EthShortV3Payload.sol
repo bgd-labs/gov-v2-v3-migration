@@ -33,6 +33,10 @@ contract EthShortV3Payload {
   // TODO: update address
   address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
+  address public constant ABPT_PROXY = 0x41A08648C3766F9F9d85598fF102a08f4ef84F84;
+  // TODO: update address
+  address public constant ABPT_IMPL = address(1);
+
   uint256 public constant LINK_AMOUNT_ROBOT_GOV_CHAIN = 300 ether;
   uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 100 ether;
   uint256 public constant LINK_AMOUNT_ROOTS_CONSUMER = 100 ether;
@@ -56,6 +60,12 @@ contract EthShortV3Payload {
   function execute() external {
     // LONG ADMIN PERMISSIONS
     IMediator(MEDIATOR).execute();
+
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgradeAndCall(
+      ITransparentUpgradeableProxy(address(ABPT_PROXY)),
+      address(ABPT_IMPL),
+      abi.encodeWithSignature('initialize(address)', GovernanceV3Ethereum.EXECUTOR_LVL_1)
+    );
 
     IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),

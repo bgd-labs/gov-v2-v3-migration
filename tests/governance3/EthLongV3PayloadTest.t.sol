@@ -18,7 +18,7 @@ contract EthLongV3PayloadTest is ProtocolV3TestBase {
   address public constant GOVERNANCE_3_IMPL = 0x8543A1c3f8D4Cb0D7363047bec613b6b54740B1d;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18412862);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18455132);
   }
 
   function testPayload() public {
