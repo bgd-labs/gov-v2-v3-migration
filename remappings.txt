@@ -10,3 +10,5 @@ forge-std/=lib/forge-std/src/
 solidity-utils/=lib/solidity-utils/src/
 aave-stk-gov-v3/=lib/aave-stk-gov-v3/src/
 aave-token-v3/=lib/aave-token-v3/src/
+aave-delivery-infrastructure/=lib/aave-delivery-infrastructure/src/
+aave-delivery-infrastructure-scripts/=lib/aave-delivery-infrastructure/scripts/
