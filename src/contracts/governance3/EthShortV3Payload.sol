@@ -28,6 +28,16 @@ interface IAaveArcTimelock {
   ) external;
 
   function updateEthereumGovernanceExecutor(address ethereumGovernanceExecutor) external;
+
+  function getActionsSetCount() external view returns (uint256);
+
+  function execute(uint256 actionsSetId) external;
+
+  function getDelay() external view returns (uint256);
+
+  function getEthereumGovernanceExecutor() external view returns (address);
+
+  function getCurrentState(uint256 actionsSetId) external view returns (uint8);
 }
 
 /**
@@ -66,41 +76,41 @@ contract EthShortV3Payload {
 
   function execute() external {
     // LONG ADMIN PERMISSIONS
-    IMediator(MEDIATOR).execute();
-
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      MiscEthereum.PROXY_ADMIN_LONG
-    );
-
-    upgradeAAave();
-
-    // GET LINK TOKENS FROM COLLECTOR
-    MigratorLib.fetchLinkTokens(
-      AaveV3Ethereum.COLLECTOR,
-      address(AaveV2Ethereum.POOL),
-      AaveV2EthereumAssets.LINK_UNDERLYING,
-      AaveV2EthereumAssets.LINK_A_TOKEN,
-      TOTAL_LINK_AMOUNT,
-      true
-    );
-
-    // migrate ecosystem reserve
-    _ecosystemReserve();
+    //    IMediator(MEDIATOR).execute();
+    //
+    //    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
+    //      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+    //      MiscEthereum.PROXY_ADMIN_LONG
+    //    );
+    //
+    //    upgradeAAave();
+    //
+    //    // GET LINK TOKENS FROM COLLECTOR
+    //    MigratorLib.fetchLinkTokens(
+    //      AaveV3Ethereum.COLLECTOR,
+    //      address(AaveV2Ethereum.POOL),
+    //      AaveV2EthereumAssets.LINK_UNDERLYING,
+    //      AaveV2EthereumAssets.LINK_A_TOKEN,
+    //      TOTAL_LINK_AMOUNT,
+    //      true
+    //    );
+    //
+    //    // migrate ecosystem reserve
+    //    _ecosystemReserve();
 
     // migrate aave arc gov executor to new gov v3 executor lvl 1
     _migrateArc();
 
     // ROBOT
-    migrateKeepers();
-
-    // EXECUTOR PERMISSIONS
-    // new executor - call execute payload to accept new permissions
-    IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
+    //    migrateKeepers();
+    //
+    //    // EXECUTOR PERMISSIONS
+    //    // new executor - call execute payload to accept new permissions
+    //    IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
   }
 
   function _ecosystemReserve() internal {
-    IOwnable(address(AAVE_ECOSYSTEM_RESERVE_CONTROLLER)).transferOwnership(
+    IOwnable(address(MiscEthereum.AAVE_ECOSYSTEM_RESERVE_CONTROLLER)).transferOwnership(
       MiscEthereum.PROXY_ADMIN
     );
     ITransparentUpgradeableProxy(MiscEthereum.ECOSYSTEM_RESERVE).changeAdmin(
@@ -110,7 +120,7 @@ contract EthShortV3Payload {
 
   function _migrateArc() internal {
     address[] memory targets = new address[](1);
-    targets[0] = ARC_TIMELOCK;
+    targets[0] = AaveGovernanceV2.ARC_TIMELOCK;
     uint256[] memory values = new uint256[](1);
     values[0] = 0;
     string[] memory signatures = new string[](1);
