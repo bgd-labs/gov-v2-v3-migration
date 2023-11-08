@@ -60,8 +60,6 @@ contract EthShortV3Payload {
   address public constant VOTING_CHAIN_ROBOT = 0x2cf0fA5b36F0f89a5EA18F835d1375974a7720B8;
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
-  address public constant ARC_TIMELOCK = 0xAce1d11d836cb3F51Ef658FD4D353fFb3c301218;
-
   constructor(address mediator) {
     MEDIATOR = mediator;
   }
@@ -87,6 +85,9 @@ contract EthShortV3Payload {
       true
     );
 
+    // migrate ecosystem reserve
+    _ecosystemReserve();
+
     // migrate aave arc gov executor to new gov v3 executor lvl 1
     _migrateArc();
 
@@ -96,6 +97,15 @@ contract EthShortV3Payload {
     // EXECUTOR PERMISSIONS
     // new executor - call execute payload to accept new permissions
     IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
+  }
+
+  function _ecosystemReserve() internal {
+    IOwnable(address(AAVE_ECOSYSTEM_RESERVE_CONTROLLER)).transferOwnership(
+      MiscEthereum.PROXY_ADMIN
+    );
+    ITransparentUpgradeableProxy(MiscEthereum.ECOSYSTEM_RESERVE).changeAdmin(
+      MiscEthereum.PROXY_ADMIN
+    );
   }
 
   function _migrateArc() internal {
@@ -111,7 +121,13 @@ contract EthShortV3Payload {
     withDelegatecalls[0] = true;
 
     // create payload for arc timelock
-    IAaveArcTimelock(ARC_TIMELOCK).queue(targets, values, signatures, calldatas, withDelegatecalls);
+    IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).queue(
+      targets,
+      values,
+      signatures,
+      calldatas,
+      withDelegatecalls
+    );
   }
 
   function migrateKeepers() internal {
