@@ -16,8 +16,19 @@ import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IMediator} from '../interfaces/IMediator.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
-
 import {MigratorLib} from '../libraries/MigratorLib.sol';
+
+interface IAaveArcTimelock {
+  function queue(
+    address[] memory targets,
+    uint256[] memory values,
+    string[] memory signatures,
+    bytes[] memory calldatas,
+    bool[] memory withDelegatecalls
+  ) external;
+
+  function updateEthereumGovernanceExecutor(address ethereumGovernanceExecutor) external;
+}
 
 /**
  * @title EthShortV3Payload
@@ -49,6 +60,8 @@ contract EthShortV3Payload {
   address public constant VOTING_CHAIN_ROBOT = 0x2cf0fA5b36F0f89a5EA18F835d1375974a7720B8;
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
+  address public constant ARC_TIMELOCK = 0xAce1d11d836cb3F51Ef658FD4D353fFb3c301218;
+
   constructor(address mediator) {
     MEDIATOR = mediator;
   }
@@ -74,12 +87,31 @@ contract EthShortV3Payload {
       true
     );
 
+    // migrate aave arc gov executor to new gov v3 executor lvl 1
+    _migrateArc();
+
     // ROBOT
     migrateKeepers();
 
     // EXECUTOR PERMISSIONS
     // new executor - call execute payload to accept new permissions
     IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
+  }
+
+  function _migrateArc() internal {
+    address[] memory targets = new address[](1);
+    targets[0] = ARC_TIMELOCK;
+    uint256[] memory values = new uint256[](1);
+    values[0] = 0;
+    string[] memory signatures = new string[](1);
+    signatures[0] = 'updateEthereumGovernanceExecutor(address)';
+    bytes[] memory calldatas = new bytes[](1);
+    calldatas[0] = abi.encode(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    bool[] memory withDelegatecalls = new bool[](1);
+    withDelegatecalls[0] = true;
+
+    // create payload for arc timelock
+    IAaveArcTimelock(ARC_TIMELOCK).queue(targets, values, signatures, calldatas, withDelegatecalls);
   }
 
   function migrateKeepers() internal {
