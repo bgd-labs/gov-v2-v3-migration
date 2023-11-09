@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {ProtocolV3TestBase, ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
+import {GovV3Helpers} from 'aave-helpers/GovV3Helpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
@@ -49,16 +50,16 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     payload = new EthShortV3Payload(address(mediator));
     uint40 payloadId = _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(payload));
 
-    EthShortV2Payload shortPayload = new EthShortV2Payload(payloadId, 1, 1, 1);
+    EthShortV2Payload shortV2Payload = new EthShortV2Payload(payloadId, 1, 1, 1);
 
-    // execute v2 payload
-    GovHelpers.executePayload(vm, address(shortPayload), AaveGovernanceV2.SHORT_EXECUTOR);
+    // execute v2 short payload
+    GovHelpers.executePayload(vm, address(shortV2Payload), AaveGovernanceV2.SHORT_EXECUTOR);
 
-    // execute 2.5 payload
+    // execute v3 long payload
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
 
-    // TODO: execute using payloadId payload
-    GovHelpers.executePayload(vm, address(payload), GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    // execute v3 short payload via registered id
+    GovV3Helpers.executePayload(vm, payloadId);
 
     vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
 
@@ -70,6 +71,8 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     vm.stopPrank();
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    _testArc();
 
     _testExecutor();
 
@@ -83,16 +86,16 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   }
 
   function _testArc() internal {
-    assertEq(
-      IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getEthereumGovernanceExecutor(),
-      GovernanceV3Ethereum.EXECUTOR_LVL_1
-    );
-
     // execute payload on arc timelock
     uint256 currentActionId = IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getActionsSetCount();
 
     skip(3 days + 10);
     IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).execute(currentActionId - 1);
+
+    assertEq(
+      IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getEthereumGovernanceExecutor(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
 
     rewind(3 days + 10);
   }

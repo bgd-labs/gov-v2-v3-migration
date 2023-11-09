@@ -40,7 +40,10 @@ interface IAaveArcTimelock {
  * @author BGD Labs
  **/
 contract EthShortV2Payload {
-  PayloadsControllerUtils.Payload[4] public payloads;
+  uint40 immutable MAINNET_PAYLOAD_ID;
+  uint40 immutable POLYGON_PAYLOAD_ID;
+  uint40 immutable AVALANCHE_PAYLOAD_ID;
+  uint40 immutable BASE_PAYLOAD_ID;
 
   constructor(
     uint40 mainnetPayloadId,
@@ -48,30 +51,10 @@ contract EthShortV2Payload {
     uint40 avalanchePayloadId,
     uint40 basePayloadId
   ) public {
-    payloads[0] = PayloadsControllerUtils.Payload({
-      chain: 1,
-      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
-      payloadsController: address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
-      payloadId: mainnetPayloadId
-    });
-    payloads[1] = PayloadsControllerUtils.Payload({
-      chain: 137,
-      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
-      payloadsController: address(GovernanceV3Polygon.PAYLOADS_CONTROLLER),
-      payloadId: polygonPayloadId
-    });
-    payloads[2] = PayloadsControllerUtils.Payload({
-      chain: 43114,
-      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
-      payloadsController: address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER),
-      payloadId: avalanchePayloadId
-    });
-    payloads[3] = PayloadsControllerUtils.Payload({
-      chain: 8453,
-      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
-      payloadsController: address(GovernanceV3Base.PAYLOADS_CONTROLLER),
-      payloadId: basePayloadId
-    });
+    MAINNET_PAYLOAD_ID = mainnetPayloadId;
+    POLYGON_PAYLOAD_ID = polygonPayloadId;
+    AVALANCHE_PAYLOAD_ID = avalanchePayloadId;
+    BASE_PAYLOAD_ID = basePayloadId;
   }
 
   function execute() external {
@@ -82,11 +65,7 @@ contract EthShortV2Payload {
     _migrateArc();
 
     // call governance 2.5
-    for (uint256 i = 0; i < payloads.length; i++) {
-      IGovernance_V2_5(address(GovernanceV3Ethereum.GOVERNANCE)).forwardPayloadForExecution(
-        payloads[i]
-      );
-    }
+    _forwardToGovernance2_5();
   }
 
   function _ecosystemReserve() internal {
@@ -118,5 +97,40 @@ contract EthShortV2Payload {
       calldatas,
       withDelegatecalls
     );
+  }
+
+  function _forwardToGovernance2_5() internal {
+    PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](4);
+
+    payloads[0] = PayloadsControllerUtils.Payload({
+      chain: 1,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
+      payloadId: MAINNET_PAYLOAD_ID
+    });
+    payloads[1] = PayloadsControllerUtils.Payload({
+      chain: 137,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Polygon.PAYLOADS_CONTROLLER),
+      payloadId: POLYGON_PAYLOAD_ID
+    });
+    payloads[2] = PayloadsControllerUtils.Payload({
+      chain: 43114,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER),
+      payloadId: AVALANCHE_PAYLOAD_ID
+    });
+    payloads[3] = PayloadsControllerUtils.Payload({
+      chain: 8453,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Base.PAYLOADS_CONTROLLER),
+      payloadId: BASE_PAYLOAD_ID
+    });
+
+    for (uint256 i = 0; i < payloads.length; i++) {
+      IGovernance_V2_5(address(GovernanceV3Ethereum.GOVERNANCE)).forwardPayloadForExecution(
+        payloads[i]
+      );
+    }
   }
 }
