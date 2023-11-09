@@ -31,7 +31,18 @@ import {deployContract} from './helpers';
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
 // create mainnet fork
-const getFork = async (chain: any) => {
+
+const TENDERLY_BASE: string = `https://api.tenderly.co/api/v1`;
+const networkForks: Record<number, string> = {
+  1: '',
+  137: '',
+  43_114: '',
+  8453: '',
+  42_161: '',
+  10: '',
+};
+
+const getFork = async (chain: any, fixed?: boolean) => {
   const fork = await tenderly.fork({chainId: chain.id, alias: 'govV3Fork'});
 
   const walletClient = createWalletClient({
@@ -47,6 +58,24 @@ const getFork = async (chain: any) => {
 
   return {fork, walletClient, publicClient};
 };
+
+const getForkInfo = async () => {
+  // rpc.tenderly.co/fork/5b6e4a5b-96c7-47c1-9103-52ee1c17bc88
+  const response = await fetch(
+    'https://api.tenderly.co/api/v1/account/bgd-labs/project/governance-v3/fork/5b6e4a5b-96c7-47c1-9103-52ee1c17bc88',
+    {
+      method: 'GET',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+        'X-Access-Key': 'MgtjFl-q99PY32WbxMRl8K119euRkTcd',
+      }),
+    }
+  );
+  const result = await response.json();
+  console.log('--------> ', result);
+};
+
+getForkInfo().then().catch();
 
 const deployAndExecuteL2Payload = async (
   chain: any,
@@ -150,7 +179,7 @@ const deployPayloadsEthereum = async () => {
   // console.log('proposalId: ', proposalId);
 };
 
-deployPayloadsEthereum().then().catch(console.log);
+// deployPayloadsEthereum().then().catch(console.log);
 
 async function upgradeL2s() {
   await deployAndExecuteL2Payload(
@@ -194,4 +223,4 @@ async function upgradeL2s() {
   );
 }
 
-upgradeL2s();
+// upgradeL2s();
