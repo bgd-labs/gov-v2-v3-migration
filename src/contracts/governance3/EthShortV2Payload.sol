@@ -2,21 +2,15 @@
 pragma solidity ^0.8.0;
 
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
-import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
-import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
-import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
-import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
+import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
+import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {IGovernance_V2_5} from 'aave-helpers/GovV3Helpers.sol';
 import {ITransparentUpgradeableProxy} from '../dependencies/ITransparentUpgradeableProxy.sol';
-import {IProxyAdmin} from '../dependencies/IProxyAdmin.sol';
-import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
-import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
-import {IMediator} from '../interfaces/IMediator.sol';
-import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
-import {MigratorLib} from '../libraries/MigratorLib.sol';
 
 interface IAaveArcTimelock {
   function queue(
@@ -46,12 +40,53 @@ interface IAaveArcTimelock {
  * @author BGD Labs
  **/
 contract EthShortV2Payload {
+  PayloadsControllerUtils.Payload[4] public payloads;
+
+  constructor(
+    uint40 mainnetPayloadId,
+    uint40 polygonPayloadId,
+    uint40 avalanchePayloadId,
+    uint40 basePayloadId
+  ) public {
+    payloads[0] = PayloadsControllerUtils.Payload({
+      chain: 1,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Ethereum.PAYLOADS_CONTROLLER),
+      payloadId: mainnetPayloadId
+    });
+    payloads[1] = PayloadsControllerUtils.Payload({
+      chain: 137,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Polygon.PAYLOADS_CONTROLLER),
+      payloadId: polygonPayloadId
+    });
+    payloads[2] = PayloadsControllerUtils.Payload({
+      chain: 43114,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER),
+      payloadId: avalanchePayloadId
+    });
+    payloads[3] = PayloadsControllerUtils.Payload({
+      chain: 8453,
+      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+      payloadsController: address(GovernanceV3Base.PAYLOADS_CONTROLLER),
+      payloadId: basePayloadId
+    });
+  }
+
   function execute() external {
     // migrate ecosystem reserve
     _ecosystemReserve();
 
     // migrate aave arc gov executor to new gov v3 executor lvl 1
     _migrateArc();
+
+    // call governance 2.5
+    for (uint256 i = 0; i < payloads.length; i++) {
+      IGovernance_V2_5(address(GovernanceV3Ethereum.GOVERNANCE)).forwardPayloadForExecution(
+        payloads[i]
+      );
+    }
   }
 
   function _ecosystemReserve() internal {
@@ -61,8 +96,6 @@ contract EthShortV2Payload {
     ITransparentUpgradeableProxy(MiscEthereum.ECOSYSTEM_RESERVE).changeAdmin(
       MiscEthereum.PROXY_ADMIN
     );
-
-    // call Governance 2.5
   }
 
   function _migrateArc() internal {

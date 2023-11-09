@@ -17,6 +17,7 @@ import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecut
 import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {DeployV3Payload} from '../../scripts/DeployV3Payloads.s.sol';
 import {Mediator} from '../../src/contracts/governance3/Mediator.sol';
 import {EthLongV3Payload} from '../../src/contracts/governance3/EthLongV3Payload.sol';
 import {EthShortV2Payload, IAaveArcTimelock} from '../../src/contracts/governance3/EthShortV2Payload.sol';
@@ -24,7 +25,7 @@ import {EthShortV3Payload} from '../../src/contracts/governance3/EthShortV3Paylo
 import {ShortPayload} from '../mocks/ShortPayload.sol';
 import {LongPayload} from '../mocks/LongPayload.sol';
 
-contract EthShortPayloadTest is ProtocolV3TestBase {
+contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
   //TODO: update addresses
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
@@ -44,9 +45,11 @@ contract EthShortPayloadTest is ProtocolV3TestBase {
   function testPayload() public {
     Mediator mediator = new Mediator();
 
-    EthShortV2Payload shortPayload = new EthShortV2Payload();
     EthLongV3Payload longPayload = new EthLongV3Payload(address(mediator));
     payload = new EthShortV3Payload(address(mediator));
+    uint40 payloadId = _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(payload));
+
+    EthShortV2Payload shortPayload = new EthShortV2Payload(payloadId, 1, 1, 1);
 
     // execute v2 payload
     GovHelpers.executePayload(vm, address(shortPayload), AaveGovernanceV2.SHORT_EXECUTOR);
