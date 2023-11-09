@@ -70,7 +70,7 @@ contract EthShortV2Payload {
 
   function _ecosystemReserve() internal {
     IOwnable(address(MiscEthereum.AAVE_ECOSYSTEM_RESERVE_CONTROLLER)).transferOwnership(
-      MiscEthereum.PROXY_ADMIN
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
     );
     ITransparentUpgradeableProxy(MiscEthereum.ECOSYSTEM_RESERVE).changeAdmin(
       MiscEthereum.PROXY_ADMIN

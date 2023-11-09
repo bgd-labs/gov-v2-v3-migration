@@ -14,6 +14,7 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
+import {IProxyAdmin} from '../../src/contracts/dependencies/IProxyAdmin.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
 import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
@@ -74,6 +75,8 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
 
     _testArc();
 
+    _testEcosystemReserve();
+
     _testExecutor();
 
     _testRobot();
@@ -98,6 +101,20 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     );
 
     rewind(3 days + 10);
+  }
+
+  function _testEcosystemReserve() internal {
+    MiscEthereum.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
+      MiscEthereum.ECOSYSTEM_RESERVE,
+      AaveV2EthereumAssets.AAVE_UNDERLYING,
+      address(this),
+      10e18
+    );
+
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgrade(
+      ITransparentUpgradeableProxy(payable(MiscEthereum.ECOSYSTEM_RESERVE)),
+      address(MiscEthereum.AAVE_ECOSYSTEM_RESERVE_CONTROLLER)
+    );
   }
 
   function _testExecutor() internal {
