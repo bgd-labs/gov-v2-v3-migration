@@ -18,17 +18,17 @@ import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {Mediator} from '../../src/contracts/governance3/Mediator.sol';
-import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/EthShortMovePermissionsPayload.sol';
 import {EthLongV3Payload} from '../../src/contracts/governance3/EthLongV3Payload.sol';
+import {EthShortV2Payload, IAaveArcTimelock} from '../../src/contracts/governance3/EthShortV2Payload.sol';
 import {EthShortV3Payload} from '../../src/contracts/governance3/EthShortV3Payload.sol';
 import {ShortPayload} from '../mocks/ShortPayload.sol';
 import {LongPayload} from '../mocks/LongPayload.sol';
 
-contract EthShortV3PayloadTest is ProtocolV3TestBase {
-  //TODO: update addresses
-  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
+contract EthShortPayloadTest is ProtocolV3TestBase {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
+  //TODO: update addresses
   address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
+  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
 
   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
 
@@ -37,21 +37,24 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18412862);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18484852);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
     Mediator mediator = new Mediator();
 
-    EthShortMovePermissionsPayload shortPayload = new EthShortMovePermissionsPayload();
+    EthShortV2Payload shortPayload = new EthShortV2Payload();
     EthLongV3Payload longPayload = new EthLongV3Payload(address(mediator));
-
     payload = new EthShortV3Payload(address(mediator));
 
-    // execute 2.5 payload
+    // execute v2 payload
     GovHelpers.executePayload(vm, address(shortPayload), AaveGovernanceV2.SHORT_EXECUTOR);
+
+    // execute 2.5 payload
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
+
+    // TODO: execute using payloadId payload
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
     vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
@@ -74,6 +77,21 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     _testAaveTokenUpgrade();
     _testStkAaveTokenUpgrade();
     _testLongPermissions(address(mediator));
+  }
+
+  function _testArc() internal {
+    assertEq(
+      IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getEthereumGovernanceExecutor(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
+
+    // execute payload on arc timelock
+    uint256 currentActionId = IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getActionsSetCount();
+
+    skip(3 days + 10);
+    IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).execute(currentActionId - 1);
+
+    rewind(3 days + 10);
   }
 
   function _testExecutor() internal {
