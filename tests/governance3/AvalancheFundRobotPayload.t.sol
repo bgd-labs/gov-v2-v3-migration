@@ -8,27 +8,22 @@ import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
-import {AvaxMovePermissionsPayload} from '../../src/contracts/governance2.5/AvaxMovePermissionsPayload.sol';
 import {AvalancheFundRobotPayload} from '../../src/contracts/governance3/AvalancheFundRobotPayload.sol';
 
-contract AvaxMovePermissionsPayloadTest is Test {
-  address constant AVALANCHE_GUARDIAN = 0xa35b76E4935449E33C56aB24b23fcd3246f13470;
-
+contract AvalancheFundRobotPayloadTest is Test {
   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
 
   AvalancheFundRobotPayload public payload;
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 36817784);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 37570572);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
-    AvaxMovePermissionsPayload permissionsPayload = new AvaxMovePermissionsPayload();
     payload = new AvalancheFundRobotPayload();
 
-    GovHelpers.executePayload(vm, address(permissionsPayload), AVALANCHE_GUARDIAN);
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Avalanche.EXECUTOR_LVL_1);
 
     _testRobot();
@@ -40,7 +35,7 @@ contract AvaxMovePermissionsPayloadTest is Test {
         abi.encodePacked(
           blockhash(block.number - 1),
           KEEPER_REGISTRY,
-          uint32(registryState.nonce + 1)
+          uint32(registryState.nonce)
         )
       )
     );
