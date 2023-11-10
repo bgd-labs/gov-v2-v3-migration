@@ -40,7 +40,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18540103);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18540567);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
