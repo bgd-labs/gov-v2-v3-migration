@@ -8,7 +8,6 @@ import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {PolygonMovePermissionsPayload} from '../../src/contracts/governance2.5/PolygonMovePermissionsPayload.sol';
 import {PolygonFundRobotPayload} from '../../src/contracts/governance3/PolygonFundRobotPayload.sol';
 
 contract PolygonFundRobotPayloadTest is Test {
@@ -19,16 +18,13 @@ contract PolygonFundRobotPayloadTest is Test {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 49056415);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 49764443);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
   function testPayload() public {
-    PolygonMovePermissionsPayload permissionsPayload = new PolygonMovePermissionsPayload();
-
     payload = new PolygonFundRobotPayload();
 
-    GovHelpers.executePayload(vm, address(permissionsPayload), AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
     GovHelpers.executePayload(vm, address(payload), GovernanceV3Polygon.EXECUTOR_LVL_1);
 
     _testRobot();
@@ -37,7 +33,7 @@ contract PolygonFundRobotPayloadTest is Test {
   function _testRobot() internal {
     uint256 votingChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce + 1))
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
       )
     );
 

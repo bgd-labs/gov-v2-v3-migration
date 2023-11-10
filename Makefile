@@ -36,3 +36,11 @@ deploy-owner-optimism :; forge script scripts/OwnershipUpdate.s.sol:Optimism --f
 deploy-owner-base :; forge script scripts/OwnershipUpdate.s.sol:Base --fork-url base $(common-flags)
 deploy-owner-metis :; forge script scripts/OwnershipUpdate.s.sol:Metis --fork-url metis $(common-flags)
 deploy-owner-gnosis :; forge script scripts/OwnershipUpdate.s.sol:Gnosis --fork-url gnosis $(common-flags)
+
+
+
+deploy-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployMainnet --rpc-url mainnet $(common-flags)
+deploy-v2-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployV2Mainnet --rpc-url mainnet $(common-flags)
+deploy-polygon :; forge script scripts/DeployV3Payloads.s.sol:DeployPolygon  --rpc-url polygon $(common-flags)
+deploy-avax :; forge script scripts/DeployV3Payloads.s.sol:DeployAvalanche  --rpc-url avalanche $(common-flags)
+deploy-base :; forge script scripts/DeployV3Payloads.s.sol:DeployBase  --rpc-url base $(common-flags)
