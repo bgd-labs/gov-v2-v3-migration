@@ -68,11 +68,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     // execute v3 short payload via registered id
     GovV3Helpers.executePayload(vm, payloadId);
 
-    vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
-
     _testGovernanceUpdate();
-
-    vm.stopPrank();
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
@@ -92,6 +88,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   }
 
   function _testGovernanceUpdate() internal {
+    hoax(MiscEthereum.PROXY_ADMIN_LONG);
     assertEq(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
       MiscEthereum.PROXY_ADMIN_LONG
