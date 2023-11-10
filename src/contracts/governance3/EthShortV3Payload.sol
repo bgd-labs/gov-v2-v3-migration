@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -25,6 +26,7 @@ import {MigratorLib} from '../libraries/MigratorLib.sol';
  * @author BGD Labs
  **/
 contract EthShortV3Payload {
+  using SafeERC20 for IERC20;
   using SafeCast for uint256;
 
   address public immutable MEDIATOR;
@@ -86,7 +88,7 @@ contract EthShortV3Payload {
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
     // REGISTER NEW KEEPER (GOV CHAIN, VOTING CHAIN)
-    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).approve(
+    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).forceApprove(
       ROBOT_OPERATOR,
       LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN
     );

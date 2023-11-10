@@ -59,7 +59,7 @@ contract PolygonFundRobotPayload {
 
   function _registerKeepers() internal {
     // REGISTER NEW VOTING CHAIN KEEPER
-    IERC20(ERC677_LINK).approve(ROBOT_OPERATOR, LINK_AMOUNT_ROBOT_VOTING_CHAIN);
+    IERC20(ERC677_LINK).forceApprove(ROBOT_OPERATOR, LINK_AMOUNT_ROBOT_VOTING_CHAIN);
 
     IAaveCLRobotOperator(ROBOT_OPERATOR).register(
       'Voting Chain Keeper',
