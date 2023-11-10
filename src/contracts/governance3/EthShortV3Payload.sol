@@ -18,6 +18,7 @@ import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/in
 import {IMediator} from '../interfaces/IMediator.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {MigratorLib} from '../libraries/MigratorLib.sol';
+import {IGovernance} from 'aave-governance-v3/interfaces/IGovernance.sol';
 
 /**
  * @title EthShortV3Payload
@@ -50,6 +51,8 @@ contract EthShortV3Payload {
   address public constant VOTING_CHAIN_ROBOT = 0x2cf0fA5b36F0f89a5EA18F835d1375974a7720B8;
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
+  address public constant GOVERNANCE_V3_IMPL = 0x0B4F6342ecaccD82cf9269A97eB09bf23eD4913F;
+
   constructor(address mediator) {
     MEDIATOR = mediator;
   }
@@ -58,11 +61,9 @@ contract EthShortV3Payload {
     // LONG ADMIN PERMISSIONS
     IMediator(MEDIATOR).execute();
 
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      MiscEthereum.PROXY_ADMIN_LONG
-    );
+    _updateGovernance2_5();
 
+    // update implementation and change proxy admin to long
     upgradeAAave();
 
     // GET LINK TOKENS FROM COLLECTOR
@@ -81,6 +82,19 @@ contract EthShortV3Payload {
     // EXECUTOR PERMISSIONS
     // new executor - call execute payload to accept new permissions
     IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
+  }
+
+  function _updateGovernance2_5() internal {
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgradeAndCall(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+      GOVERNANCE_V3_IMPL,
+      abi.encodeWithSelector(IGovernance.initializeWithRevision.selector, 180_000)
+    );
+
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+      MiscEthereum.PROXY_ADMIN_LONG
+    );
   }
 
   function migrateKeepers() internal {

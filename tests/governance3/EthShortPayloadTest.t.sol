@@ -26,6 +26,8 @@ import {EthShortV2Payload, IAaveArcTimelock} from '../../src/contracts/governanc
 import {EthShortV3Payload} from '../../src/contracts/governance3/EthShortV3Payload.sol';
 import {ShortPayload} from '../mocks/ShortPayload.sol';
 import {LongPayload} from '../mocks/LongPayload.sol';
+import {IGovernance} from 'aave-governance-v3/interfaces/IGovernance.sol';
+import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/IWithGuardian.sol';
 
 contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
@@ -40,7 +42,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18540567);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18541547);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
   }
 
@@ -64,10 +66,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
 
     vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
 
-    assertEq(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
-      MiscEthereum.PROXY_ADMIN_LONG
-    );
+    _testGovernanceUpdate();
 
     vm.stopPrank();
 
@@ -86,6 +85,23 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     _testAaveTokenUpgrade();
     _testStkAaveTokenUpgrade();
     _testLongPermissions(address(mediator));
+  }
+
+  function _testGovernanceUpdate() internal {
+    assertEq(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
+      MiscEthereum.PROXY_ADMIN_LONG
+    );
+
+    assertEq(IGovernance(address(GovernanceV3Ethereum.GOVERNANCE)).getGasLimit(), 180_000);
+    assertEq(
+      IOwnable(address(GovernanceV3Ethereum.GOVERNANCE)).owner(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
+    assertEq(
+      IWithGuardian(address(GovernanceV3Ethereum.GOVERNANCE)).guardian(),
+      MiscEthereum.PROTOCOL_GUARDIAN
+    );
   }
 
   function _testArc() internal {
