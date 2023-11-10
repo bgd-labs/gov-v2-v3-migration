@@ -44,6 +44,10 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 18541547);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
+
+    // unpause pool ethereum v2
+    hoax(MiscEthereum.PROTOCOL_GUARDIAN);
+    AaveV2Ethereum.POOL_CONFIGURATOR.setPoolPause(false);
   }
 
   function testPayload() public {
