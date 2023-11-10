@@ -32,27 +32,31 @@ export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
 // create mainnet fork
 
-const TENDERLY_BASE: string = `https://api.tenderly.co/api/v1`;
-const networkForks: Record<number, string> = {
-  1: '',
-  137: '',
-  43_114: '',
-  8453: '',
-  42_161: '',
-  10: '',
+const forkIdByNetwork: Record<number, string> = {
+  1: 'e9279f2c-8033-4a28-b9b8-4465fe50ffbc',
+  137: 'a65ea772-1ccb-48b6-8c0b-9fabb3dc07e2',
+  43_114: 'e57f9ba6-2357-4963-a2a3-7cf66cd4f1d3',
+  8453: '7b18548c-aeff-4013-af55-c4508f14dcdf',
+  42_161: '2883e0f6-ccb4-46a9-a3f3-79ef521fa5b3',
+  10: '79632950-d543-4b7c-b5eb-2beda6ba5738',
 };
 
 const getFork = async (chain: any, fixed?: boolean) => {
-  const fork = await tenderly.fork({chainId: chain.id, alias: 'govV3Fork'});
+  let fork: any;
+  if (!fixed && process.env.TENDERLY_PROJECT_SLUG) {
+    fork = await tenderly.getForkInfo(forkIdByNetwork[chain.id]);
+  } else {
+    fork = await tenderly.fork({chainId: chain.id, alias: 'govV3Fork'});
+  }
 
   const walletClient = createWalletClient({
     account: AaveMisc.ECOSYSTEM_RESERVE,
-    chain: {...chain, id: 3030, name: 'tenderly'},
+    chain: {...chain, id: fork.forkNetworkId, name: 'tenderly'},
     transport: http(fork.forkUrl),
   });
 
   const publicClient = createPublicClient({
-    chain: {...chain, id: 3030, name: 'tenderly'},
+    chain: {...chain, id: fork.forkNetworkId, name: 'tenderly'},
     transport: http(fork.forkUrl),
   });
 
