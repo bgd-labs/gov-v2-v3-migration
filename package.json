@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/bgd-labs/gov-v2-v3-migration#readme",
   "devDependencies": {
-    "@bgd-labs/aave-cli": "0.0.26-0396806c8f74afae2d425f537a3103af9b5ebd34.0",
+    "@bgd-labs/aave-cli": "0.1.1-ac39b56696493ba6dfd536d9c6ccea3baeb68ccd.0",
     "dotenv": "^16.3.1",
     "prettier": "2.8.7",
     "prettier-plugin-solidity": "1.1.3",
