@@ -34,27 +34,31 @@ interface IAaveArcTimelock {
   function getCurrentState(uint256 actionsSetId) external view returns (uint8);
 }
 
+interface ICrossChainForwarder {
+  function execute(address payload) external;
+}
+
 /**
  * @title EthShortV2Payload
  * @notice Migrate ethereum executor of the ARC and ecosystem reserve, queue gov v 2.5 execution
  * @author BGD Labs
  **/
 contract EthShortV2Payload {
-  uint40 immutable MAINNET_PAYLOAD_ID;
-  uint40 immutable POLYGON_PAYLOAD_ID;
-  uint40 immutable AVALANCHE_PAYLOAD_ID;
-  uint40 immutable BASE_PAYLOAD_ID;
+  uint40 public immutable MAINNET_PAYLOAD_ID;
+  uint40 public immutable POLYGON_PAYLOAD_ID;
+  uint40 public immutable AVALANCHE_PAYLOAD_ID;
+  address public immutable BASE_PAYLOAD_ADDRESS;
 
   constructor(
     uint40 mainnetPayloadId,
     uint40 polygonPayloadId,
     uint40 avalanchePayloadId,
-    uint40 basePayloadId
+    address basePayloadAddress
   ) public {
     MAINNET_PAYLOAD_ID = mainnetPayloadId;
     POLYGON_PAYLOAD_ID = polygonPayloadId;
     AVALANCHE_PAYLOAD_ID = avalanchePayloadId;
-    BASE_PAYLOAD_ID = basePayloadId;
+    BASE_PAYLOAD_ADDRESS = basePayloadAddress;
   }
 
   function execute() external {
@@ -64,8 +68,15 @@ contract EthShortV2Payload {
     // migrate aave arc gov executor to new gov v3 executor lvl 1
     _migrateArc();
 
+    // forward to base network
+    _forwardToBase();
+
     // call governance 2.5
     _forwardToGovernance2_5();
+  }
+
+  function _forwardToBase() internal {
+    ICrossChainForwarder(AaveGovernanceV2.CROSSCHAIN_FORWARDER_BASE).execute(BASE_PAYLOAD_ADDRESS);
   }
 
   function _ecosystemReserve() internal {
@@ -119,12 +130,6 @@ contract EthShortV2Payload {
       accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
       payloadsController: address(GovernanceV3Avalanche.PAYLOADS_CONTROLLER),
       payloadId: AVALANCHE_PAYLOAD_ID
-    });
-    payloads[3] = PayloadsControllerUtils.Payload({
-      chain: 8453,
-      accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
-      payloadsController: address(GovernanceV3Base.PAYLOADS_CONTROLLER),
-      payloadId: BASE_PAYLOAD_ID
     });
 
     for (uint256 i = 0; i < payloads.length; i++) {

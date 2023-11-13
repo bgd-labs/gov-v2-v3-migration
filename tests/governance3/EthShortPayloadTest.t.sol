@@ -56,7 +56,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     payload = new EthShortV3Payload(address(mediator));
     uint40 payloadId = _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(payload));
 
-    EthShortV2Payload shortV2Payload = new EthShortV2Payload(payloadId, 1, 1, 1);
+    EthShortV2Payload shortV2Payload = new EthShortV2Payload(payloadId, 1, 1, address(1234));
 
     // execute v2 short payload
     GovHelpers.executePayload(vm, address(shortV2Payload), AaveGovernanceV2.SHORT_EXECUTOR);
