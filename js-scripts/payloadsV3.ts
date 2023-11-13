@@ -21,3 +21,15 @@ export async function createAndExecuteGovernanceV3Payload(
   const tenderlyRequest = await payloadsController.getSimulationPayloadForExecution(payloadId);
   return tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, tenderlyRequest);
 }
+
+export async function executeGovernanceV3Payload(
+  controller: Hex,
+  publicClient: PublicClient,
+  payloadId: number,
+  fork: any
+) {
+  const payloadsController = getPayloadsController(controller, publicClient);
+
+  const tenderlyRequest = await payloadsController.getSimulationPayloadForExecution(payloadId);
+  return tenderly.unwrapAndExecuteSimulationPayloadOnFork(fork, tenderlyRequest);
+}
