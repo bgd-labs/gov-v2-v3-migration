@@ -15,7 +15,7 @@ import {EthShortV2Payload} from '../src/contracts/governance3/EthShortV2Payload.
 import {EthShortV3Payload} from '../src/contracts/governance3/EthShortV3Payload.sol';
 import {AvalancheFundRobotPayload} from '../src/contracts/governance3/AvalancheFundRobotPayload.sol';
 import {PolygonFundRobotPayload} from '../src/contracts/governance3/PolygonFundRobotPayload.sol';
-// import {BaseSwapAdaptersPayload} from '../src/contracts/governance3/BaseSwapAdaptersPayload.sol';
+import {BaseSwapsPayload} from '../src/contracts/governance3/BaseSwapsPayload.sol';
 import {Mediator} from '../src/contracts/governance3/Mediator.sol';
 
 contract DeployV3Payload {
@@ -62,8 +62,8 @@ contract DeployPolygon is DeployV3Payload, PolygonScript {
   }
 }
 
-// contract DeployBase is BaseScript {
-//   function run() external broadcast {
-//     new BaseMovePermissionsPayload();
-//   }
-// }
+contract DeployBase is BaseScript {
+  function run() external broadcast {
+    new BaseSwapsPayload();
+  }
+}

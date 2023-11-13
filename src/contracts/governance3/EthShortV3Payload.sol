@@ -22,8 +22,8 @@ import {IGovernance} from 'aave-governance-v3/interfaces/IGovernance.sol';
 
 /**
  * @title EthShortV3Payload
- * @notice Execute long permissions movement, fund governance robots, upgrade aAave implementation and
- * @notice accept admin of the existing short executor.
+ * @notice Execute long permissions movement, update governance contract, fund governance robots,
+ * @notice upgrade aAave implementation and accept admin of the existing short executor.
  * @author BGD Labs
  **/
 contract EthShortV3Payload {
@@ -32,7 +32,6 @@ contract EthShortV3Payload {
 
   address public immutable MEDIATOR;
 
-  // TODO: update address
   address public constant A_AAVE_IMPL = 0x366AE337897223AEa70e3EBe1862219386f20593;
 
   uint256 public constant LINK_AMOUNT_ROBOT_GOV_CHAIN = 300 ether;
