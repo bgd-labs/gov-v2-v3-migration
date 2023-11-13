@@ -14,10 +14,8 @@ import {Mediator} from '../../src/contracts/governance3/Mediator.sol';
 import {EthLongV3Payload} from '../../src/contracts/governance3/EthLongV3Payload.sol';
 
 contract EthLongV3PayloadTest is ProtocolV3TestBase {
-  address public constant GOVERNANCE_3_IMPL = 0x8543A1c3f8D4Cb0D7363047bec613b6b54740B1d;
-
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18540103);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18562187);
   }
 
   function testPayload() public {
@@ -35,12 +33,5 @@ contract EthLongV3PayloadTest is ProtocolV3TestBase {
     );
 
     assertEq(IOwnable(GovernanceV3Ethereum.EXECUTOR_LVL_2).owner(), address(mediator));
-
-    address newImpl = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-      vm,
-      address(GovernanceV3Ethereum.GOVERNANCE)
-    );
-
-    // assertEq(newImpl, GOVERNANCE_3_IMPL);
   }
 }

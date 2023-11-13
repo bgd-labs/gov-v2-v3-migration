@@ -33,7 +33,7 @@ contract EthShortV3Payload {
   address public immutable MEDIATOR;
 
   // TODO: update address
-  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
+  address public constant A_AAVE_IMPL = 0x366AE337897223AEa70e3EBe1862219386f20593;
 
   uint256 public constant LINK_AMOUNT_ROBOT_GOV_CHAIN = 300 ether;
   uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 100 ether;
