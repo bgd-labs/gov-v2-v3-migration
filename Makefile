@@ -10,7 +10,7 @@ build  :; forge build --sizes
 test   :; forge test -vvv
 
 # common
-common-flags := --legacy --ledger --mnemonic-indexes $(MNEMONIC_INDEX) --sender $(LEDGER_SENDER) --verify -vvv --broadcast --slow
+common-flags := --legacy --ledger --mnemonic-indexes $(MNEMONIC_INDEX) --sender $(LEDGER_SENDER) --verify -vvvv --broadcast --slow
 
 # Utilities
 download :; cast etherscan-source --chain ${chain} -d src/etherscan/${chain}_${address} ${address}
@@ -39,8 +39,8 @@ deploy-owner-gnosis :; forge script scripts/OwnershipUpdate.s.sol:Gnosis --fork-
 
 
 
-deploy-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployMainnet --rpc-url https://rpc.tenderly.co/fork/e9279f2c-8033-4a28-b9b8-4465fe50ffbc $(common-flags)
-deploy-v2-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployV2Mainnet --rpc-url https://rpc.tenderly.co/fork/e9279f2c-8033-4a28-b9b8-4465fe50ffbc $(common-flags)
-deploy-polygon :; forge script scripts/DeployV3Payloads.s.sol:DeployPolygon  --rpc-url https://rpc.tenderly.co/fork/a65ea772-1ccb-48b6-8c0b-9fabb3dc07e2 $(common-flags)
-deploy-avax :; forge script scripts/DeployV3Payloads.s.sol:DeployAvalanche  --rpc-url https://rpc.tenderly.co/fork/e57f9ba6-2357-4963-a2a3-7cf66cd4f1d3 $(common-flags)
-deploy-base :; forge script scripts/DeployV3Payloads.s.sol:DeployBase  --rpc-url https://rpc.tenderly.co/fork/7b18548c-aeff-4013-af55-c4508f14dcdf $(common-flags)
+deploy-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployMainnet --rpc-url https://rpc.tenderly.co/fork/669e1b6f-00e9-4bb2-a217-4b4b66e13f8d $(common-flags)
+deploy-v2-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployV2Mainnet --rpc-url https://rpc.tenderly.co/fork/669e1b6f-00e9-4bb2-a217-4b4b66e13f8d $(common-flags)
+deploy-polygon :; forge script scripts/DeployV3Payloads.s.sol:DeployPolygon  --rpc-url https://rpc.tenderly.co/fork/43d79c07-30f3-4001-af68-ca4c466651a4 $(common-flags)
+deploy-avax :; forge script scripts/DeployV3Payloads.s.sol:DeployAvalanche  --rpc-url https://rpc.tenderly.co/fork/816c495a-864e-49b2-b1b7-89688ecadd95 $(common-flags)
+deploy-base :; forge script scripts/DeployV3Payloads.s.sol:DeployBase  --rpc-url https://rpc.tenderly.co/fork/c0075b05-3600-456b-864a-d4e3a6c0d9ab $(common-flags)

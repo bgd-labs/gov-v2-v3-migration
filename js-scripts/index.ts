@@ -23,22 +23,18 @@ export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
 // create mainnet fork
 
 const forkIdByNetwork: Record<number, string> = {
-  1: 'e9279f2c-8033-4a28-b9b8-4465fe50ffbc',
-  137: 'a65ea772-1ccb-48b6-8c0b-9fabb3dc07e2',
-  43_114: 'e57f9ba6-2357-4963-a2a3-7cf66cd4f1d3',
-  8453: '7b18548c-aeff-4013-af55-c4508f14dcdf',
-  42_161: '2883e0f6-ccb4-46a9-a3f3-79ef521fa5b3',
-  10: '79632950-d543-4b7c-b5eb-2beda6ba5738',
+  1: '669e1b6f-00e9-4bb2-a217-4b4b66e13f8d',
+  137: '43d79c07-30f3-4001-af68-ca4c466651a4',
+  43_114: '816c495a-864e-49b2-b1b7-89688ecadd95',
+  8453: 'c0075b05-3600-456b-864a-d4e3a6c0d9ab',
 };
 
 const getFork = async (chain: any, fixed?: boolean) => {
   let fork: any;
   if (!fixed && process.env.TENDERLY_PROJECT_SLUG) {
-    console.log('------', forkIdByNetwork[chain.id]);
     fork = await tenderly.getForkInfo(forkIdByNetwork[chain.id], 'governance-v3');
-    console.log('fork', fork);
   } else {
-    fork = await tenderly.fork({chainId: chain.id, alias: 'govV3Fork'});
+    fork = await tenderly.fork({chainId: chain.id, alias: 'migration', forkChainId: chain.id});
   }
 
   const walletClient = createWalletClient({
@@ -61,7 +57,7 @@ const deployAndExecuteL2Payload = async (
   governanceAddresses: any
 ) => {
   const {fork, walletClient, publicClient} = await getFork(chain);
-
+  console.log(fork);
   await executeGovernanceV3Payload(
     governanceAddresses.PAYLOADS_CONTROLLER,
     publicClient,
@@ -73,8 +69,8 @@ const deployAndExecuteL2Payload = async (
 const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
-  const shortMigrationPayload = '0xe40e84457f4b5075f1eb32352d81ecf1de77fee6';
-  const longMigrationPayload = '0x6195a956dC026A949dE552F04a5803d3aa1fC408';
+  const shortMigrationPayload = '0x30dB87b980D42C060ED90fc890b3b64a24EF41c5';
+  const longMigrationPayload = '0xF60BDDE9077Be3226Db8109432d78afD92a8A003';
 
   const block = await publicClient.getBlock();
   // create proposal on v2
@@ -85,7 +81,7 @@ const deployPayloadsEthereum = async () => {
     AaveGovernanceV2.LONG_EXECUTOR
   );
 
-  const timeToWarpTo = block.timestamp + 60n * 60n * 24n * 16n;
+  const timeToWarpTo = block.timestamp + 60n * 60n * 24n * 14n;
   await tenderly.warpTime(fork, timeToWarpTo);
 
   const shortProposalId = await createV2Proposal(
@@ -101,17 +97,28 @@ const deployPayloadsEthereum = async () => {
     timestamp: timeToWarpTo,
   });
 
+  // execute lvl1
+  const timeToWarpToLvl1 = block.timestamp + 60n * 60n * 24n * 2n;
+  await tenderly.warpTime(fork, timeToWarpToLvl1);
+  await deployAndExecuteL2Payload(mainnet, 13, GovernanceV3Ethereum);
+
   // TODO: execute aave arc
 };
 
-// deployPayloadsEthereum().then().catch(console.log);
+deployPayloadsEthereum().then().catch(console.log);
 
 async function upgradeL2s() {
-  await deployAndExecuteL2Payload(mainnet, 12, GovernanceV3Ethereum);
-  await deployAndExecuteL2Payload(polygon, 5, GovernanceV3Polygon);
-  await deployAndExecuteL2Payload(avalanche, 4, GovernanceV3Avalanche);
+  await deployAndExecuteL2Payload(polygon, 8, GovernanceV3Polygon);
+  await deployAndExecuteL2Payload(avalanche, 5, GovernanceV3Avalanche);
 
   // TODO: execute base
 }
 
-upgradeL2s();
+const generateForks = async () => {
+  const mainnetFork = await getFork(mainnet, true);
+  const polFork = await getFork(polygon, true);
+  const avaFork = await getFork(avalanche, true);
+  const baseFork = await getFork(base, true);
+};
+// generateForks();
+// upgradeL2s();
