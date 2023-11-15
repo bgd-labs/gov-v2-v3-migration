@@ -7,7 +7,6 @@ import {PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
-import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {IGovernance_V2_5} from 'aave-helpers/GovV3Helpers.sol';
 import {ITransparentUpgradeableProxy} from '../dependencies/ITransparentUpgradeableProxy.sol';
@@ -47,18 +46,11 @@ contract EthShortV2Payload {
   uint40 public immutable MAINNET_PAYLOAD_ID;
   uint40 public immutable POLYGON_PAYLOAD_ID;
   uint40 public immutable AVALANCHE_PAYLOAD_ID;
-  address public immutable BASE_PAYLOAD_ADDRESS;
 
-  constructor(
-    uint40 mainnetPayloadId,
-    uint40 polygonPayloadId,
-    uint40 avalanchePayloadId,
-    address basePayloadAddress
-  ) public {
+  constructor(uint40 mainnetPayloadId, uint40 polygonPayloadId, uint40 avalanchePayloadId) public {
     MAINNET_PAYLOAD_ID = mainnetPayloadId;
     POLYGON_PAYLOAD_ID = polygonPayloadId;
     AVALANCHE_PAYLOAD_ID = avalanchePayloadId;
-    BASE_PAYLOAD_ADDRESS = basePayloadAddress;
   }
 
   function execute() external {
@@ -68,15 +60,8 @@ contract EthShortV2Payload {
     // migrate aave arc gov executor to new gov v3 executor lvl 1
     _migrateArc();
 
-    // forward to base network
-    _forwardToBase();
-
     // call governance 2.5
     _forwardToGovernance2_5();
-  }
-
-  function _forwardToBase() internal {
-    ICrossChainForwarder(AaveGovernanceV2.CROSSCHAIN_FORWARDER_BASE).execute(BASE_PAYLOAD_ADDRESS);
   }
 
   function _ecosystemReserve() internal {
@@ -111,7 +96,7 @@ contract EthShortV2Payload {
   }
 
   function _forwardToGovernance2_5() internal {
-    PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](4);
+    PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](3);
 
     payloads[0] = PayloadsControllerUtils.Payload({
       chain: 1,

@@ -56,7 +56,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
     payload = new EthShortV3Payload(address(mediator));
     uint40 payloadId = _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(payload));
 
-    EthShortV2Payload shortV2Payload = new EthShortV2Payload(payloadId, 1, 1, address(1234));
+    EthShortV2Payload shortV2Payload = new EthShortV2Payload(payloadId, 1, 1);
 
     // execute v2 short payload
     GovHelpers.executePayload(vm, address(shortV2Payload), AaveGovernanceV2.SHORT_EXECUTOR);
@@ -93,7 +93,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
       MiscEthereum.PROXY_ADMIN_LONG
     );
 
-    assertEq(IGovernance(address(GovernanceV3Ethereum.GOVERNANCE)).getGasLimit(), 180_000);
+    assertEq(IGovernance(address(GovernanceV3Ethereum.GOVERNANCE)).getGasLimit(), 300_000);
     assertEq(
       IOwnable(address(GovernanceV3Ethereum.GOVERNANCE)).owner(),
       GovernanceV3Ethereum.EXECUTOR_LVL_1
