@@ -17,16 +17,17 @@ import {
 import {deployAndRegisterTestPayloads, generateProposalAndExecutePayload} from './proposalsV3';
 import {createAndExecuteGovernanceV3Payload, executeGovernanceV3Payload} from './payloadsV3';
 import {deployContract} from './helpers';
+import {ArcTimelock_ABI} from './abis/ArcTimelock';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
 // create mainnet fork
 
 const forkIdByNetwork: Record<number, string> = {
-  1: '669e1b6f-00e9-4bb2-a217-4b4b66e13f8d',
-  137: '43d79c07-30f3-4001-af68-ca4c466651a4',
-  43_114: '816c495a-864e-49b2-b1b7-89688ecadd95',
-  8453: 'c0075b05-3600-456b-864a-d4e3a6c0d9ab',
+  1: '9b6fa248-6f8f-4e48-b808-488778c3d3cb',
+  137: '055d96d7-7612-41a4-aa39-fdedad2a3ba4',
+  43_114: 'e323cdc4-0414-4572-8e8c-1311615881ba',
+  8453: 'a92f8e60-6a6d-440a-9067-0d8535fea8b2',
 };
 
 const getFork = async (chain: any, fixed?: boolean) => {
@@ -57,13 +58,19 @@ const deployAndExecuteL2Payload = async (
   governanceAddresses: any
 ) => {
   const {fork, walletClient, publicClient} = await getFork(chain);
-  console.log(fork);
+
   await executeGovernanceV3Payload(
     governanceAddresses.PAYLOADS_CONTROLLER,
     publicClient,
     payloadId,
     fork
   );
+};
+
+const deployAndExecuteOldL2Payload = async (chain: any, executor: Address, payloadAddress: any) => {
+  const {fork, walletClient, publicClient} = await getFork(chain);
+
+  await executeL2Payload(walletClient, publicClient, executor, payloadAddress, fork);
 };
 
 const deployPayloadsEthereum = async () => {
@@ -98,20 +105,32 @@ const deployPayloadsEthereum = async () => {
   });
 
   // execute lvl1
-  const timeToWarpToLvl1 = block.timestamp + 60n * 60n * 24n * 2n;
-  await tenderly.warpTime(fork, timeToWarpToLvl1);
   await deployAndExecuteL2Payload(mainnet, 13, GovernanceV3Ethereum);
 
-  // TODO: execute aave arc
-};
+  // execute aave arc
+  const timeToWarpToLvl1 = block.timestamp + 60n * 60n * 24n * 3n + 10n;
+  await tenderly.warpTime(fork, timeToWarpToLvl1);
 
-deployPayloadsEthereum().then().catch(console.log);
+  const {request, result} = await publicClient.simulateContract({
+    address: AaveGovernanceV2.ARC_TIMELOCK,
+    abi: ArcTimelock_ABI,
+    functionName: 'execute',
+    account: DEPLOYER,
+    args: [5],
+  });
+  const hash = await walletClient.writeContract(request);
+};
 
 async function upgradeL2s() {
   await deployAndExecuteL2Payload(polygon, 8, GovernanceV3Polygon);
   await deployAndExecuteL2Payload(avalanche, 5, GovernanceV3Avalanche);
 
-  // TODO: execute base
+  // execute base with old executor
+  await deployAndExecuteOldL2Payload(
+    base,
+    AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
+    '0x2e649f6b54b07e210b31c9cc2eb8a0d5997c3d4a'
+  );
 }
 
 const generateForks = async () => {
@@ -120,5 +139,7 @@ const generateForks = async () => {
   const avaFork = await getFork(avalanche, true);
   const baseFork = await getFork(base, true);
 };
-// generateForks();
+
+generateForks();
 // upgradeL2s();
+// deployPayloadsEthereum().then().catch(console.log);
