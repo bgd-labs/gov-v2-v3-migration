@@ -87,7 +87,7 @@ contract EthShortV3Payload {
     IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgradeAndCall(
       ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
       GOVERNANCE_V3_IMPL,
-      abi.encodeWithSelector(IGovernance.initializeWithRevision.selector, 180_000)
+      abi.encodeWithSelector(IGovernance.initializeWithRevision.selector, 300_000)
     );
 
     IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
