@@ -24,7 +24,7 @@ export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
 // create mainnet fork
 
 const forkIdByNetwork: Record<number, string> = {
-  1: '9b6fa248-6f8f-4e48-b808-488778c3d3cb',
+  1: '3625066b-2d1b-49b0-acb3-4fe22cc391eb',
   137: '055d96d7-7612-41a4-aa39-fdedad2a3ba4',
   43_114: 'e323cdc4-0414-4572-8e8c-1311615881ba',
   8453: 'a92f8e60-6a6d-440a-9067-0d8535fea8b2',
@@ -105,10 +105,11 @@ const deployPayloadsEthereum = async () => {
   });
 
   // execute lvl1
-  await deployAndExecuteL2Payload(mainnet, 13, GovernanceV3Ethereum);
+  await deployAndExecuteL2Payload(mainnet, 16, GovernanceV3Ethereum);
 
   // execute aave arc
-  const timeToWarpToLvl1 = block.timestamp + 60n * 60n * 24n * 3n + 10n;
+  const block2 = await publicClient.getBlock();
+  const timeToWarpToLvl1 = block2.timestamp + 60n * 60n * 24n * 2n + 60n;
   await tenderly.warpTime(fork, timeToWarpToLvl1);
 
   const {request, result} = await publicClient.simulateContract({
@@ -122,24 +123,24 @@ const deployPayloadsEthereum = async () => {
 };
 
 async function upgradeL2s() {
-  await deployAndExecuteL2Payload(polygon, 8, GovernanceV3Polygon);
-  await deployAndExecuteL2Payload(avalanche, 5, GovernanceV3Avalanche);
+  await deployAndExecuteL2Payload(polygon, 10, GovernanceV3Polygon);
+  await deployAndExecuteL2Payload(avalanche, 7, GovernanceV3Avalanche);
 
   // execute base with old executor
   await deployAndExecuteOldL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    '0x2e649f6b54b07e210b31c9cc2eb8a0d5997c3d4a'
+    '0x2e649f6b54B07E210b31c9cC2eB8a0d5997c3D4A'
   );
 }
 
 const generateForks = async () => {
   const mainnetFork = await getFork(mainnet, true);
-  const polFork = await getFork(polygon, true);
-  const avaFork = await getFork(avalanche, true);
-  const baseFork = await getFork(base, true);
+  // const polFork = await getFork(polygon, true);
+  // const avaFork = await getFork(avalanche, true);
+  // const baseFork = await getFork(base, true);
 };
 
-generateForks();
+// generateForks();
 // upgradeL2s();
 // deployPayloadsEthereum().then().catch(console.log);
