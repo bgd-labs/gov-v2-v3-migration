@@ -39,8 +39,8 @@ deploy-owner-gnosis :; forge script scripts/OwnershipUpdate.s.sol:Gnosis --fork-
 
 
 
-deploy-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployMainnet --rpc-url https://rpc.tenderly.co/fork/669e1b6f-00e9-4bb2-a217-4b4b66e13f8d $(common-flags)
-deploy-v2-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployV2Mainnet --rpc-url https://rpc.tenderly.co/fork/669e1b6f-00e9-4bb2-a217-4b4b66e13f8d $(common-flags)
-deploy-polygon :; forge script scripts/DeployV3Payloads.s.sol:DeployPolygon  --rpc-url https://rpc.tenderly.co/fork/43d79c07-30f3-4001-af68-ca4c466651a4 $(common-flags)
-deploy-avax :; forge script scripts/DeployV3Payloads.s.sol:DeployAvalanche  --rpc-url https://rpc.tenderly.co/fork/816c495a-864e-49b2-b1b7-89688ecadd95 $(common-flags)
-deploy-base :; forge script scripts/DeployV3Payloads.s.sol:DeployBase  --rpc-url https://rpc.tenderly.co/fork/c0075b05-3600-456b-864a-d4e3a6c0d9ab $(common-flags)
+deploy-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployMainnet --rpc-url https://rpc.tenderly.co/fork/3625066b-2d1b-49b0-acb3-4fe22cc391eb $(common-flags)
+deploy-v2-mainnet :; forge script scripts/DeployV3Payloads.s.sol:DeployV2Mainnet --rpc-url https://rpc.tenderly.co/fork/3625066b-2d1b-49b0-acb3-4fe22cc391eb $(common-flags)
+deploy-polygon :; forge script scripts/DeployV3Payloads.s.sol:DeployPolygon  --rpc-url https://rpc.tenderly.co/fork/055d96d7-7612-41a4-aa39-fdedad2a3ba4 $(common-flags)
+deploy-avax :; forge script scripts/DeployV3Payloads.s.sol:DeployAvalanche  --rpc-url https://rpc.tenderly.co/fork/e323cdc4-0414-4572-8e8c-1311615881ba $(common-flags)
+deploy-base :; forge script scripts/DeployV3Payloads.s.sol:DeployBase  --rpc-url https://rpc.tenderly.co/fork/a92f8e60-6a6d-440a-9067-0d8535fea8b2 $(common-flags)

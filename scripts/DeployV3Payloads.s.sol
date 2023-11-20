@@ -45,7 +45,7 @@ contract DeployMainnet is DeployV3Payload, EthereumScript {
 contract DeployV2Mainnet is EthereumScript {
   function run() external broadcast {
     // TODO: update with correct values after payloads deployments
-    new EthShortV2Payload(13, 8, 5);
+    new EthShortV2Payload(16, 10, 7);
   }
 }
 
