@@ -5,6 +5,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
+import {RegisterKeepersPayloadBase} from './RegisterKeepersPayloadBase.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
 import {IPegSwap} from '../dependencies/IPegSwap.sol';
 
@@ -13,7 +14,7 @@ import {IPegSwap} from '../dependencies/IPegSwap.sol';
  * @notice Fund Robots on Polygon needed for governance v3.
  * @author BGD Labs
  **/
-contract PolygonFundRobotPayload {
+contract PolygonFundRobotPayload is RegisterKeepersPayloadBase {
   using SafeERC20 for IERC20;
   using SafeCast for uint256;
 
@@ -24,7 +25,8 @@ contract PolygonFundRobotPayload {
 
   IPegSwap public constant PEGSWAP = IPegSwap(0xAA1DC356dc4B18f30C347798FD5379F3D77ABC5b);
 
-  uint256 public constant TOTAL_LINK_AMOUNT = LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROOTS_CONSUMER;
+  uint256 public constant TOTAL_LINK_AMOUNT =
+    LINK_AMOUNT_ROBOT_VOTING_CHAIN + LINK_AMOUNT_ROOTS_CONSUMER;
 
   address public constant ROBOT_OPERATOR = 0x4e8984D11A47Ff89CD67c7651eCaB6C00a74B4A9;
 
@@ -34,7 +36,13 @@ contract PolygonFundRobotPayload {
   function execute() external {
     _fetchLinkTokens();
 
-    _registerKeepers();
+    _registerKeepers(
+      ERC677_LINK,
+      LINK_AMOUNT_ROBOT_VOTING_CHAIN,
+      ROBOT_OPERATOR,
+      VOTING_CHAIN_ROBOT,
+      ROOTS_CONSUMER
+    );
   }
 
   function _fetchLinkTokens() internal {
@@ -55,23 +63,5 @@ contract PolygonFundRobotPayload {
     // Swap ERC-20 link to ERC-677 link
     IERC20(AaveV3PolygonAssets.LINK_UNDERLYING).forceApprove(address(PEGSWAP), linkBalance);
     PEGSWAP.swap(linkBalance, AaveV3PolygonAssets.LINK_UNDERLYING, ERC677_LINK);
-  }
-
-  function _registerKeepers() internal {
-    // REGISTER NEW VOTING CHAIN KEEPER
-    IERC20(ERC677_LINK).forceApprove(ROBOT_OPERATOR, LINK_AMOUNT_ROBOT_VOTING_CHAIN);
-
-    IAaveCLRobotOperator(ROBOT_OPERATOR).register(
-      'Voting Chain Keeper',
-      VOTING_CHAIN_ROBOT,
-      5000000,
-      LINK_AMOUNT_ROBOT_VOTING_CHAIN.toUint96()
-    );
-
-    // FUND ROOTS CONSUMER
-    IERC20(ERC677_LINK).transfer(
-      ROOTS_CONSUMER,
-      IERC20(ERC677_LINK).balanceOf(address(this))
-    );
   }
 }
