@@ -12,6 +12,7 @@ import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/
 import {GovernanceV3Ethereum, GovernanceV3Arbitrum, GovernanceV3Avalanche, GovernanceV3Optimism, GovernanceV3Polygon, GovernanceV3Metis, GovernanceV3Base, GovernanceV3BNB, GovernanceV3Gnosis} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV2Ethereum, AaveV2Polygon, AaveV2Avalanche} from 'aave-address-book/AaveAddressBook.sol';
 import {ICrossChainForwarder} from 'aave-delivery-infrastructure/contracts/interfaces/ICrossChainForwarder.sol';
+import {MiscBNB} from 'aave-address-book/MiscBNB.sol';
 
 // Effects of executing this changes on tenderly fork can be found here: https://github.com/bgd-labs/aave-permissions-list/pull/42
 
@@ -343,35 +344,35 @@ contract Gnosis is GnosisScript, UpdateV3ContractsPermissionsGnosis {
   }
 }
 
-//contract UpdateV3ContractsPermissionsBNB {
-//  function _changeOwnerAndGuardian() internal {
-//    address newOwner = GovernanceV3BNB.EXECUTOR_LVL_1;
-//    require(newOwner != address(0), 'NEW_OWNER_CANT_BE_0');
-//
-//    address newGuardian = address(0);
-//    require(newGuardian != address(0), 'NEW_GUARDIAN_CANT_BE_0');
-//
-//    //change ownership of proxy admin TODO: get from address book when updated
-//    Ownable(0x39EBFfc7679c62Dfcc4A3E2c09Bcb0be255Ae63c).transferOwnership(newOwner);
-//
-//    // ------------- INFRASTRUCTURE CONTRACTS -----------------
-//
-//    // change guardian
-//    IWithGuardian(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).updateGuardian(newGuardian);
-//    // change ownership
-//    Ownable(GovernanceV3BNB.CROSS_CHAIN_CONTROLLER).transferOwnership(newOwner);
-//
-//    // ------------- GOVERNANCE CONTRACTS -----------------
-//
-//    // change guardian
-//    IWithGuardian(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).updateGuardian(newGuardian);
-//    // change ownership
-//    Ownable(address(GovernanceV3BNB.PAYLOADS_CONTROLLER)).transferOwnership(newOwner);
-//  }
-//}
-//
-//contract Binance is BNBScript, UpdateV3ContractsPermissionsBNB {
-//  function run() external broadcast {
-//    _changeOwnerAndGuardian();
-//  }
-//}
+contract UpdateV3ContractsPermissionsBNB is UpdateV3Permissions {
+  function targetOwner() public pure override returns (address) {
+    return GovernanceV3Gnosis.EXECUTOR_LVL_1;
+  }
+
+  function targetADIGuardian() public pure override returns (address) {
+    return address(0); // BGD Safe
+  }
+
+  function targetGovernanceGuardian() public pure override returns (address) {
+    return address(0);
+  }
+
+  function govContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER);
+    return contracts;
+  }
+
+  function aDIContractsToUpdate() public pure override returns (address[] memory) {
+    address[] memory contracts = new address[](1);
+    contracts[0] = GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER;
+    return contracts;
+  }
+}
+
+contract Binance is BNBScript, UpdateV3ContractsPermissionsBNB {
+  function run() external broadcast {
+    _changeOwnerAndGuardian();
+    Ownable(MiscBNB.PROXY_ADMIN).transferOwnership(GovernanceV3BNB.EXECUTOR_LVL_1);
+  }
+}
