@@ -36,6 +36,7 @@ deploy-owner-optimism :; forge script scripts/OwnershipUpdate.s.sol:Optimism --f
 deploy-owner-base :; forge script scripts/OwnershipUpdate.s.sol:Base --fork-url base $(common-flags)
 deploy-owner-metis :; forge script scripts/OwnershipUpdate.s.sol:Metis --fork-url metis $(common-flags)
 deploy-owner-gnosis :; forge script scripts/OwnershipUpdate.s.sol:Gnosis --fork-url gnosis $(common-flags)
+deploy-owner-binance :; forge script scripts/OwnershipUpdate.s.sol:Binance --fork-url https://rpc.tenderly.co/fork/1eb44d80-5b7a-424c-bc4e-1bd3dfcde83d $(common-flags)
 
 
 

@@ -346,26 +346,26 @@ contract Gnosis is GnosisScript, UpdateV3ContractsPermissionsGnosis {
 
 contract UpdateV3ContractsPermissionsBNB is UpdateV3Permissions {
   function targetOwner() public pure override returns (address) {
-    return GovernanceV3Gnosis.EXECUTOR_LVL_1;
+    return GovernanceV3BNB.EXECUTOR_LVL_1;
   }
 
   function targetADIGuardian() public pure override returns (address) {
-    return address(0); // BGD Safe
+    return 0xE8C5ab722d0b1B7316Cc4034f2BE91A5B1d29964; // BGD Safe
   }
 
   function targetGovernanceGuardian() public pure override returns (address) {
-    return address(0);
+    return MiscBNB.PROTOCOL_GUARDIAN;
   }
 
   function govContractsToUpdate() public pure override returns (address[] memory) {
     address[] memory contracts = new address[](1);
-    contracts[0] = address(GovernanceV3Gnosis.PAYLOADS_CONTROLLER);
+    contracts[0] = address(GovernanceV3BNB.PAYLOADS_CONTROLLER);
     return contracts;
   }
 
   function aDIContractsToUpdate() public pure override returns (address[] memory) {
     address[] memory contracts = new address[](1);
-    contracts[0] = GovernanceV3Gnosis.CROSS_CHAIN_CONTROLLER;
+    contracts[0] = GovernanceV3BNB.CROSS_CHAIN_CONTROLLER;
     return contracts;
   }
 }
