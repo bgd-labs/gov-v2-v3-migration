@@ -26,7 +26,7 @@ contract Mediator is IMediator {
   uint256 public constant OVERDUE = 172800; // 2 days
 
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
-  address public constant STK_AAVE_IMPL = 0x0A5a19f1c4a527773F8B6e7428255DD83b7A687b;
+  address public constant STK_AAVE_IMPL = 0x0fE58FE1CaA69951dC924A8c222bE19013B89476;
 
   /**
    * @dev Throws if the caller is not the short executor.
