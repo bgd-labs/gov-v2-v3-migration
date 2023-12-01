@@ -28,12 +28,7 @@ import {ShortPayload} from '../mocks/ShortPayload.sol';
 contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
   address public constant GOVERNANCE_25_IMPL = 0x323F2c8E227b3F0d88B047Ed16581fc0b6B9B1d7;
 
-  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
-
   address public constant AAVE_V1_CONFIGURATOR = 0x4965f6FA20fE9728deCf5165016fc338a5a85aBF;
-
-  address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
-  address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
 
   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
 
@@ -224,6 +219,10 @@ contract EthShortMovePermissionsPayloadTest is MovePermissionsTestBase {
 
     assertEq(IOwnable(payload.ROBOT_OPERATOR()).owner(), GovernanceV3Ethereum.EXECUTOR_LVL_1);
     assertEq(executionChainKeeperTarget, payload.EXECUTION_CHAIN_ROBOT());
-    assertApproxEqAbs(uint256(keeperBalance), payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(), 0.2 ether);
+    assertApproxEqAbs(
+      uint256(keeperBalance),
+      payload.LINK_AMOUNT_ROBOT_EXECUTION_CHAIN(),
+      0.2 ether
+    );
   }
 }

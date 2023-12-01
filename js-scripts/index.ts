@@ -15,33 +15,37 @@ import {
   GovernanceV3Base,
 } from '@bgd-labs/aave-address-book';
 import {deployAndRegisterTestPayloads, generateProposalAndExecutePayload} from './proposalsV3';
-import TestV2PayloadEthereum from '../out/PoolPayload.sol/TestV2PayloadEthereum.json';
-import TestV3PayloadEthereum from '../out/PoolPayload.sol/TestV3PayloadEthereum.json';
-import TestV2PayloadPolygon from '../out/PoolPayload.sol/TestV2PayloadPolygon.json';
-import TestV3PayloadPolygon from '../out/PoolPayload.sol/TestV3PayloadPolygon.json';
-import TestV2PayloadAvalanche from '../out/PoolPayload.sol/TestV2PayloadAvalanche.json';
-import TestV3PayloadAvalanche from '../out/PoolPayload.sol/TestV3PayloadAvalanche.json';
-import TestV3PayloadArbitrum from '../out/PoolPayload.sol/TestV3PayloadArbitrum.json';
-import TestV3PayloadOptimism from '../out/PoolPayload.sol/TestV3PayloadOptimism.json';
-import TestV3PayloadBase from '../out/PoolPayload.sol/TestV3PayloadBase.json';
-import TestV2_5PayloadEthereum from '../out/PoolPayload.sol/TestV2_5PayloadEthereum.json';
-import {createAndExecuteGovernanceV3Payload} from './payloadsV3';
+import {createAndExecuteGovernanceV3Payload, executeGovernanceV3Payload} from './payloadsV3';
 import {deployContract} from './helpers';
+import {ArcTimelock_ABI} from './abis/ArcTimelock';
 
 export const DEPLOYER = '0xEAF6183bAb3eFD3bF856Ac5C058431C8592394d6';
 export const AVAX_GUARDIAN = '0xa35b76E4935449E33C56aB24b23fcd3246f13470';
 // create mainnet fork
-const getFork = async (chain: any) => {
-  const fork = await tenderly.fork({chainId: chain.id, alias: 'govV3Fork'});
+
+const forkIdByNetwork: Record<number, string> = {
+  1: '3625066b-2d1b-49b0-acb3-4fe22cc391eb',
+  137: '055d96d7-7612-41a4-aa39-fdedad2a3ba4',
+  43_114: 'e323cdc4-0414-4572-8e8c-1311615881ba',
+  8453: 'a92f8e60-6a6d-440a-9067-0d8535fea8b2',
+};
+
+const getFork = async (chain: any, fixed?: boolean) => {
+  let fork: any;
+  if (!fixed && process.env.TENDERLY_PROJECT_SLUG) {
+    fork = await tenderly.getForkInfo(forkIdByNetwork[chain.id], 'governance-v3');
+  } else {
+    fork = await tenderly.fork({chainId: chain.id, alias: 'migration', forkChainId: chain.id});
+  }
 
   const walletClient = createWalletClient({
     account: AaveMisc.ECOSYSTEM_RESERVE,
-    chain: {...chain, id: 3030, name: 'tenderly'},
+    chain: {...chain, id: fork.forkNetworkId, name: 'tenderly'},
     transport: http(fork.forkUrl),
   });
 
   const publicClient = createPublicClient({
-    chain: {...chain, id: 3030, name: 'tenderly'},
+    chain: {...chain, id: fork.forkNetworkId, name: 'tenderly'},
     transport: http(fork.forkUrl),
   });
 
@@ -50,45 +54,42 @@ const getFork = async (chain: any) => {
 
 const deployAndExecuteL2Payload = async (
   chain: any,
-  executor: Address,
-  payloadAddress: any,
-  governanceAddresses: any,
-  payloadArtifacts: any[]
+  payloadId: number,
+  governanceAddresses: any
 ) => {
   const {fork, walletClient, publicClient} = await getFork(chain);
 
-  if (chain.id !== avalanche.id) {
-    await executeL2Payload(walletClient, publicClient, executor, payloadAddress, fork);
-  } else {
-    await executeL2PayloadViaGuardian(walletClient, publicClient, executor, payloadAddress, fork);
-  }
-  await createAndExecuteGovernanceV3Payload(
+  await executeGovernanceV3Payload(
     governanceAddresses.PAYLOADS_CONTROLLER,
     publicClient,
-    walletClient,
-    fork,
-    payloadArtifacts
+    payloadId,
+    fork
   );
+};
+
+const deployAndExecuteOldL2Payload = async (chain: any, executor: Address, payloadAddress: any) => {
+  const {fork, walletClient, publicClient} = await getFork(chain);
+
+  await executeL2Payload(walletClient, publicClient, executor, payloadAddress, fork);
 };
 
 const deployPayloadsEthereum = async () => {
   const {fork, walletClient, publicClient} = await getFork(mainnet);
 
-  const shortMigrationPayload = '0xe40e84457f4b5075f1eb32352d81ecf1de77fee6';
-  // const longMigrationPayload = '0x6195a956dC026A949dE552F04a5803d3aa1fC408';
+  const shortMigrationPayload = '0x30dB87b980D42C060ED90fc890b3b64a24EF41c5';
+  const longMigrationPayload = '0xF60BDDE9077Be3226Db8109432d78afD92a8A003';
 
   const block = await publicClient.getBlock();
   // create proposal on v2
-  // const longProposalId = await createV2Proposal(
-  //   walletClient,
-  //   publicClient,
-  //   [longMigrationPayload],
-  //   AaveGovernanceV2.LONG_EXECUTOR
-  // );
-  //
-  const timeToWarpTo = block.timestamp; // + 60n * 60n * 24n * 16n;
-  //
-  // await tenderly.warpTime(fork, timeToWarpTo);
+  const longProposalId = await createV2Proposal(
+    walletClient,
+    publicClient,
+    [longMigrationPayload],
+    AaveGovernanceV2.LONG_EXECUTOR
+  );
+
+  const timeToWarpTo = block.timestamp + 60n * 60n * 24n * 14n;
+  await tenderly.warpTime(fork, timeToWarpTo);
 
   const shortProposalId = await createV2Proposal(
     walletClient,
@@ -98,100 +99,48 @@ const deployPayloadsEthereum = async () => {
   );
 
   // execute proposals
-  // await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork, {
-  //   number: block.number,
-  //   timestamp: timeToWarpTo,
-  // });
-
-  await executeV2Proposal(shortProposalId, walletClient, publicClient, fork, {
+  await executeV2Proposals(shortProposalId, longProposalId, walletClient, publicClient, fork, {
     number: block.number,
     timestamp: timeToWarpTo,
   });
 
-  const payloadId = await deployAndRegisterTestPayloads(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-    [TestV2PayloadEthereum, TestV3PayloadEthereum]
-  );
+  // execute lvl1
+  await deployAndExecuteL2Payload(mainnet, 16, GovernanceV3Ethereum);
 
-  // deploy payload 2.5
-  const payload_2_5 = await deployContract(
-    walletClient,
-    publicClient,
-    DEPLOYER,
-    TestV2_5PayloadEthereum
-  );
+  // execute aave arc
+  const block2 = await publicClient.getBlock();
+  const timeToWarpToLvl1 = block2.timestamp + 60n * 60n * 24n * 2n + 60n;
+  await tenderly.warpTime(fork, timeToWarpToLvl1);
 
-  // create proposal 2.5
-  const shortProposal2_5Id = await createV2Proposal(
-    walletClient,
-    publicClient,
-    [payload_2_5],
-    AaveGovernanceV2.SHORT_EXECUTOR
-  );
-
-  // execute proposal 2.5
-  const block2_5 = await publicClient.getBlock();
-  await executeV2Proposal(shortProposal2_5Id, walletClient, publicClient, fork, {
-    number: block2_5.number,
-    timestamp: block2_5.timestamp,
+  const {request, result} = await publicClient.simulateContract({
+    address: AaveGovernanceV2.ARC_TIMELOCK,
+    abi: ArcTimelock_ABI,
+    functionName: 'execute',
+    account: DEPLOYER,
+    args: [5],
   });
-
-  // const proposalId = await generateProposalAndExecutePayload(
-  //   walletClient,
-  //   publicClient,
-  //   fork,
-  //   AaveMisc.ECOSYSTEM_RESERVE,
-  //   payloadId,
-  //   mainnet
-  // );
-  // console.log('proposalId: ', proposalId);
+  const hash = await walletClient.writeContract(request);
 };
 
-deployPayloadsEthereum().then().catch(console.log);
-
 async function upgradeL2s() {
-  await deployAndExecuteL2Payload(
-    polygon,
-    AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR,
-    '0xc7751400f809cdb0c167f87985083c558a0610f7',
-    GovernanceV3Polygon,
-    [TestV2PayloadPolygon, TestV3PayloadPolygon]
-  );
+  await deployAndExecuteL2Payload(polygon, 10, GovernanceV3Polygon);
+  await deployAndExecuteL2Payload(avalanche, 7, GovernanceV3Avalanche);
 
-  await deployAndExecuteL2Payload(
-    avalanche,
-    AVAX_GUARDIAN,
-    '0x0a5a19f1c4a527773f8b6e7428255dd83b7a687b',
-    GovernanceV3Avalanche,
-    [TestV2PayloadAvalanche, TestV3PayloadAvalanche]
-  );
-
-  await deployAndExecuteL2Payload(
-    arbitrum,
-    AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR,
-    '0xd0f0bc55ac46f63a68f7c27fbfd60792c9571fea',
-    GovernanceV3Arbitrum,
-    [TestV3PayloadArbitrum]
-  );
-
-  await deployAndExecuteL2Payload(
-    optimism,
-    AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR,
-    '0xab22988d93d5f942fc6b6c6ea285744809d1d9cc',
-    GovernanceV3Optimism,
-    [TestV3PayloadOptimism]
-  );
-
-  await deployAndExecuteL2Payload(
+  // execute base with old executor
+  await deployAndExecuteOldL2Payload(
     base,
     AaveGovernanceV2.BASE_BRIDGE_EXECUTOR,
-    '0x80a2f9a653d3990878cff8206588fd66699e7f2a',
-    GovernanceV3Base,
-    [TestV3PayloadBase]
+    '0x2e649f6b54B07E210b31c9cC2eB8a0d5997c3D4A'
   );
 }
 
-upgradeL2s();
+const generateForks = async () => {
+  const mainnetFork = await getFork(mainnet, true);
+  // const polFork = await getFork(polygon, true);
+  // const avaFork = await getFork(avalanche, true);
+  // const baseFork = await getFork(base, true);
+};
+
+// generateForks();
+// upgradeL2s();
+// deployPayloadsEthereum().then().catch(console.log);

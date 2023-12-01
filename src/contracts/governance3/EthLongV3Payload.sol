@@ -20,21 +20,11 @@ import {IMediator} from '../interfaces/IMediator.sol';
 contract EthLongV3Payload {
   address public immutable MEDIATOR;
 
-  // TODO: update with the new governance address
-  address public constant GOVERNANCE_3_IMPL = 0x8543A1c3f8D4Cb0D7363047bec613b6b54740B1d;
-
   constructor(address mediator) {
     MEDIATOR = mediator;
   }
 
   function execute() external {
-    // GOVERNANCE V3
-    // IProxyAdmin(MiscEthereum.PROXY_ADMIN_LONG).upgradeAndCall(
-    //   ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-    //   GOVERNANCE_3_IMPL,
-    //   abi.encodeWithSignature('initialize()')
-    // );
-
     // move aave token proxy admin owner from Long Executor to ProxyAdminLong
     ITransparentUpgradeableProxy(payable(AaveV3EthereumAssets.AAVE_UNDERLYING)).changeAdmin(
       MiscEthereum.PROXY_ADMIN_LONG

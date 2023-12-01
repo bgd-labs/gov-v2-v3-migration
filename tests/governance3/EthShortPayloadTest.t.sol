@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {ProtocolV3TestBase, ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {GovHelpers} from 'aave-helpers/GovHelpers.sol';
+import {GovV3Helpers} from 'aave-helpers/GovV3Helpers.sol';
 import {ProxyHelpers} from 'aave-helpers/ProxyHelpers.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
@@ -13,22 +14,25 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveSafetyModule} from 'aave-address-book/AaveSafetyModule.sol';
 import {ITransparentUpgradeableProxy} from '../../src/contracts/dependencies/ITransparentUpgradeableProxy.sol';
+import {IProxyAdmin} from '../../src/contracts/dependencies/IProxyAdmin.sol';
 import {IExecutor as IExecutorV2} from '../../src/contracts/dependencies/IExecutor.sol';
 import {IStakedToken} from '../../src/contracts/dependencies/IStakedToken.sol';
 import {IKeeperRegistry} from '../../src/contracts/dependencies/IKeeperRegistry.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {DeployV3Payload} from '../../scripts/DeployV3Payloads.s.sol';
 import {Mediator} from '../../src/contracts/governance3/Mediator.sol';
-import {EthShortMovePermissionsPayload} from '../../src/contracts/governance2.5/EthShortMovePermissionsPayload.sol';
 import {EthLongV3Payload} from '../../src/contracts/governance3/EthLongV3Payload.sol';
+import {EthShortV2Payload, IAaveArcTimelock} from '../../src/contracts/governance3/EthShortV2Payload.sol';
 import {EthShortV3Payload} from '../../src/contracts/governance3/EthShortV3Payload.sol';
 import {ShortPayload} from '../mocks/ShortPayload.sol';
 import {LongPayload} from '../mocks/LongPayload.sol';
+import {IGovernance} from 'aave-governance-v3/interfaces/IGovernance.sol';
+import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/IWithGuardian.sol';
 
-contract EthShortV3PayloadTest is ProtocolV3TestBase {
-  //TODO: update addresses
-  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
+contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
-  address public constant STK_AAVE_IMPL = 0x27FADCFf20d7A97D3AdBB3a6856CB6DedF2d2132;
+  address public constant STK_AAVE_IMPL = 0x0A5a19f1c4a527773F8B6e7428255DD83b7A687b;
+  address public constant A_AAVE_IMPL = 0x366AE337897223AEa70e3EBe1862219386f20593;
 
   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
 
@@ -37,33 +41,39 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18412862);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18562187);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
+
+    // unpause pool ethereum v2
+    hoax(MiscEthereum.PROTOCOL_GUARDIAN);
+    AaveV2Ethereum.POOL_CONFIGURATOR.setPoolPause(false);
   }
 
   function testPayload() public {
     Mediator mediator = new Mediator();
 
-    EthShortMovePermissionsPayload shortPayload = new EthShortMovePermissionsPayload();
     EthLongV3Payload longPayload = new EthLongV3Payload(address(mediator));
-
     payload = new EthShortV3Payload(address(mediator));
+    uint40 payloadId = _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(payload));
 
-    // execute 2.5 payload
-    GovHelpers.executePayload(vm, address(shortPayload), AaveGovernanceV2.SHORT_EXECUTOR);
+    EthShortV2Payload shortV2Payload = new EthShortV2Payload(payloadId, 1, 1);
+
+    // execute v2 short payload
+    GovHelpers.executePayload(vm, address(shortV2Payload), AaveGovernanceV2.SHORT_EXECUTOR);
+
+    // execute v3 long payload
     GovHelpers.executePayload(vm, address(longPayload), AaveGovernanceV2.LONG_EXECUTOR);
-    GovHelpers.executePayload(vm, address(payload), GovernanceV3Ethereum.EXECUTOR_LVL_1);
 
-    vm.startPrank(MiscEthereum.PROXY_ADMIN_LONG);
+    // execute v3 short payload via registered id
+    GovV3Helpers.executePayload(vm, payloadId);
 
-    assertEq(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
-      MiscEthereum.PROXY_ADMIN_LONG
-    );
-
-    vm.stopPrank();
+    _testGovernanceUpdate();
 
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+
+    _testArc();
+
+    _testEcosystemReserve();
 
     _testExecutor();
 
@@ -74,6 +84,53 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
     _testAaveTokenUpgrade();
     _testStkAaveTokenUpgrade();
     _testLongPermissions(address(mediator));
+  }
+
+  function _testGovernanceUpdate() internal {
+    hoax(MiscEthereum.PROXY_ADMIN_LONG);
+    assertEq(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)).admin(),
+      MiscEthereum.PROXY_ADMIN_LONG
+    );
+
+    assertEq(IGovernance(address(GovernanceV3Ethereum.GOVERNANCE)).getGasLimit(), 300_000);
+    assertEq(
+      IOwnable(address(GovernanceV3Ethereum.GOVERNANCE)).owner(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
+    assertEq(
+      IWithGuardian(address(GovernanceV3Ethereum.GOVERNANCE)).guardian(),
+      MiscEthereum.PROTOCOL_GUARDIAN
+    );
+  }
+
+  function _testArc() internal {
+    // execute payload on arc timelock
+    uint256 currentActionId = IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getActionsSetCount();
+
+    skip(3 days + 10);
+    IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).execute(currentActionId - 1);
+
+    assertEq(
+      IAaveArcTimelock(AaveGovernanceV2.ARC_TIMELOCK).getEthereumGovernanceExecutor(),
+      GovernanceV3Ethereum.EXECUTOR_LVL_1
+    );
+
+    rewind(3 days + 10);
+  }
+
+  function _testEcosystemReserve() internal {
+    MiscEthereum.AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
+      MiscEthereum.ECOSYSTEM_RESERVE,
+      AaveV2EthereumAssets.AAVE_UNDERLYING,
+      address(this),
+      10e18
+    );
+
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgrade(
+      ITransparentUpgradeableProxy(payable(MiscEthereum.ECOSYSTEM_RESERVE)),
+      address(MiscEthereum.AAVE_ECOSYSTEM_RESERVE_CONTROLLER)
+    );
   }
 
   function _testExecutor() internal {
@@ -105,8 +162,6 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
       executionTime,
       true
     );
-
-    assertEq(IStakedToken(STK_AAVE_IMPL).ghoDebtToken(), shortPayload.GHO_DEBT_TOKEN());
 
     rewind(86400);
   }
@@ -201,11 +256,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
   function _testRobot() internal {
     uint256 govChainKeeperId = uint256(
       keccak256(
-        abi.encodePacked(
-          blockhash(block.number - 1),
-          KEEPER_REGISTRY,
-          uint32(registryState.nonce + 1)
-        )
+        abi.encodePacked(blockhash(block.number - 1), KEEPER_REGISTRY, uint32(registryState.nonce))
       )
     );
     uint256 votingChainKeeperId = uint256(
@@ -213,7 +264,7 @@ contract EthShortV3PayloadTest is ProtocolV3TestBase {
         abi.encodePacked(
           blockhash(block.number - 1),
           KEEPER_REGISTRY,
-          uint32(registryState.nonce + 2)
+          uint32(registryState.nonce + 1)
         )
       )
     );

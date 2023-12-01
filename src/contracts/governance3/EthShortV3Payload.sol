@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -16,22 +17,22 @@ import {IExecutor as IExecutorV2} from '../dependencies/IExecutor.sol';
 import {IExecutor as IExecutorV3} from 'aave-governance-v3/contracts/payloads/interfaces/IExecutor.sol';
 import {IMediator} from '../interfaces/IMediator.sol';
 import {IAaveCLRobotOperator} from '../dependencies/IAaveCLRobotOperator.sol';
-
 import {MigratorLib} from '../libraries/MigratorLib.sol';
+import {IGovernance} from 'aave-governance-v3/interfaces/IGovernance.sol';
 
 /**
  * @title EthShortV3Payload
- * @notice Execute long permissions movement, fund governance robots, upgrade aAave implementation and
- * @notice accept admin of the existing short executor.
+ * @notice Execute long permissions movement, update governance contract, fund governance robots,
+ * @notice upgrade aAave implementation and accept admin of the existing short executor.
  * @author BGD Labs
  **/
 contract EthShortV3Payload {
+  using SafeERC20 for IERC20;
   using SafeCast for uint256;
 
   address public immutable MEDIATOR;
 
-  // TODO: update address
-  address public constant A_AAVE_IMPL = 0x6acCc155626E0CF8bFe97e68A17a567394D51238;
+  address public constant A_AAVE_IMPL = 0x366AE337897223AEa70e3EBe1862219386f20593;
 
   uint256 public constant LINK_AMOUNT_ROBOT_GOV_CHAIN = 300 ether;
   uint256 public constant LINK_AMOUNT_ROBOT_VOTING_CHAIN = 100 ether;
@@ -49,6 +50,8 @@ contract EthShortV3Payload {
   address public constant VOTING_CHAIN_ROBOT = 0x2cf0fA5b36F0f89a5EA18F835d1375974a7720B8;
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
+  address public constant GOVERNANCE_V3_IMPL = 0x0B4F6342ecaccD82cf9269A97eB09bf23eD4913F;
+
   constructor(address mediator) {
     MEDIATOR = mediator;
   }
@@ -57,11 +60,9 @@ contract EthShortV3Payload {
     // LONG ADMIN PERMISSIONS
     IMediator(MEDIATOR).execute();
 
-    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
-      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
-      MiscEthereum.PROXY_ADMIN_LONG
-    );
+    _updateGovernance2_5();
 
+    // update implementation and change proxy admin to long
     upgradeAAave();
 
     // GET LINK TOKENS FROM COLLECTOR
@@ -82,12 +83,25 @@ contract EthShortV3Payload {
     IExecutorV2(AaveGovernanceV2.SHORT_EXECUTOR).acceptAdmin();
   }
 
+  function _updateGovernance2_5() internal {
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).upgradeAndCall(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+      GOVERNANCE_V3_IMPL,
+      abi.encodeWithSelector(IGovernance.initializeWithRevision.selector, 300_000)
+    );
+
+    IProxyAdmin(MiscEthereum.PROXY_ADMIN).changeProxyAdmin(
+      ITransparentUpgradeableProxy(address(GovernanceV3Ethereum.GOVERNANCE)),
+      MiscEthereum.PROXY_ADMIN_LONG
+    );
+  }
+
   function migrateKeepers() internal {
     // CANCEL PREVIOUS KEEPER
     IAaveCLRobotOperator(ROBOT_OPERATOR).cancel(GOV_V2_ROBOT_ID);
 
     // REGISTER NEW KEEPER (GOV CHAIN, VOTING CHAIN)
-    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).approve(
+    IERC20(AaveV3EthereumAssets.LINK_UNDERLYING).forceApprove(
       ROBOT_OPERATOR,
       LINK_AMOUNT_ROBOT_GOV_CHAIN + LINK_AMOUNT_ROBOT_VOTING_CHAIN
     );
