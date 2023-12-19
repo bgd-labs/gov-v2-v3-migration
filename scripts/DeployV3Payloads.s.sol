@@ -33,9 +33,7 @@ contract DeployV3Payload {
 
 contract DeployMainnet is DeployV3Payload, EthereumScript {
   function run() external broadcast {
-    Mediator mediator = new Mediator();
-
-    new EthLongV3Payload(address(mediator));
+    Mediator mediator = Mediator(0xF60BDDE9077Be3226Db8109432d78afD92a8A003);
 
     EthShortV3Payload shortPayload = new EthShortV3Payload(address(mediator));
     _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(shortPayload));
@@ -44,8 +42,7 @@ contract DeployMainnet is DeployV3Payload, EthereumScript {
 
 contract DeployV2Mainnet is EthereumScript {
   function run() external broadcast {
-    // TODO: update with correct values after payloads deployments
-    new EthShortV2Payload(16, 10, 7);
+    new EthShortV2Payload(42, 16, 8);
   }
 }
 

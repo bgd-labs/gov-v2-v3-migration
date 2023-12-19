@@ -50,7 +50,7 @@ contract EthShortV3Payload {
   address public constant VOTING_CHAIN_ROBOT = 0x2cf0fA5b36F0f89a5EA18F835d1375974a7720B8;
   address public constant ROOTS_CONSUMER = 0x2fA6F0A65886123AFD24A575aE4554d0FCe8B577;
 
-  address public constant GOVERNANCE_V3_IMPL = 0x0B4F6342ecaccD82cf9269A97eB09bf23eD4913F;
+  address public constant GOVERNANCE_V3_IMPL = 0x58BcB647C4beFf253B4B6996c62F737B783f2cDd;
 
   constructor(address mediator) {
     MEDIATOR = mediator;
