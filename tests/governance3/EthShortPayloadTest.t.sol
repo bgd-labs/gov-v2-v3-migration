@@ -31,7 +31,7 @@ import {IWithGuardian} from 'solidity-utils/contracts/access-control/interfaces/
 
 contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   address public constant AAVE_IMPL = 0x5D4Aa78B08Bc7C530e21bf7447988b1Be7991322;
-  address public constant STK_AAVE_IMPL = 0x0A5a19f1c4a527773F8B6e7428255DD83b7A687b;
+  address public constant STK_AAVE_IMPL = 0x0fE58FE1CaA69951dC924A8c222bE19013B89476;
   address public constant A_AAVE_IMPL = 0x366AE337897223AEa70e3EBe1862219386f20593;
 
   address public KEEPER_REGISTRY = 0x02777053d6764996e594c3E88AF1D58D5363a2e6;
@@ -41,7 +41,7 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   IKeeperRegistry.State public registryState;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18562187);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18821263);
     (registryState, , ) = IKeeperRegistry(KEEPER_REGISTRY).getState();
 
     // unpause pool ethereum v2
@@ -50,9 +50,9 @@ contract EthShortPayloadTest is ProtocolV3TestBase, DeployV3Payload {
   }
 
   function testPayload() public {
-    Mediator mediator = new Mediator();
+    Mediator mediator = Mediator(0xF60BDDE9077Be3226Db8109432d78afD92a8A003);
 
-    EthLongV3Payload longPayload = new EthLongV3Payload(address(mediator));
+    EthLongV3Payload longPayload = EthLongV3Payload(0xAF0C901489790c35D9cef02CFA11123009E81e2a);
     payload = new EthShortV3Payload(address(mediator));
     uint40 payloadId = _registerPayload(GovernanceV3Ethereum.PAYLOADS_CONTROLLER, address(payload));
 
